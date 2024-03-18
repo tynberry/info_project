@@ -1,7 +1,7 @@
 pub mod basic;
 mod player;
 
-use basic::{Position, Rotation};
+use basic::{Position, Rotation, Wrapped};
 use macroquad::prelude::*;
 use player::Player;
 
@@ -14,12 +14,14 @@ async fn main() {
     world.spawn((Player::new(), Position{
         x: 100.0,
         y: 100.0,
-    }, Rotation::default()));
+    }, Rotation::default(), Wrapped));
 
     loop {
         let dt = get_frame_time();
         //UPDATE WORLD
         player::player_motion_update(&mut world, dt);
+
+        basic::ensure_wrapping(&mut world);
 
         //RENDERING PHASE
         clear_background(BLACK);
