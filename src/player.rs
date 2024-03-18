@@ -27,7 +27,7 @@ impl Player {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
-pub fn player_motion_update(world: &mut World, dt: f32) {
+pub fn motion_update(world: &mut World, dt: f32) {
     //get player
     let (_, (player, player_angle, player_pos)) = world
         .query_mut::<(&mut Player, &mut Rotation, &mut Position)>()
@@ -50,7 +50,7 @@ pub fn player_motion_update(world: &mut World, dt: f32) {
     player_pos.y += player.vel_y * dt;
 }
 
-pub fn player_render(world: &mut World) {
+pub fn render(world: &mut World) {
     //get player
     let (_, (player_angle, player_pos)) = world
         .query_mut::<(&Rotation, &Position)>()

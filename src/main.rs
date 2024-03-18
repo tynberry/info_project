@@ -26,7 +26,7 @@ async fn main() {
     loop {
         let dt = get_frame_time();
         //UPDATE WORLD
-        player::player_motion_update(&mut world, dt);
+        player::motion_update(&mut world, dt);
 
         projectile::motion(&mut world, dt);
 
@@ -37,7 +37,7 @@ async fn main() {
 
         projectile::render(&mut world);
 
-        player::player_render(&mut world);
+        player::render(&mut world);
 
 
         next_frame().await;
