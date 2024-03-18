@@ -5,8 +5,8 @@ use crate::basic::Position;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Projectile{
-    size: f32,
-    vel: Vec2
+    pub size: f32,
+    pub vel: Vec2
 }
 
 impl Projectile{
