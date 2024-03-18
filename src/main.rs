@@ -1,9 +1,11 @@
 pub mod basic;
 mod player;
+pub mod projectile;
 
 use basic::{Position, Rotation, Wrapped};
 use macroquad::prelude::*;
 use player::Player;
+use projectile::Projectile;
 
 #[macroquad::main("Warping Warp")]
 async fn main() {
@@ -16,17 +18,27 @@ async fn main() {
         y: 100.0,
     }, Rotation::default(), Wrapped));
 
+    //add projectile 
+    world.spawn((Projectile::new(10.0), Position{
+        x: 25.0, y:50.0
+    }));
+
     loop {
         let dt = get_frame_time();
         //UPDATE WORLD
         player::player_motion_update(&mut world, dt);
+
+        projectile::motion(&mut world, dt);
 
         basic::ensure_wrapping(&mut world);
 
         //RENDERING PHASE
         clear_background(BLACK);
 
+        projectile::render(&mut world);
+
         player::player_render(&mut world);
+
 
         next_frame().await;
     }
