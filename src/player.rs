@@ -2,7 +2,7 @@ use hecs::World;
 use macroquad::prelude::*;
 
 use crate::{
-    basic::{DeleteOnWarp, Position, Rotation},
+    basic::{DamageDealer, DeleteOnWarp, Health, HitEvent, Position, Rotation},
     projectile::Projectile,
 };
 
@@ -83,6 +83,29 @@ pub fn motion_update(world: &mut World, dt: f32) {
     //euler integration
     player_pos.x += player.vel_x * dt;
     player_pos.y += player.vel_y * dt;
+}
+
+pub fn health(world: &mut World, events: &mut World) {
+    //get player
+    let player_query = &mut world.query::<&mut Health>();
+    let (player_id, player_hp) = player_query.into_iter().next().unwrap();
+    //get events concerning the player
+    let hit_events = events
+        .query_mut::<&HitEvent>()
+        .into_iter()
+        .filter(|event| event.1.who == player_id);
+    for (_, event) in hit_events {
+        //get damage
+        let Ok(damage) = world.get::<&DamageDealer>(event.by) else {
+            continue;
+        };
+        //apply it
+        player_hp.hp -= damage.dmg;
+        //check for death
+        if player_hp.hp <= 0.0 {
+            //TODO DEATH
+        }
+    }
 }
 
 pub fn render(world: &mut World) {

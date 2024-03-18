@@ -2,7 +2,7 @@ pub mod basic;
 mod player;
 pub mod projectile;
 
-use basic::{Position, Rotation, Wrapped};
+use basic::{Health, HitBox, HurtBox, Position, Rotation, Team, Wrapped};
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 use player::Player;
@@ -12,6 +12,8 @@ use projectile::Projectile;
 async fn main() {
     //init world
     let mut world = hecs::World::default();
+    //init events
+    let mut events = hecs::World::default();
 
     //init cmd
     let mut cmd = CommandBuffer::new();
@@ -21,11 +23,19 @@ async fn main() {
         Player::new(),
         Position { x: 100.0, y: 100.0 },
         Rotation::default(),
+        Health { hp: 10.0 },
+        HitBox { radius: 7.0 },
+        Team::Player,
         Wrapped,
     ));
 
     //add projectile
-    world.spawn((Projectile::new(10.0), Position { x: 25.0, y: 50.0 }));
+    world.spawn((
+        Projectile::new(10.0),
+        Position { x: 25.0, y: 50.0 },
+        Team::Enemy,
+        HurtBox { radius: 10.0 },
+    ));
 
     loop {
         let dt = get_frame_time();
@@ -36,9 +46,16 @@ async fn main() {
         projectile::motion(&mut world, dt);
 
         basic::ensure_wrapping(&mut world, &mut cmd);
+        basic::ensure_damage(&mut world, &mut events);
+
+        player::health(&mut world, &mut events);
+        projectile::on_hurt(&mut world, &mut events, &mut cmd);
 
         //COMMAND BUFFER FLUSH
         cmd.run_on(&mut world);
+
+        //CLEAR ALL EVENTS
+        events.clear();
 
         //RENDERING PHASE
         clear_background(BLACK);
