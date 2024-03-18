@@ -1,7 +1,7 @@
 pub mod basic;
 mod player;
 
-use basic::Position;
+use basic::{Position, Rotation};
 use macroquad::prelude::*;
 use player::Player;
 
@@ -14,7 +14,7 @@ async fn main() {
     world.spawn((Player::new(), Position{
         x: 100.0,
         y: 100.0,
-    }));
+    }, Rotation::default()));
 
     loop {
         let dt = get_frame_time();
