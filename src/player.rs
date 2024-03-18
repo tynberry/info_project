@@ -3,6 +3,8 @@ use macroquad::prelude::*;
 
 use crate::basic::{Position, Rotation};
 
+const PLAYER_ACCEL: f32 = 600.0;
+
 const PLAYER_SIZE: f32 = 15.0;
 
 
@@ -39,17 +41,9 @@ pub fn player_motion_update(world: &mut World, dt: f32) {
     let mouse_pos = mouse_position();
     player_angle.angle = (mouse_pos.1 - player_pos.y).atan2(mouse_pos.0 - player_pos.x);
     //input handling 
-    if is_key_down(KeyCode::Up) {
-        player.vel_y -= 100.0 * dt;
-    }
-    if is_key_down(KeyCode::Down) {
-        player.vel_y += 100.0 * dt;
-    }
-    if is_key_down(KeyCode::Left) {
-        player.vel_x -= 100.0 * dt;
-    }
-    if is_key_down(KeyCode::Right) {
-        player.vel_x += 100.0 * dt;
+    if is_mouse_button_down(MouseButton::Left) {
+        player.vel_x += player_angle.angle.cos() * PLAYER_ACCEL * dt;
+        player.vel_y += player_angle.angle.sin() * PLAYER_ACCEL * dt;
     }
     //euler integration 
     player_pos.x += player.vel_x * dt;
