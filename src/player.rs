@@ -1,7 +1,10 @@
 use hecs::World;
 use macroquad::prelude::*;
 
-use crate::{basic::{DeleteOnWarp, Position, Rotation}, projectile::Projectile};
+use crate::{
+    basic::{DeleteOnWarp, Position, Rotation},
+    projectile::Projectile,
+};
 
 const PLAYER_ACCEL: f32 = 600.0;
 
@@ -49,11 +52,12 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
         cmd.spawn((
             Projectile {
                 size: 2.0,
-                vel: Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0 + vec2(player.vel_x, player.vel_y),
+                vel: Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
+                    + vec2(player.vel_x, player.vel_y),
                 team: crate::basic::Team::Player,
             },
-            player_pos.clone(),
-            DeleteOnWarp
+            *player_pos,
+            DeleteOnWarp,
         ));
     }
 }
