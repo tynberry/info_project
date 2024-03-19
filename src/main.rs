@@ -21,7 +21,10 @@ async fn main() {
     //add player
     world.spawn((
         Player::new(),
-        Position { x: 100.0, y: 100.0 },
+        Position {
+            x: screen_width() / 2.0,
+            y: screen_height() / 2.0,
+        },
         Rotation::default(),
         Health { hp: 10.0 },
         HitBox { radius: 7.0 },
@@ -32,7 +35,7 @@ async fn main() {
     //add projectile
     world.spawn((
         Projectile::new(10.0),
-        Position { x: 25.0, y: 50.0 },
+        Position { x: 125.0, y: 150.0 },
         Team::Enemy,
         HurtBox { radius: 10.0 },
     ));
