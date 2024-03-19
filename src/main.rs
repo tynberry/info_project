@@ -45,7 +45,7 @@ async fn main() {
         },
         HealthDisplay {
             target: player_id,
-            max_width: 100.0,
+            max_width: 250.0,
             height: 6.0,
             color: RED,
         },
