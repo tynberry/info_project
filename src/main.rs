@@ -87,7 +87,7 @@ async fn main() {
 
         player::render(&mut world);
 
-        basic::health::render_health(&mut world);
+        basic::health::render_displays(&mut world);
 
         next_frame().await;
     }
