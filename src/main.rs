@@ -2,7 +2,9 @@ pub mod basic;
 mod player;
 pub mod projectile;
 
-use basic::{Health, HitBox, HurtBox, Position, Rotation, Team, Wrapped};
+use basic::{
+    health::HealthDisplay, DamageDealer, Health, HitBox, HurtBox, Position, Rotation, Team, Wrapped,
+};
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 use player::Player;
@@ -19,17 +21,34 @@ async fn main() {
     let mut cmd = CommandBuffer::new();
 
     //add player
-    world.spawn((
+    let player_id = world.spawn((
         Player::new(),
         Position {
             x: screen_width() / 2.0,
             y: screen_height() / 2.0,
         },
         Rotation::default(),
-        Health { hp: 10.0 },
+        Health {
+            hp: 10.0,
+            max_hp: 10.0,
+        },
         HitBox { radius: 7.0 },
         Team::Player,
         Wrapped,
+    ));
+
+    //add player health display
+    world.spawn((
+        Position {
+            x: screen_width() / 2.0,
+            y: screen_height() - 3.0,
+        },
+        HealthDisplay {
+            target: player_id,
+            max_width: 100.0,
+            height: 6.0,
+            color: RED,
+        },
     ));
 
     //add projectile
@@ -38,6 +57,7 @@ async fn main() {
         Position { x: 125.0, y: 150.0 },
         Team::Enemy,
         HurtBox { radius: 10.0 },
+        DamageDealer { dmg: 5.0 },
     ));
 
     loop {
@@ -66,6 +86,8 @@ async fn main() {
         projectile::render(&mut world);
 
         player::render(&mut world);
+
+        basic::health::render_health(&mut world);
 
         next_frame().await;
     }

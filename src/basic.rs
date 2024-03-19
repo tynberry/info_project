@@ -1,6 +1,8 @@
 use hecs::{CommandBuffer, Entity, World};
 use macroquad::prelude::*;
 
+pub mod health;
+
 //-----------------------------------------------------------------------------
 //UTILS PART
 //-----------------------------------------------------------------------------
@@ -45,6 +47,7 @@ pub struct DeleteOnWarp;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Health {
+    pub max_hp: f32,
     pub hp: f32,
 }
 
