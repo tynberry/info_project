@@ -40,10 +40,3 @@ pub fn on_hurt(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
         }
     }
 }
-
-pub fn render(world: &mut World) {
-    //render all projectiles
-    for (_, (proj, proj_pos)) in world.query_mut::<(&Projectile, &Position)>() {
-        draw_circle(proj_pos.x, proj_pos.y, proj.size, GREEN);
-    }
-}

@@ -2,15 +2,20 @@ use hecs::World;
 use macroquad::prelude::*;
 
 use crate::{
-    basic::{DamageDealer, DeleteOnWarp, Health, HitEvent, Position, Rotation},
+    basic::{
+        render::Rectangle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent, Position,
+        Rotation, Team, Wrapped,
+    },
     projectile::Projectile,
 };
 
 const PLAYER_ACCEL: f32 = 600.0;
 
+const PLAYER_MAX_BASE_HP: f32 = 10.0;
+
 const PLAYER_FIRE_COOLDOWN: f32 = 0.5;
 
-const PLAYER_SIZE: f32 = 15.0;
+const PLAYER_SIZE: f32 = 30.0;
 
 #[derive(Debug)]
 pub struct Player {
@@ -29,6 +34,43 @@ impl Player {
             fire_timer: 0.0,
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+//ENTITY GEN
+//-----------------------------------------------------------------------------
+
+pub fn new_entity() -> (
+    Player,
+    Position,
+    Rotation,
+    Health,
+    HitBox,
+    Team,
+    Wrapped,
+    Rectangle,
+) {
+    (
+        Player::new(),
+        Position {
+            x: screen_width() / 2.0,
+            y: screen_height() / 2.0,
+        },
+        Rotation::default(),
+        Health {
+            hp: PLAYER_MAX_BASE_HP,
+            max_hp: PLAYER_MAX_BASE_HP,
+        },
+        HitBox { radius: 7.0 },
+        Team::Player,
+        Wrapped,
+        Rectangle {
+            width: PLAYER_SIZE,
+            height: PLAYER_SIZE / 1.6,
+            color: RED,
+            z_index: 0,
+        },
+    )
 }
 
 //-----------------------------------------------------------------------------
@@ -106,24 +148,4 @@ pub fn health(world: &mut World, events: &mut World) {
             //TODO DEATH
         }
     }
-}
-
-pub fn render(world: &mut World) {
-    //get player
-    let (_, (player_angle, player_pos)) = world
-        .query_mut::<(&Rotation, &Position)>()
-        .with::<&Player>()
-        .into_iter()
-        .next()
-        .unwrap();
-    //draw player
-    let v1 = vec2(player_pos.x, player_pos.y)
-        + Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * PLAYER_SIZE;
-    let v2 = vec2(player_pos.x, player_pos.y)
-        + Vec2::from_angle(player_angle.angle + 4.0 * std::f32::consts::PI / 3.0).rotate(Vec2::X)
-            * PLAYER_SIZE;
-    let v3 = vec2(player_pos.x, player_pos.y)
-        + Vec2::from_angle(player_angle.angle - 4.0 * std::f32::consts::PI / 3.0).rotate(Vec2::X)
-            * PLAYER_SIZE;
-    draw_triangle(v1, v2, v3, RED);
 }

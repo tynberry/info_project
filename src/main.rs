@@ -2,12 +2,9 @@ pub mod basic;
 mod player;
 pub mod projectile;
 
-use basic::{
-    health::HealthDisplay, DamageDealer, Health, HitBox, HurtBox, Position, Rotation, Team, Wrapped,
-};
+use basic::{health::HealthDisplay, render::Circle, DamageDealer, HurtBox, Position, Team};
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
-use player::Player;
 use projectile::Projectile;
 
 #[macroquad::main("Warping Warp")]
@@ -21,21 +18,7 @@ async fn main() {
     let mut cmd = CommandBuffer::new();
 
     //add player
-    let player_id = world.spawn((
-        Player::new(),
-        Position {
-            x: screen_width() / 2.0,
-            y: screen_height() / 2.0,
-        },
-        Rotation::default(),
-        Health {
-            hp: 10.0,
-            max_hp: 10.0,
-        },
-        HitBox { radius: 7.0 },
-        Team::Player,
-        Wrapped,
-    ));
+    let player_id = world.spawn(player::new_entity());
 
     //add player health display
     world.spawn((
@@ -58,6 +41,11 @@ async fn main() {
         Team::Enemy,
         HurtBox { radius: 10.0 },
         DamageDealer { dmg: 5.0 },
+        Circle {
+            radius: 10.0,
+            color: GREEN,
+            z_index: -1,
+        },
     ));
 
     loop {
@@ -83,9 +71,7 @@ async fn main() {
         //RENDERING PHASE
         clear_background(BLACK);
 
-        projectile::render(&mut world);
-
-        player::render(&mut world);
+        basic::render::render_all(&mut world);
 
         basic::health::render_displays(&mut world);
 
