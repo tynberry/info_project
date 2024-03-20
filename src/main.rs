@@ -1,4 +1,5 @@
 pub mod basic;
+pub mod enemy;
 mod player;
 pub mod projectile;
 
@@ -41,6 +42,9 @@ async fn main() {
         5.0,
         Team::Enemy,
     ));
+
+    //add enemy
+    world.spawn(enemy::create_asteroid(vec2(-10.0, 300.0), vec2(1.0, 0.0)));
 
     loop {
         let dt = get_frame_time();
