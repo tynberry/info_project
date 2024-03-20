@@ -3,10 +3,10 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        render::Rectangle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent, Position,
+        render::Rectangle, DamageDealer, Health, HitBox, HitEvent, Position,
         Rotation, Team, Wrapped,
     },
-    projectile::{self, Projectile},
+    projectile::{self},
 };
 
 const PLAYER_ACCEL: f32 = 600.0;

@@ -3,12 +3,12 @@ mod player;
 pub mod projectile;
 
 use basic::{
-    health::HealthDisplay, motion::LinearMotion, render::Circle, DamageDealer, HurtBox, Position,
+    health::HealthDisplay, Position,
     Team,
 };
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
-use projectile::Projectile;
+
 
 #[macroquad::main("Warping Warp")]
 async fn main() {
