@@ -6,7 +6,7 @@ use crate::{
         render::Rectangle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent, Position,
         Rotation, Team, Wrapped,
     },
-    projectile::Projectile,
+    projectile::{self, Projectile},
 };
 
 const PLAYER_ACCEL: f32 = 600.0;
@@ -91,15 +91,13 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
         //reset timer
         player.fire_timer = PLAYER_FIRE_COOLDOWN;
         //fire
-        cmd.spawn((
-            Projectile {
-                size: 2.0,
-                vel: Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
-                    + vec2(player.vel_x, player.vel_y),
-                team: crate::basic::Team::Player,
-            },
-            *player_pos,
-            DeleteOnWarp,
+        cmd.spawn(projectile::create_projectile(
+            vec2(player_pos.x, player_pos.y),
+            Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
+                + vec2(player.vel_x, player.vel_y),
+            2.0,
+            1.0,
+            Team::Player,
         ));
     }
 }

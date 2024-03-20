@@ -2,6 +2,7 @@ use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
 pub mod health;
+pub mod motion;
 pub mod render;
 
 pub use health::*;

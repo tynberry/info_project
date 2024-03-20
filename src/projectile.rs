@@ -1,36 +1,49 @@
+use crate::basic::{
+    motion::LinearMotion, render::Circle, DamageDealer, HitEvent, HurtBox, Position, Team,
+};
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
-use crate::basic::{HitEvent, Position, Team};
-
 #[derive(Clone, Copy, Debug)]
-pub struct Projectile {
-    pub size: f32,
-    pub vel: Vec2,
-    pub team: Team,
-}
+pub struct Projectile;
 
-impl Projectile {
-    pub fn new(size: f32) -> Self {
-        Self {
-            size,
-            vel: Vec2::new(0.0, 0.0),
-            team: Team::Player,
-        }
-    }
+//-----------------------------------------------------------------------------
+//CONSTRUCT ENTITY
+//-----------------------------------------------------------------------------
+
+pub fn create_projectile(
+    pos: Vec2,
+    vel: Vec2,
+    size: f32,
+    dmg: f32,
+    team: Team,
+) -> (
+    Projectile,
+    LinearMotion,
+    Position,
+    Team,
+    HurtBox,
+    DamageDealer,
+    Circle,
+) {
+    (
+        Projectile,
+        LinearMotion { vel },
+        Position { x: pos.x, y: pos.y },
+        team,
+        HurtBox { radius: size },
+        DamageDealer { dmg },
+        Circle {
+            radius: size,
+            color: GREEN,
+            z_index: -1,
+        },
+    )
 }
 
 //-----------------------------------------------------------------------------
 //SYSTEM PART
 //-----------------------------------------------------------------------------
-pub fn motion(world: &mut World, dt: f32) {
-    //move all particles
-    for (_, (proj, proj_pos)) in world.query_mut::<(&Projectile, &mut Position)>() {
-        proj_pos.x += proj.vel.x * dt;
-        proj_pos.y += proj.vel.y * dt;
-    }
-}
-
 pub fn on_hurt(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     for (proj_id, _) in world.query_mut::<&Projectile>() {
         for (_, event) in events.query_mut::<&HitEvent>() {

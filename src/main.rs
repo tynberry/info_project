@@ -2,7 +2,10 @@ pub mod basic;
 mod player;
 pub mod projectile;
 
-use basic::{health::HealthDisplay, render::Circle, DamageDealer, HurtBox, Position, Team};
+use basic::{
+    health::HealthDisplay, motion::LinearMotion, render::Circle, DamageDealer, HurtBox, Position,
+    Team,
+};
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 use projectile::Projectile;
@@ -35,17 +38,12 @@ async fn main() {
     ));
 
     //add projectile
-    world.spawn((
-        Projectile::new(10.0),
-        Position { x: 125.0, y: 150.0 },
+    world.spawn(projectile::create_projectile(
+        vec2(150.0, 150.0),
+        vec2(0.0, 0.0),
+        10.0,
+        5.0,
         Team::Enemy,
-        HurtBox { radius: 10.0 },
-        DamageDealer { dmg: 5.0 },
-        Circle {
-            radius: 10.0,
-            color: GREEN,
-            z_index: -1,
-        },
     ));
 
     loop {
@@ -54,7 +52,7 @@ async fn main() {
         player::weapons(&mut world, &mut cmd, dt);
         player::motion_update(&mut world, dt);
 
-        projectile::motion(&mut world, dt);
+        basic::motion::apply_motion(&mut world, dt);
 
         basic::ensure_wrapping(&mut world, &mut cmd);
         basic::ensure_damage(&mut world, &mut events);
