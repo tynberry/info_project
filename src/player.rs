@@ -3,8 +3,8 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        render::Rectangle, DamageDealer, Health, HitBox, HitEvent, Position,
-        Rotation, Team, Wrapped,
+        render::Rectangle, DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team,
+        Wrapped,
     },
     projectile::{self},
 };
@@ -14,6 +14,7 @@ const PLAYER_ACCEL: f32 = 600.0;
 const PLAYER_MAX_BASE_HP: f32 = 10.0;
 
 const PLAYER_FIRE_COOLDOWN: f32 = 0.5;
+const PLAYER_INVUL_COOLDOWN: f32 = 1.0;
 
 const PLAYER_SIZE: f32 = 30.0;
 
@@ -23,6 +24,8 @@ pub struct Player {
     vel_y: f32,
 
     fire_timer: f32,
+
+    invul_timer: f32,
 }
 
 impl Player {
@@ -32,6 +35,7 @@ impl Player {
             vel_y: 0.0,
 
             fire_timer: 0.0,
+            invul_timer: 0.0,
         }
     }
 }
@@ -125,10 +129,15 @@ pub fn motion_update(world: &mut World, dt: f32) {
     player_pos.y += player.vel_y * dt;
 }
 
-pub fn health(world: &mut World, events: &mut World) {
+pub fn health(world: &mut World, events: &mut World, dt: f32) {
     //get player
-    let player_query = &mut world.query::<&mut Health>();
-    let (player_id, player_hp) = player_query.into_iter().next().unwrap();
+    let player_query = &mut world.query::<(&mut Player, &mut Health)>();
+    let (player_id, (player, player_hp)) = player_query.into_iter().next().unwrap();
+    //move invul frames
+    player.invul_timer -= dt;
+    if player.invul_timer > 0.0 {
+        return;
+    }
     //get events concerning the player
     let hit_events = events
         .query_mut::<&HitEvent>()
@@ -141,6 +150,8 @@ pub fn health(world: &mut World, events: &mut World) {
         };
         //apply it
         player_hp.hp -= damage.dmg;
+        //set invul frames
+        player.invul_timer = PLAYER_INVUL_COOLDOWN;
         //check for death
         if player_hp.hp <= 0.0 {
             //TODO DEATH

@@ -2,13 +2,9 @@ pub mod basic;
 mod player;
 pub mod projectile;
 
-use basic::{
-    health::HealthDisplay, Position,
-    Team,
-};
+use basic::{health::HealthDisplay, Position, Team};
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
-
 
 #[macroquad::main("Warping Warp")]
 async fn main() {
@@ -57,7 +53,7 @@ async fn main() {
         basic::ensure_wrapping(&mut world, &mut cmd);
         basic::ensure_damage(&mut world, &mut events);
 
-        player::health(&mut world, &mut events);
+        player::health(&mut world, &mut events, dt);
         projectile::on_hurt(&mut world, &mut events, &mut cmd);
 
         //COMMAND BUFFER FLUSH
