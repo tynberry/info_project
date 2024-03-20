@@ -28,7 +28,13 @@ impl Renderable for Rectangle {
                     },
                 );
             }
-            None => todo!(),
+            None => draw_rectangle(
+                pos.x - self.width / 2.0,
+                pos.y - self.height / 2.0,
+                self.width,
+                self.height,
+                self.color,
+            ),
         }
     }
 
