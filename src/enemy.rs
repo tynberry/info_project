@@ -2,7 +2,7 @@ use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
 use crate::basic::{
-    motion::LinearMotion, render::Rectangle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent,
+    motion::LinearMotion, render::Circle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent,
     HurtBox, Position, Team,
 };
 
@@ -25,7 +25,7 @@ pub fn create_asteroid(
     Enemy,
     Position,
     LinearMotion,
-    Rectangle,
+    Circle,
     HitBox,
     HurtBox,
     Health,
@@ -39,9 +39,8 @@ pub fn create_asteroid(
         LinearMotion {
             vel: dir * ASTEROID_SPEED,
         },
-        Rectangle {
-            width: ASTEROID_SIZE,
-            height: ASTEROID_SIZE - 5.0,
+        crate::basic::render::Circle {
+            radius: ASTEROID_SIZE,
             color: BLUE,
             z_index: 1,
         },
