@@ -1,5 +1,5 @@
 use crate::basic::{
-    motion::{Charge, LinearMotion, PhysicsMotion},
+    motion::{Charge, PhysicsMotion},
     render::Circle,
     DamageDealer, HitEvent, HurtBox, Position, Team,
 };
