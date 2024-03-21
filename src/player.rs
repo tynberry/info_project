@@ -3,13 +3,15 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        render::Rectangle, DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team,
-        Wrapped,
+        motion::{Charge, PhysicsMotion},
+        render::Rectangle,
+        DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
     projectile::{self},
 };
 
 const PLAYER_ACCEL: f32 = 600.0;
+const PLAYER_MASS: f32 = 10.0;
 
 const PLAYER_MAX_BASE_HP: f32 = 10.0;
 
@@ -20,9 +22,6 @@ const PLAYER_SIZE: f32 = 30.0;
 
 #[derive(Debug)]
 pub struct Player {
-    vel_x: f32,
-    vel_y: f32,
-
     fire_timer: f32,
 
     invul_timer: f32,
@@ -31,9 +30,6 @@ pub struct Player {
 impl Player {
     pub fn new() -> Self {
         Self {
-            vel_x: 0.0,
-            vel_y: 0.0,
-
             fire_timer: 0.0,
             invul_timer: 0.0,
         }
@@ -47,18 +43,24 @@ impl Player {
 pub fn new_entity() -> (
     Player,
     Position,
+    PhysicsMotion,
     Rotation,
     Health,
     HitBox,
     Team,
     Wrapped,
     Rectangle,
+    Charge,
 ) {
     (
         Player::new(),
         Position {
             x: screen_width() / 2.0,
             y: screen_height() / 2.0,
+        },
+        PhysicsMotion {
+            vel: Vec2::ZERO,
+            mass: PLAYER_MASS,
         },
         Rotation::default(),
         Health {
@@ -74,6 +76,7 @@ pub fn new_entity() -> (
             color: RED,
             z_index: 0,
         },
+        Charge { charge: 1.0 },
     )
 }
 
@@ -83,8 +86,8 @@ pub fn new_entity() -> (
 
 pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
     //get player
-    let (_, (player, player_angle, player_pos)) = world
-        .query_mut::<(&mut Player, &Rotation, &Position)>()
+    let (_, (player, player_vel, player_angle, player_pos)) = world
+        .query_mut::<(&mut Player, &PhysicsMotion, &Rotation, &Position)>()
         .into_iter()
         .next()
         .unwrap();
@@ -98,7 +101,7 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
         cmd.spawn(projectile::create_projectile(
             vec2(player_pos.x, player_pos.y),
             Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
-                + vec2(player.vel_x, player.vel_y),
+                + vec2(player_vel.vel.x, player_vel.vel.y),
             2.0,
             1.0,
             Team::Player,
@@ -110,25 +113,26 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
 
 pub fn motion_update(world: &mut World, dt: f32) {
     //get player
-    let (_, (player, player_angle, player_pos)) = world
-        .query_mut::<(&mut Player, &mut Rotation, &mut Position)>()
+    let (_, (player_vel, player_angle, player_pos)) = world
+        .query_mut::<(&mut PhysicsMotion, &mut Rotation, &mut Position)>()
+        .with::<&Player>()
         .into_iter()
         .next()
         .unwrap();
     //motion friction
-    player.vel_x *= 0.9_f32.powf(dt);
-    player.vel_y *= 0.9_f32.powf(dt);
+    player_vel.vel.x *= 0.9_f32.powf(dt);
+    player_vel.vel.y *= 0.9_f32.powf(dt);
     //follow mouse
     let mouse_pos = mouse_position();
     player_angle.angle = (mouse_pos.1 - player_pos.y).atan2(mouse_pos.0 - player_pos.x);
     //input handling
     if is_mouse_button_down(MouseButton::Left) {
-        player.vel_x += player_angle.angle.cos() * PLAYER_ACCEL * dt;
-        player.vel_y += player_angle.angle.sin() * PLAYER_ACCEL * dt;
+        player_vel.vel.x += player_angle.angle.cos() * PLAYER_ACCEL * dt;
+        player_vel.vel.y += player_angle.angle.sin() * PLAYER_ACCEL * dt;
     }
     //euler integration
-    player_pos.x += player.vel_x * dt;
-    player_pos.y += player.vel_y * dt;
+    player_pos.x += player_vel.vel.x * dt;
+    player_pos.y += player_vel.vel.y * dt;
 }
 
 pub fn health(world: &mut World, events: &mut World, dt: f32) {
