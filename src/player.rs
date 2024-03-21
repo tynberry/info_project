@@ -102,6 +102,8 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
             2.0,
             1.0,
             Team::Player,
+            -0.2,
+            1.0,
         ));
     }
 }

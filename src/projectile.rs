@@ -19,9 +19,10 @@ pub fn create_projectile(
     size: f32,
     dmg: f32,
     team: Team,
+    charge: f32,
+    mass: f32,
 ) -> (
     Projectile,
-    LinearMotion,
     Position,
     Team,
     HurtBox,
@@ -32,7 +33,6 @@ pub fn create_projectile(
 ) {
     (
         Projectile,
-        LinearMotion { vel },
         Position { x: pos.x, y: pos.y },
         team,
         HurtBox { radius: size },
@@ -42,11 +42,8 @@ pub fn create_projectile(
             color: GREEN,
             z_index: -1,
         },
-        Charge { charge: 1.0 },
-        PhysicsMotion {
-            vel: Vec2::ZERO,
-            mass: 4.0,
-        },
+        Charge { charge },
+        PhysicsMotion { vel, mass },
     )
 }
 

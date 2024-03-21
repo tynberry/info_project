@@ -45,6 +45,8 @@ async fn main() {
         10.0,
         5.0,
         Team::Enemy,
+        1.0,
+        1.0,
     ));
 
     //add projectile
@@ -54,6 +56,8 @@ async fn main() {
         10.0,
         5.0,
         Team::Enemy,
+        1.0,
+        1.0,
     ));
 
     //add enemy
