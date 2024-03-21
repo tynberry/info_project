@@ -1,5 +1,7 @@
 use crate::basic::{
-    motion::LinearMotion, render::Circle, DamageDealer, HitEvent, HurtBox, Position, Team,
+    motion::{Charge, LinearMotion, PhysicsMotion},
+    render::Circle,
+    DamageDealer, HitEvent, HurtBox, Position, Team,
 };
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
@@ -25,6 +27,8 @@ pub fn create_projectile(
     HurtBox,
     DamageDealer,
     Circle,
+    Charge,
+    PhysicsMotion,
 ) {
     (
         Projectile,
@@ -37,6 +41,11 @@ pub fn create_projectile(
             radius: size,
             color: GREEN,
             z_index: -1,
+        },
+        Charge { charge: 1.0 },
+        PhysicsMotion {
+            vel: Vec2::ZERO,
+            mass: 4.0,
         },
     )
 }
