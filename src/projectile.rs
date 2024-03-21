@@ -1,5 +1,5 @@
 use crate::basic::{
-    motion::{Charge, PhysicsMotion},
+    motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
     render::Circle,
     DamageDealer, HitEvent, HurtBox, Position, Team,
 };
@@ -28,7 +28,8 @@ pub fn create_projectile(
     HurtBox,
     DamageDealer,
     Circle,
-    Charge,
+    ChargeSender,
+    ChargeReceiver,
     PhysicsMotion,
 ) {
     (
@@ -42,7 +43,8 @@ pub fn create_projectile(
             color: GREEN,
             z_index: -1,
         },
-        Charge { charge },
+        ChargeSender { charge },
+        ChargeReceiver { charge },
         PhysicsMotion { vel, mass },
     )
 }

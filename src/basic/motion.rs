@@ -29,7 +29,12 @@ pub struct PhysicsDamping {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
-pub struct Charge {
+pub struct ChargeSender {
+    pub charge: f32,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct ChargeReceiver {
     pub charge: f32,
 }
 
@@ -64,10 +69,10 @@ pub fn apply_physics(world: &mut World, dt: f32) {
 
     //apply all charges O(n^2)
     for (a_ind, (a_charge, a_physics, a_pos)) in world
-        .query::<(&Charge, &mut PhysicsMotion, &Position)>()
+        .query::<(&ChargeReceiver, &mut PhysicsMotion, &Position)>()
         .into_iter()
     {
-        for (b_ind, (b_charge, b_pos)) in world.query::<(&Charge, &Position)>().into_iter() {
+        for (b_ind, (b_charge, b_pos)) in world.query::<(&ChargeSender, &Position)>().into_iter() {
             //ignore same entities
             if a_ind == b_ind {
                 continue;

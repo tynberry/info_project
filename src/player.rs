@@ -3,7 +3,7 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        motion::{Charge, PhysicsMotion},
+        motion::{ChargeReceiver, PhysicsMotion},
         render::Rectangle,
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
@@ -50,7 +50,7 @@ pub fn new_entity() -> (
     Team,
     Wrapped,
     Rectangle,
-    Charge,
+    ChargeReceiver,
 ) {
     (
         Player::new(),
@@ -76,7 +76,7 @@ pub fn new_entity() -> (
             color: RED,
             z_index: 0,
         },
-        Charge { charge: 1.0 },
+        ChargeReceiver { charge: 1.0 },
     )
 }
 
