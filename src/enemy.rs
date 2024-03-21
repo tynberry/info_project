@@ -2,8 +2,8 @@ use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
 use crate::basic::{
-    motion::LinearMotion, render::Rectangle, DamageDealer, Health, HitBox, HitEvent, HurtBox,
-    Position, Team,
+    motion::LinearMotion, render::Rectangle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent,
+    HurtBox, Position, Team,
 };
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -31,6 +31,7 @@ pub fn create_asteroid(
     Health,
     DamageDealer,
     Team,
+    DeleteOnWarp,
 ) {
     (
         Enemy,
@@ -56,6 +57,7 @@ pub fn create_asteroid(
         },
         DamageDealer { dmg: ASTEROID_DMG },
         Team::Enemy,
+        DeleteOnWarp,
     )
 }
 
