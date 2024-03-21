@@ -72,6 +72,7 @@ async fn main() {
         basic::ensure_damage(&mut world, &mut events);
 
         player::health(&mut world, &mut events, dt);
+        enemy::health(&mut world, &mut events, &mut cmd);
         projectile::on_hurt(&mut world, &mut events, &mut cmd);
 
         //COMMAND BUFFER FLUSH

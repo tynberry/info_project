@@ -103,7 +103,7 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
             Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
                 + vec2(player_vel.vel.x, player_vel.vel.y),
             2.0,
-            1.0,
+            0.25,
             Team::Player,
             -0.2,
             1.0,
