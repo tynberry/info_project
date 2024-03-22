@@ -3,7 +3,7 @@ pub mod enemy;
 mod player;
 pub mod projectile;
 
-use basic::{health::HealthDisplay, Position, Team};
+use basic::{health::HealthDisplay, Position};
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 
@@ -34,36 +34,18 @@ async fn main() {
         },
     ));
 
-    //add projectile
-    world.spawn(projectile::create_projectile(
-        vec2(150.0, 150.0),
-        vec2(0.0, 0.0),
-        10.0,
-        5.0,
-        Team::Enemy,
-        100.0,
-        1.0,
-    ));
-
-    //add projectile
-    world.spawn(projectile::create_projectile(
-        vec2(300.0, 300.0),
-        vec2(0.0, 0.0),
-        10.0,
-        5.0,
-        Team::Enemy,
-        100.0,
-        1.0,
-    ));
-
     //add enemy
     world.spawn(enemy::create_asteroid(vec2(-10.0, 300.0), vec2(1.0, 0.0)));
+
+    world.spawn(enemy::create_shooter(vec2(200.0, 150.0), vec2(0.0, 0.0)));
 
     loop {
         let dt = get_frame_time();
         //UPDATE WORLD
         player::weapons(&mut world, &mut cmd, dt);
         player::motion_update(&mut world, dt);
+
+        enemy::shooter_ai(&mut world, &mut cmd, dt);
 
         basic::motion::apply_physics(&mut world, dt);
         basic::motion::apply_motion(&mut world, dt);
