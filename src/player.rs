@@ -130,8 +130,13 @@ pub fn motion_update(world: &mut World, dt: f32) {
         .next()
         .unwrap();
     //motion friction
-    player_vel.vel.x *= 0.9_f32.powf(dt);
-    player_vel.vel.y *= 0.9_f32.powf(dt);
+    if is_mouse_button_down(MouseButton::Left) {
+        player_vel.vel.x *= 0.9_f32.powf(dt);
+        player_vel.vel.y *= 0.9_f32.powf(dt);
+    } else {
+        player_vel.vel.x *= 0.5_f32.powf(dt);
+        player_vel.vel.y *= 0.5_f32.powf(dt);
+    }
     //follow mouse
     let mouse_pos = mouse_position();
     player_angle.angle = (mouse_pos.1 - player_pos.y).atan2(mouse_pos.0 - player_pos.x);
