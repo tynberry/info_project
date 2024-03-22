@@ -43,8 +43,12 @@ pub fn create_projectile(
             color: GREEN,
             z_index: -1,
         },
-        ChargeSender { charge },
-        ChargeReceiver { charge },
+        ChargeSender {
+            force: charge,
+            full_radius: 100.0,
+            no_radius: 200.0,
+        },
+        ChargeReceiver { multiplier: 0.4 },
         PhysicsMotion { vel, mass },
     )
 }

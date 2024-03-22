@@ -3,8 +3,6 @@ use macroquad::math::{vec2, Vec2};
 
 use super::Position;
 
-const PIXEL_TO_METER: f32 = 0.01;
-
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearMotion {
     pub vel: Vec2,
@@ -30,12 +28,14 @@ pub struct PhysicsDamping {
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeSender {
-    pub charge: f32,
+    pub force: f32,
+    pub full_radius: f32,
+    pub no_radius: f32,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeReceiver {
-    pub charge: f32,
+    pub multiplier: f32,
 }
 
 //-----------------------------------------------------------------------------
@@ -79,17 +79,21 @@ pub fn apply_physics(world: &mut World, dt: f32) {
             }
             //compute distance
             let distance = ((a_pos.x - b_pos.x).powi(2) + (a_pos.y - b_pos.y).powi(2)).sqrt();
-            let distance = distance * PIXEL_TO_METER;
-            if distance <= 0.01 {
-                //distance too small to safely apply force
+            //compute force portion over radius
+            let force = if distance >= b_charge.no_radius {
+                //no force
                 continue;
-            }
+            } else if distance > b_charge.full_radius {
+                //partial force
+                (b_charge.no_radius - distance) / (b_charge.no_radius - b_charge.full_radius)
+                    * b_charge.force
+            } else {
+                //full force
+                b_charge.force
+            };
             //apply force
             let normal = vec2(a_pos.x - b_pos.x, a_pos.y - b_pos.y) / distance;
-            a_physics.apply_force(
-                (a_charge.charge * b_charge.charge / (distance.powi(2))) * normal,
-                dt,
-            );
+            a_physics.apply_force(a_charge.multiplier * force * normal, dt);
         }
     }
 }

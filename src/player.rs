@@ -3,7 +3,7 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        motion::{ChargeReceiver, PhysicsMotion},
+        motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
         render::Rectangle,
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
@@ -12,6 +12,10 @@ use crate::{
 
 const PLAYER_ACCEL: f32 = 600.0;
 const PLAYER_MASS: f32 = 10.0;
+
+const PLAYER_CHARGE_FORCE: f32 = 200.0;
+const PLAYER_CHARGE_FULL_RADIUS: f32 = 150.0;
+const PLAYER_CHARGE_RADIUS: f32 = 300.0;
 
 const PLAYER_MAX_BASE_HP: f32 = 10.0;
 
@@ -51,6 +55,7 @@ pub fn new_entity() -> (
     Wrapped,
     Rectangle,
     ChargeReceiver,
+    ChargeSender,
 ) {
     (
         Player::new(),
@@ -76,7 +81,12 @@ pub fn new_entity() -> (
             color: RED,
             z_index: 0,
         },
-        ChargeReceiver { charge: 1.0 },
+        ChargeReceiver { multiplier: 1.0 },
+        ChargeSender {
+            force: PLAYER_CHARGE_FORCE,
+            full_radius: PLAYER_CHARGE_FULL_RADIUS,
+            no_radius: PLAYER_CHARGE_RADIUS,
+        },
     )
 }
 
@@ -105,7 +115,7 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
             2.0,
             0.25,
             Team::Player,
-            -0.2,
+            -20.0,
             1.0,
         ));
     }
