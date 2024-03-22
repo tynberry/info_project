@@ -1,9 +1,11 @@
 pub mod basic;
 pub mod enemy;
+pub mod game;
 mod player;
 pub mod projectile;
 
 use basic::{health::HealthDisplay, Position};
+use game::EnemySpawner;
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 
@@ -38,14 +40,8 @@ async fn main() {
         },
     ));
 
-    //add enemy
-    world.spawn(enemy::create_asteroid(
-        vec2(-10.0, 300.0),
-        vec2(1.0, 0.0),
-        &asteroid_texture,
-    ));
-
-    world.spawn(enemy::create_shooter(vec2(200.0, 150.0), vec2(0.0, 0.0)));
+    //add enemy spawner
+    world.spawn((EnemySpawner::default(),));
 
     loop {
         let dt = get_frame_time();
@@ -64,6 +60,9 @@ async fn main() {
         player::health(&mut world, &mut events, dt);
         enemy::health(&mut world, &mut events, &mut cmd);
         projectile::on_hurt(&mut world, &mut events, &mut cmd);
+
+        //spawn enemies
+        game::enemy_spawning(&mut world, &mut cmd, &asteroid_texture, dt);
 
         //COMMAND BUFFER FLUSH
         cmd.run_on(&mut world);
