@@ -60,6 +60,36 @@ impl Renderable for Circle {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct Sprite {
+    pub texture: Texture2D,
+    pub scale: f32,
+    pub z_index: i16,
+}
+
+impl Renderable for Sprite {
+    fn render(&self, pos: &Position, rotation: Option<&Rotation>) {
+        let width = self.texture.width() * self.scale;
+        let height = self.texture.height() * self.scale;
+
+        draw_texture_ex(
+            &self.texture,
+            pos.x - width / 2.0,
+            pos.y - height / 2.0,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(width, height)),
+                rotation: rotation.map(|rot| rot.angle).unwrap_or(0.0),
+                ..Default::default()
+            },
+        );
+    }
+
+    fn z_index(&self) -> i16 {
+        self.z_index
+    }
+}
+
 //-----------------------------------------------------------------------------
 //TRAIT PART
 //-----------------------------------------------------------------------------
@@ -76,6 +106,7 @@ trait Renderable {
 enum RenderJobs {
     Rectangle,
     Circle,
+    Sprite,
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +127,13 @@ pub fn render_all(world: &mut World) {
             .query_mut::<(&Rectangle, &Position, Option<&Rotation>)>()
             .into_iter()
             .map(|(_, (c, p, r))| (Into::<RenderJobs>::into(*c), *p, r.copied())),
+    );
+    //sprites
+    jobs.extend(
+        world
+            .query_mut::<(&Sprite, &Position, Option<&Rotation>)>()
+            .into_iter()
+            .map(|(_, (c, p, r))| (Into::<RenderJobs>::into(c.clone()), *p, r.copied())),
     );
     //sort them by z_index
     jobs.sort_unstable_by_key(|a| a.0.z_index());

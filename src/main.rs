@@ -9,6 +9,10 @@ use macroquad::prelude::*;
 
 #[macroquad::main("Warping Warp")]
 async fn main() {
+    //load assets to render
+    let player_texture = load_texture("res/player.png").await.unwrap();
+    let asteroid_texture = load_texture("res/asteroid.png").await.unwrap();
+
     //init world
     let mut world = hecs::World::default();
     //init events
@@ -18,7 +22,7 @@ async fn main() {
     let mut cmd = CommandBuffer::new();
 
     //add player
-    let player_id = world.spawn(player::new_entity());
+    let player_id = world.spawn(player::new_entity(&player_texture));
 
     //add player health display
     world.spawn((
@@ -35,7 +39,11 @@ async fn main() {
     ));
 
     //add enemy
-    world.spawn(enemy::create_asteroid(vec2(-10.0, 300.0), vec2(1.0, 0.0)));
+    world.spawn(enemy::create_asteroid(
+        vec2(-10.0, 300.0),
+        vec2(1.0, 0.0),
+        &asteroid_texture,
+    ));
 
     world.spawn(enemy::create_shooter(vec2(200.0, 150.0), vec2(0.0, 0.0)));
 

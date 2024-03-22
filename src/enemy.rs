@@ -3,8 +3,9 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        motion::LinearMotion, render::Circle, DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent,
-        HurtBox, Position, Team,
+        motion::LinearMotion,
+        render::{Circle, Sprite},
+        DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent, HurtBox, Position, Team,
     },
     player::Player,
     projectile,
@@ -12,7 +13,7 @@ use crate::{
 
 const ASTEROID_HEALTH: f32 = 1.0;
 const ASTEROID_SPEED: f32 = 100.0;
-const ASTEROID_SIZE: f32 = 30.0;
+const ASTEROID_SIZE: f32 = 50.0;
 const ASTEROID_DMG: f32 = 0.5;
 
 const SHOOTER_HEALTH: f32 = 1.0;
@@ -38,11 +39,12 @@ pub struct ShooterAI {
 pub fn create_asteroid(
     pos: Vec2,
     dir: Vec2,
+    texture: &Texture2D,
 ) -> (
     Enemy,
     Position,
     LinearMotion,
-    Circle,
+    Sprite,
     HitBox,
     HurtBox,
     Health,
@@ -56,16 +58,16 @@ pub fn create_asteroid(
         LinearMotion {
             vel: dir * ASTEROID_SPEED,
         },
-        crate::basic::render::Circle {
-            radius: ASTEROID_SIZE,
-            color: BLUE,
-            z_index: 1,
+        Sprite {
+            texture: texture.clone(),
+            scale: ASTEROID_SIZE / texture.width(),
+            z_index: 0,
         },
         HitBox {
-            radius: ASTEROID_SIZE,
+            radius: ASTEROID_SIZE / 2.0,
         },
         HurtBox {
-            radius: ASTEROID_SIZE,
+            radius: ASTEROID_SIZE / 2.0,
         },
         Health {
             max_hp: ASTEROID_HEALTH,

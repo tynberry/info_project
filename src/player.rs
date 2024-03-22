@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 use crate::{
     basic::{
         motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
-        render::Rectangle,
+        render::Sprite,
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
     projectile::{self},
@@ -44,7 +44,9 @@ impl Player {
 //ENTITY GEN
 //-----------------------------------------------------------------------------
 
-pub fn new_entity() -> (
+pub fn new_entity(
+    texture: &Texture2D,
+) -> (
     Player,
     Position,
     PhysicsMotion,
@@ -53,7 +55,7 @@ pub fn new_entity() -> (
     HitBox,
     Team,
     Wrapped,
-    Rectangle,
+    Sprite,
     ChargeReceiver,
     ChargeSender,
 ) {
@@ -75,10 +77,9 @@ pub fn new_entity() -> (
         HitBox { radius: 7.0 },
         Team::Player,
         Wrapped,
-        Rectangle {
-            width: PLAYER_SIZE,
-            height: PLAYER_SIZE / 1.6,
-            color: RED,
+        Sprite {
+            texture: texture.clone(),
+            scale: PLAYER_SIZE / texture.width(),
             z_index: 0,
         },
         ChargeReceiver { multiplier: 1.0 },
