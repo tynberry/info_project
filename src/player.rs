@@ -32,6 +32,8 @@ pub struct Player {
     fire_timer: f32,
 
     invul_timer: f32,
+
+    polarity: i8,
 }
 
 impl Player {
@@ -39,6 +41,8 @@ impl Player {
         Self {
             fire_timer: 0.0,
             invul_timer: 0.0,
+
+            polarity: 1,
         }
     }
 }
@@ -98,8 +102,18 @@ pub fn new_entity() -> (
 
 pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
     //get player
-    let (_, (player, player_vel, player_angle, player_pos)) = world
-        .query_mut::<(&mut Player, &PhysicsMotion, &Rotation, &Position)>()
+    let (
+        _,
+        (player, player_vel, player_angle, player_pos, player_charge_send, player_charge_receive),
+    ) = world
+        .query_mut::<(
+            &mut Player,
+            &PhysicsMotion,
+            &Rotation,
+            &Position,
+            &mut ChargeSender,
+            &mut ChargeReceiver,
+        )>()
         .into_iter()
         .next()
         .unwrap();
@@ -120,6 +134,14 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
             -20.0,
             1.0,
         ));
+    }
+
+    //polarity switching
+    if is_key_pressed(KeyCode::A) {
+        player.polarity = -player.polarity;
+        //change charge
+        player_charge_receive.multiplier = 1.0 * player.polarity as f32;
+        player_charge_send.force = PLAYER_CHARGE_FORCE * player.polarity as f32;
     }
 }
 
@@ -179,5 +201,21 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
         if player_hp.hp <= 0.0 {
             //TODO DEATH
         }
+    }
+}
+
+pub fn visuals(world: &mut World) {
+    //get player
+    let (_, (player, player_sprite)) = world
+        .query_mut::<(&Player, &mut Sprite)>()
+        .into_iter()
+        .next()
+        .unwrap();
+
+    //change texture based on polarity
+    player_sprite.texture = if player.polarity > 0 {
+        PLAYER_TEX_POSITIVE
+    } else {
+        PLAYER_TEX_NEGATIVE
     }
 }

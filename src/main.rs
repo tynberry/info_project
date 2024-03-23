@@ -85,6 +85,12 @@ async fn main() {
         //RENDERING PHASE
         clear_background(BLACK);
 
+        //update visuals
+
+        player::visuals(&mut world);
+
+        //actually render
+
         basic::render::render_all(&mut world, &assets);
 
         basic::health::render_displays(&mut world);
