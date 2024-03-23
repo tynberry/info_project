@@ -19,7 +19,7 @@ const PLAYER_CHARGE_RADIUS: f32 = 300.0;
 
 const PLAYER_MAX_BASE_HP: f32 = 10.0;
 
-const PLAYER_FIRE_COOLDOWN: f32 = 0.5;
+const PLAYER_FIRE_COOLDOWN: f32 = 0.15;
 const PLAYER_INVUL_COOLDOWN: f32 = 1.0;
 
 pub const PLAYER_TEX_POSITIVE: &str = "player_plus";

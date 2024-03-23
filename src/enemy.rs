@@ -75,10 +75,10 @@ pub fn create_asteroid(
             z_index: 0,
         },
         HitBox {
-            radius: ASTEROID_SIZE / 2.0,
+            radius: ASTEROID_SIZE / 2.0 - 8.0,
         },
         HurtBox {
-            radius: ASTEROID_SIZE / 2.0,
+            radius: ASTEROID_SIZE / 2.0 - 8.0,
         },
         Health {
             max_hp: ASTEROID_HEALTH,

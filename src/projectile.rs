@@ -48,7 +48,9 @@ pub fn create_projectile(
             full_radius: 100.0,
             no_radius: 200.0,
         },
-        ChargeReceiver { multiplier: 0.4 },
+        ChargeReceiver {
+            multiplier: 0.4 * charge.signum(),
+        },
         PhysicsMotion { vel, mass },
     )
 }
