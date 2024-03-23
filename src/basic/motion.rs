@@ -79,6 +79,10 @@ pub fn apply_physics(world: &mut World, dt: f32) {
             }
             //compute distance
             let distance = ((a_pos.x - b_pos.x).powi(2) + (a_pos.y - b_pos.y).powi(2)).sqrt();
+            //distance to small to safely get normal
+            if distance <= 0.1 {
+                continue;
+            }
             //compute force portion over radius
             let force = if distance >= b_charge.no_radius {
                 //no force
