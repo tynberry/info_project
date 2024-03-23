@@ -6,7 +6,7 @@ use macroquad::{
 
 use crate::enemy;
 
-const SPAWN_COOLDOWN: f32 = 7.0;
+const SPAWN_COOLDOWN: f32 = 1.0;
 const SPAWN_MARGIN: f32 = 20.0;
 const SPAWN_PUSHBACK: f32 = 10.0;
 
@@ -85,6 +85,11 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
             _ => unreachable!("Random number should not exceed range 0..4"),
         };
         //spawn an asteroid!!!
-        cmd.spawn(enemy::create_asteroid(pos, dir));
+        match fastrand::u8(1..3) {
+            //0 => cmd.spawn(enemy::create_asteroid(pos, dir)),
+            1 => cmd.spawn(enemy::create_charged_asteroid(pos, dir, 1)),
+            2 => cmd.spawn(enemy::create_charged_asteroid(pos, dir, -1)),
+            _ => unreachable!(),
+        };
     }
 }
