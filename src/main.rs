@@ -4,16 +4,28 @@ pub mod game;
 mod player;
 pub mod projectile;
 
-use basic::{health::HealthDisplay, Position};
+use basic::{health::HealthDisplay, render::AssetManager, Position};
+use enemy::{ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL, ASTEROID_TEX_POSITIVE};
 use game::EnemySpawner;
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
+use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
+
+const ASSETS: [(&str, &str); 5] = [
+    (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
+    (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
+    (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
+    (PLAYER_TEX_POSITIVE, "res/player_plus.png"),
+    (PLAYER_TEX_NEGATIVE, "res/player_minus.png"),
+];
 
 #[macroquad::main("Warping Warp")]
 async fn main() {
     //load assets to render
-    let player_texture = load_texture("res/player.png").await.unwrap();
-    let asteroid_texture = load_texture("res/asteroid.png").await.unwrap();
+    let mut assets = AssetManager::default();
+    for (asset_id, asset_path) in ASSETS {
+        assets.load_texture(asset_id, asset_path).await.unwrap();
+    }
 
     //init world
     let mut world = hecs::World::default();
@@ -24,7 +36,7 @@ async fn main() {
     let mut cmd = CommandBuffer::new();
 
     //add player
-    let player_id = world.spawn(player::new_entity(&player_texture));
+    let player_id = world.spawn(player::new_entity());
 
     //add player health display
     world.spawn((
@@ -62,7 +74,7 @@ async fn main() {
         projectile::on_hurt(&mut world, &mut events, &mut cmd);
 
         //spawn enemies
-        game::enemy_spawning(&mut world, &mut cmd, &asteroid_texture, dt);
+        game::enemy_spawning(&mut world, &mut cmd, dt);
 
         //COMMAND BUFFER FLUSH
         cmd.run_on(&mut world);
@@ -73,7 +85,7 @@ async fn main() {
         //RENDERING PHASE
         clear_background(BLACK);
 
-        basic::render::render_all(&mut world);
+        basic::render::render_all(&mut world, &assets);
 
         basic::health::render_displays(&mut world);
 

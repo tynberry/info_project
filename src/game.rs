@@ -1,7 +1,6 @@
 use hecs::{CommandBuffer, World};
 use macroquad::{
     math::vec2,
-    texture::Texture2D,
     window::{screen_height, screen_width},
 };
 
@@ -32,12 +31,7 @@ impl Default for EnemySpawner {
 //SYSTEM PART
 //------------------------------------------------------------------------------
 
-pub fn enemy_spawning(
-    world: &mut World,
-    cmd: &mut CommandBuffer,
-    asteroid_texture: &Texture2D,
-    dt: f32,
-) {
+pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
     //get spawner
     let (_, spawner) = world
         .query_mut::<&mut EnemySpawner>()
@@ -91,6 +85,6 @@ pub fn enemy_spawning(
             _ => unreachable!("Random number should not exceed range 0..4"),
         };
         //spawn an asteroid!!!
-        cmd.spawn(enemy::create_asteroid(pos, dir, asteroid_texture));
+        cmd.spawn(enemy::create_asteroid(pos, dir));
     }
 }

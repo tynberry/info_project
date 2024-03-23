@@ -13,8 +13,15 @@ use crate::{
 
 const ASTEROID_HEALTH: f32 = 1.0;
 const ASTEROID_SPEED: f32 = 100.0;
+
 const ASTEROID_SIZE: f32 = 50.0;
+const ASTEROID_SCALE: f32 = ASTEROID_SIZE / 512.0;
+
 const ASTEROID_DMG: f32 = 0.5;
+
+pub const ASTEROID_TEX_NEUTRAL: &str = "asteroid";
+pub const ASTEROID_TEX_POSITIVE: &str = "asteroid_plus";
+pub const ASTEROID_TEX_NEGATIVE: &str = "asteroid_negative";
 
 const SHOOTER_HEALTH: f32 = 1.0;
 const SHOOTER_SPEED: f32 = 100.0;
@@ -39,7 +46,6 @@ pub struct ShooterAI {
 pub fn create_asteroid(
     pos: Vec2,
     dir: Vec2,
-    texture: &Texture2D,
 ) -> (
     Enemy,
     Position,
@@ -59,8 +65,8 @@ pub fn create_asteroid(
             vel: dir * ASTEROID_SPEED,
         },
         Sprite {
-            texture: texture.clone(),
-            scale: ASTEROID_SIZE / texture.width(),
+            texture: ASTEROID_TEX_NEUTRAL,
+            scale: ASTEROID_SCALE,
             z_index: 0,
         },
         HitBox {

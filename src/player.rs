@@ -22,6 +22,9 @@ const PLAYER_MAX_BASE_HP: f32 = 10.0;
 const PLAYER_FIRE_COOLDOWN: f32 = 0.5;
 const PLAYER_INVUL_COOLDOWN: f32 = 1.0;
 
+pub const PLAYER_TEX_POSITIVE: &str = "player_plus";
+pub const PLAYER_TEX_NEGATIVE: &str = "player_negative";
+
 const PLAYER_SIZE: f32 = 30.0;
 
 #[derive(Debug)]
@@ -44,9 +47,7 @@ impl Player {
 //ENTITY GEN
 //-----------------------------------------------------------------------------
 
-pub fn new_entity(
-    texture: &Texture2D,
-) -> (
+pub fn new_entity() -> (
     Player,
     Position,
     PhysicsMotion,
@@ -78,8 +79,8 @@ pub fn new_entity(
         Team::Player,
         Wrapped,
         Sprite {
-            texture: texture.clone(),
-            scale: PLAYER_SIZE / texture.width(),
+            texture: PLAYER_TEX_POSITIVE,
+            scale: PLAYER_SIZE / 512.0,
             z_index: 0,
         },
         ChargeReceiver { multiplier: 1.0 },

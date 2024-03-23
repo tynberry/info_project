@@ -4,6 +4,33 @@ use macroquad::prelude::*;
 
 use super::{Position, Rotation};
 
+#[derive(Debug, Default)]
+pub struct AssetManager {
+    textures: fnv::FnvHashMap<&'static str, Texture2D>,
+}
+
+impl AssetManager {
+    pub async fn load_texture(
+        &mut self,
+        id: &'static str,
+        path: &str,
+    ) -> Result<(), macroquad::Error> {
+        //load it
+        let texture = load_texture(path).await?;
+        //save it
+        self.textures.insert(id, texture);
+        Ok(())
+    }
+
+    pub fn get_texture(&self, id: &'static str) -> Option<&Texture2D> {
+        self.textures.get(id)
+    }
+}
+
+//-----------------------------------------------------------------------------
+//COMPONENT PART
+//-----------------------------------------------------------------------------
+
 #[derive(Clone, Copy, Debug)]
 pub struct Rectangle {
     pub width: f32,
@@ -13,7 +40,7 @@ pub struct Rectangle {
 }
 
 impl Renderable for Rectangle {
-    fn render(&self, pos: &Position, rotation: Option<&Rotation>) {
+    fn render(&self, pos: &Position, rotation: Option<&Rotation>, _: &AssetManager) {
         match rotation {
             Some(Rotation { angle }) => {
                 draw_rectangle_ex(
@@ -51,7 +78,7 @@ pub struct Circle {
 }
 
 impl Renderable for Circle {
-    fn render(&self, pos: &Position, _rotation: Option<&Rotation>) {
+    fn render(&self, pos: &Position, _rotation: Option<&Rotation>, _: &AssetManager) {
         draw_circle(pos.x, pos.y, self.radius, self.color);
     }
 
@@ -62,18 +89,23 @@ impl Renderable for Circle {
 
 #[derive(Clone, Debug)]
 pub struct Sprite {
-    pub texture: Texture2D,
+    pub texture: &'static str,
     pub scale: f32,
     pub z_index: i16,
 }
 
 impl Renderable for Sprite {
-    fn render(&self, pos: &Position, rotation: Option<&Rotation>) {
-        let width = self.texture.width() * self.scale;
-        let height = self.texture.height() * self.scale;
+    fn render(&self, pos: &Position, rotation: Option<&Rotation>, assets: &AssetManager) {
+        //fetch texture
+        let Some(texture) = assets.get_texture(self.texture) else {
+            return;
+        };
+        //render itself
+        let width = texture.width() * self.scale;
+        let height = texture.height() * self.scale;
 
         draw_texture_ex(
-            &self.texture,
+            &texture,
             pos.x - width / 2.0,
             pos.y - height / 2.0,
             WHITE,
@@ -96,7 +128,7 @@ impl Renderable for Sprite {
 
 #[enum_dispatch]
 trait Renderable {
-    fn render(&self, pos: &Position, rotation: Option<&Rotation>);
+    fn render(&self, pos: &Position, rotation: Option<&Rotation>, assets: &AssetManager);
     fn z_index(&self) -> i16 {
         0
     }
@@ -113,7 +145,7 @@ enum RenderJobs {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
-pub fn render_all(world: &mut World) {
+pub fn render_all(world: &mut World, assets: &AssetManager) {
     //gather all render jobs
     //circles
     let mut jobs: Vec<(RenderJobs, Position, Option<Rotation>)> = world
@@ -139,6 +171,6 @@ pub fn render_all(world: &mut World) {
     jobs.sort_unstable_by_key(|a| a.0.z_index());
     //render all of them
     for job in jobs {
-        job.0.render(&job.1, job.2.as_ref());
+        job.0.render(&job.1, job.2.as_ref(), assets);
     }
 }
