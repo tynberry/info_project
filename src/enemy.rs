@@ -3,7 +3,7 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{
-        motion::{ChargeReceiver, ChargeSender, LinearMotion, PhysicsMotion},
+        motion::{ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, PhysicsMotion},
         render::{Circle, Sprite},
         DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent, HurtBox, Position, Team,
     },
@@ -27,6 +27,8 @@ pub const ASTEROID_TEX_NEGATIVE: &str = "asteroid_negative";
 const ASTEROID_FORCE: f32 = 750.0;
 const ASTEROID_FORCE_F_RADIUS: f32 = 200.0;
 const ASTEROID_FORCE_RADIUS: f32 = 350.0;
+
+const ASTEROID_KNOCKBACK: f32 = 500.0;
 
 const SHOOTER_HEALTH: f32 = 1.0;
 const SHOOTER_SPEED: f32 = 100.0;
@@ -62,6 +64,7 @@ pub fn create_asteroid(
     DamageDealer,
     Team,
     DeleteOnWarp,
+    KnockbackDealer,
 ) {
     (
         Enemy,
@@ -87,6 +90,9 @@ pub fn create_asteroid(
         DamageDealer { dmg: ASTEROID_DMG },
         Team::Enemy,
         DeleteOnWarp,
+        KnockbackDealer {
+            force: ASTEROID_KNOCKBACK,
+        },
     )
 }
 
@@ -107,6 +113,7 @@ pub fn create_charged_asteroid(
     DeleteOnWarp,
     ChargeSender,
     ChargeReceiver,
+    KnockbackDealer,
 ) {
     let texture = if charge > 0 {
         ASTEROID_TEX_POSITIVE
@@ -146,6 +153,9 @@ pub fn create_charged_asteroid(
         },
         ChargeReceiver {
             multiplier: charge as f32,
+        },
+        KnockbackDealer {
+            force: ASTEROID_KNOCKBACK,
         },
     )
 }

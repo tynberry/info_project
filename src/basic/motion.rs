@@ -1,7 +1,7 @@
 use hecs::World;
 use macroquad::math::{vec2, Vec2};
 
-use super::Position;
+use super::{HitEvent, Position};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearMotion {
@@ -36,6 +36,11 @@ pub struct ChargeSender {
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeReceiver {
     pub multiplier: f32,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct KnockbackDealer {
+    pub force: f32,
 }
 
 //-----------------------------------------------------------------------------
@@ -99,5 +104,42 @@ pub fn apply_physics(world: &mut World, dt: f32) {
             let normal = vec2(a_pos.x - b_pos.x, a_pos.y - b_pos.y) / distance;
             a_physics.apply_force(a_charge.multiplier * force * normal, dt);
         }
+    }
+}
+
+pub fn apply_knockback(world: &mut World, event: &mut World, dt: f32) {
+    //for all events
+    for (_, event) in event.query_mut::<&HitEvent>() {
+        //is the producer equal to the consumer?
+        if event.who == event.by {
+            continue;
+        }
+        //is the producer a knockback dealer?
+        let Ok(deal_ent) = world.entity(event.by) else {
+            continue;
+        };
+
+        let Some(deal) = deal_ent.get::<&KnockbackDealer>() else {
+            continue;
+        };
+
+        let Some(deal_pos) = deal_ent.get::<&Position>() else {
+            continue;
+        };
+        //is the consumer a victim?
+        let Ok(victim_ent) = world.entity(event.who) else {
+            continue;
+        };
+
+        let Some(mut victim_vel) = victim_ent.get::<&mut PhysicsMotion>() else {
+            continue;
+        };
+
+        let Some(victim_pos) = victim_ent.get::<&Position>() else {
+            continue;
+        };
+        //deal force
+        let normal = vec2(victim_pos.x - deal_pos.x, victim_pos.y - deal_pos.y).normalize_or_zero();
+        victim_vel.apply_force(normal * deal.force, 1.0);
     }
 }
