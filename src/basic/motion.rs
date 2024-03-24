@@ -107,7 +107,7 @@ pub fn apply_physics(world: &mut World, dt: f32) {
     }
 }
 
-pub fn apply_knockback(world: &mut World, event: &mut World, dt: f32) {
+pub fn apply_knockback(world: &mut World, event: &mut World) {
     //for all events
     for (_, event) in event.query_mut::<&HitEvent>() {
         //is the producer equal to the consumer?

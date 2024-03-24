@@ -105,7 +105,7 @@ impl Renderable for Sprite {
         let height = texture.height() * self.scale;
 
         draw_texture_ex(
-            &texture,
+            texture,
             pos.x - width / 2.0,
             pos.y - height / 2.0,
             WHITE,

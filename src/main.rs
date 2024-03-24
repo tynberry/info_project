@@ -72,7 +72,7 @@ async fn main() {
         basic::ensure_wrapping(&mut world, &mut cmd);
         basic::ensure_damage(&mut world, &mut events);
 
-        basic::motion::apply_knockback(&mut world, &mut events, dt);
+        basic::motion::apply_knockback(&mut world, &mut events);
 
         player::health(&mut world, &mut events, dt);
         enemy::health(&mut world, &mut events, &mut cmd);

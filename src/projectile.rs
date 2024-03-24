@@ -1,6 +1,6 @@
 use crate::basic::{
     motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
-    render::{Circle, Sprite},
+    render::Sprite,
     DamageDealer, HitEvent, HurtBox, Position, Team,
 };
 use hecs::{CommandBuffer, World};

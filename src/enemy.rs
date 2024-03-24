@@ -96,6 +96,7 @@ pub fn create_asteroid(
     )
 }
 
+#[allow(clippy::type_complexity)]
 pub fn create_charged_asteroid(
     pos: Vec2,
     dir: Vec2,
