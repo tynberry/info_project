@@ -8,7 +8,7 @@ use crate::{
         DamageDealer, DeleteOnWarp, Health, HitBox, HitEvent, HurtBox, Position, Team,
     },
     player::Player,
-    projectile,
+    projectile::{self, ProjectileType},
 };
 
 const ASTEROID_HEALTH: f32 = 1.0;
@@ -259,10 +259,8 @@ pub fn shooter_ai(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 vec2(shooter_pos.x, shooter_pos.y),
                 delta * SHOOTER_PROJ_SPEED,
                 2.0,
-                0.1,
                 Team::Enemy,
-                0.0,
-                1.0,
+                ProjectileType::Small { charge: 0 },
             ));
         }
     }

@@ -10,13 +10,16 @@ use game::EnemySpawner;
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
+use projectile::{PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
 
-const ASSETS: [(&str, &str); 5] = [
+const ASSETS: [(&str, &str); 7] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
     (PLAYER_TEX_POSITIVE, "res/player_plus.png"),
     (PLAYER_TEX_NEGATIVE, "res/player_minus.png"),
+    (PROJ_SMALL_TEX_NEG, "res/smal_proj_minus.png"),
+    (PROJ_SMALL_TEX_POS, "res/smal_proj_plus.png"),
 ];
 
 #[macroquad::main("Warping Warp")]

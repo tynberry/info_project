@@ -7,7 +7,7 @@ use crate::{
         render::Sprite,
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
-    projectile::{self},
+    projectile::{self, ProjectileType},
 };
 
 const PLAYER_ACCEL: f32 = 600.0;
@@ -128,11 +128,11 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
             vec2(player_pos.x, player_pos.y),
             Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
                 + vec2(player_vel.vel.x, player_vel.vel.y),
-            2.0,
-            0.25,
+            0.2,
             Team::Player,
-            -20.0 * player.polarity as f32,
-            1.0,
+            ProjectileType::Small {
+                charge: -player.polarity,
+            },
         ));
     }
 
