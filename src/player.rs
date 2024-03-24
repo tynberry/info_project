@@ -131,7 +131,7 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
             2.0,
             0.25,
             Team::Player,
-            -20.0,
+            -20.0 * player.polarity as f32,
             1.0,
         ));
     }
