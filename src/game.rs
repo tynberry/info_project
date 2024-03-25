@@ -14,13 +14,20 @@ const SPAWN_PUSHBACK: f32 = 10.0;
 #[derive(Clone, Copy, Debug)]
 pub struct EnemySpawner {
     pub wave_counter: u32,
-    pub fallback_timer: f32,
-    pub no_enemies: bool
+    pub no_enemies: bool,
+    pub wave_type: u8,
+    pub state: SpawnState
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum SpawnState {
+    Waiting{timer: f32},
+    Spawning{time: f32}
 }
 
 impl EnemySpawner {
     pub fn new() -> Self {
-        Self { wave_counter: 0, fallback_timer: SPAWN_FALLBACK_COOLDOWN, no_enemies: true }
+        Self { wave_counter: 0, no_enemies: true, wave_type: 0, state: SpawnState::Waiting { timer: SPAWN_FALLBACK_COOLDOWN } }
     }
 }
 
@@ -43,51 +50,92 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
         .into_iter()
         .next()
         .unwrap();
-    //if there are no enemies, time travel the timer 
-    if enemy_count == 0 && !spawner.no_enemies {
-        spawner.fallback_timer = SPAWN_NO_ENEMY_TIMER;
-        spawner.no_enemies = true;
-    }
-    //move its timer
-    spawner.fallback_timer -= dt;
-    //spawn!
-    if spawner.fallback_timer <= 0.0 {
-        spawner.wave_counter += 1;
-        spawner.fallback_timer = SPAWN_FALLBACK_COOLDOWN;
-        spawner.no_enemies = false;
-        //spawn a wave
-        let wave_type = fastrand::u8(0..3);
-        match wave_type {
-            0 => {
-                //center crunch attack 
-                let charge = fastrand::i8(0..1) * 2 - 1;
-                //spawn them 
-                cmd.spawn(enemy::create_charged_asteroid(vec2(-SPAWN_PUSHBACK, screen_height() / 2.0), vec2(1.0, 0.0),charge));
-                cmd.spawn(enemy::create_charged_asteroid(vec2(screen_width()+SPAWN_PUSHBACK, screen_height() / 2.0), vec2(-1.0, 0.0),charge));
-                cmd.spawn(enemy::create_charged_asteroid(vec2( screen_width() / 2.0,-SPAWN_PUSHBACK), vec2(0.0, 1.0),charge));
-                cmd.spawn(enemy::create_charged_asteroid(vec2(screen_width() / 2.0, screen_height()+SPAWN_PUSHBACK), vec2(0.0, -1.0),charge));
-            },
-            1 => {
-                //two opposite sides, opposite polarities
-                let side = get_side();
-                let opposite_side = get_opposite_side(side);
-                //spawn them 
-                for _ in 0..4 {
-                    cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(side), get_dir(side), 1));
-                    cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(opposite_side), get_dir(opposite_side), -1));
+    //advance state 
+    let new_state = match &mut spawner.state {
+        SpawnState::Waiting { timer } => {
+            //if there are no enemies, time travel the timer 
+            if enemy_count == 0 && !spawner.no_enemies {
+                *timer = SPAWN_NO_ENEMY_TIMER;
+                spawner.no_enemies = true;
+            }
+            //move the timer
+            *timer -= dt;
+            //change state
+            if *timer <= 0.0 {
+                Some(SpawnState::Spawning { time: std::f32::NAN } )
+            }else{
+                None
+            }
+        },
+        SpawnState::Spawning { time } => {
+            if time.is_nan() {
+                //init the wave
+                spawner.wave_counter += 1;
+                spawner.no_enemies = false;
+                spawner.wave_type =  fastrand::u8(0..3);
+                //do the initial calls
+                match spawner.wave_type {
+                    0 => center_crunch(cmd),
+                    1 => opposite_sides(cmd),
+                    2 => one_side_opposites(cmd),
+                    _ => unreachable!("Random number should not exceed its bounds!")
                 }
-            },
-            2 => {
-                //one side, both polarities, equal count
-                let side = get_side();
-                //spawn them 
-                for _ in 0..3 {
-                    cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(side), get_dir(side), 1));
-                    cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(side), get_dir(side), -1));
+                //change states
+                if time.is_nan() {
+                    Some(SpawnState::Waiting { timer: SPAWN_FALLBACK_COOLDOWN })
+                }else{
+                    None
+                }
+            }else{
+                //move timer 
+                *time -= dt;
+                //do the another wave calls
+                match spawner.wave_type {
+                    _ => ()
+                }
+                //change states
+                if *time <= 0.0 {
+                    Some(SpawnState::Waiting { timer: SPAWN_FALLBACK_COOLDOWN })
+                }else{
+                    None
                 }
             }
-            _ => unreachable!("Random number should not exceed its bounds!")
         }
+    };
+    //apply new state 
+    if let Some(state) = new_state {
+        spawner.state = state;
+    };
+}
+
+fn center_crunch(cmd: &mut CommandBuffer) {
+    //center crunch attack 
+    let charge = fastrand::i8(0..1) * 2 - 1;
+    //spawn them 
+    cmd.spawn(enemy::create_charged_asteroid(vec2(-SPAWN_PUSHBACK, screen_height() / 2.0), vec2(1.0, 0.0),charge));
+    cmd.spawn(enemy::create_charged_asteroid(vec2(screen_width()+SPAWN_PUSHBACK, screen_height() / 2.0), vec2(-1.0, 0.0),charge));
+    cmd.spawn(enemy::create_charged_asteroid(vec2( screen_width() / 2.0,-SPAWN_PUSHBACK), vec2(0.0, 1.0),charge));
+    cmd.spawn(enemy::create_charged_asteroid(vec2(screen_width() / 2.0, screen_height()+SPAWN_PUSHBACK), vec2(0.0, -1.0),charge));
+}
+
+fn opposite_sides(cmd: &mut CommandBuffer) {
+    //two opposite sides, opposite polarities
+    let side = get_side();
+    let opposite_side = get_opposite_side(side);
+    //spawn them 
+    for _ in 0..4 {
+        cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(side), get_dir(side), 1));
+        cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(opposite_side), get_dir(opposite_side), -1));
+    }
+}
+
+fn one_side_opposites(cmd: &mut CommandBuffer) {
+    //one side, both polarities, equal count
+    let side = get_side();
+    //spawn them 
+    for _ in 0..3 {
+        cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(side), get_dir(side), 1));
+        cmd.spawn(enemy::create_charged_asteroid(get_spawn_pos(side), get_dir(side), -1));
     }
 }
 
