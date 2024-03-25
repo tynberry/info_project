@@ -47,6 +47,7 @@ pub struct HealthDisplay {
     pub max_width: f32,
     pub height: f32,
     pub color: Color,
+    pub max_color: Color
 }
 
 //-----------------------------------------------------------------------------
@@ -62,6 +63,15 @@ pub fn render_displays(world: &mut World) {
         //render a rect for their health
         let current_width = (target_hp.hp / target_hp.max_hp) * display.max_width;
 
+        //draw background of max
+        draw_rectangle(
+            display_pos.x - display.max_width / 2.0,
+            display_pos.y - display.height / 2.0,
+            display.max_width,
+            display.height,
+            display.max_color,
+        );
+        //draw actual health
         draw_rectangle(
             display_pos.x - current_width / 2.0,
             display_pos.y - display.height / 2.0,

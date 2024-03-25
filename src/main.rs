@@ -52,6 +52,7 @@ async fn main() {
             max_width: 250.0,
             height: 6.0,
             color: RED,
+            max_color: Color { r: 0.4, g: 0.0, b: 0.0, a: 1.0 }
         },
     ));
 
