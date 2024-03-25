@@ -75,6 +75,7 @@ pub fn create_asteroid(
         Sprite {
             texture: ASTEROID_TEX_NEUTRAL,
             scale: ASTEROID_SCALE,
+            color: WHITE,
             z_index: 0,
         },
         HitBox {
@@ -132,6 +133,7 @@ pub fn create_charged_asteroid(
         Sprite {
             texture,
             scale: ASTEROID_SCALE,
+            color: WHITE,
             z_index: 0,
         },
         HitBox {

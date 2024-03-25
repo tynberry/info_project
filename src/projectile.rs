@@ -82,6 +82,7 @@ pub fn create_projectile(
         Sprite {
             texture,
             scale: 1.0,
+            color: WHITE,
             z_index: -1,
         },
         ChargeSender {

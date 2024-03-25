@@ -85,6 +85,7 @@ pub fn new_entity() -> (
         Sprite {
             texture: PLAYER_TEX_POSITIVE,
             scale: PLAYER_SIZE / 512.0,
+            color: WHITE,
             z_index: 0,
         },
         ChargeReceiver { multiplier: 1.0 },

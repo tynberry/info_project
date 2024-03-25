@@ -91,6 +91,7 @@ impl Renderable for Circle {
 pub struct Sprite {
     pub texture: &'static str,
     pub scale: f32,
+    pub color: Color,
     pub z_index: i16,
 }
 
@@ -108,7 +109,7 @@ impl Renderable for Sprite {
             texture,
             pos.x - width / 2.0,
             pos.y - height / 2.0,
-            WHITE,
+            self.color,
             DrawTextureParams {
                 dest_size: Some(vec2(width, height)),
                 rotation: rotation.map(|rot| rot.angle).unwrap_or(0.0),
