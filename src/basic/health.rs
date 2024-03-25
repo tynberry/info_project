@@ -13,6 +13,7 @@ use super::Team;
 pub struct HitEvent {
     pub who: Entity,
     pub by: Entity,
+    pub can_hurt: bool,
 }
 
 //-----------------------------------------------------------------------------
@@ -80,11 +81,6 @@ pub fn ensure_damage(world: &mut World, events: &mut World) {
         for (hurt_id, (hurt_pos, hurt_box, hurt_team)) in
             world.query::<(&Position, &HurtBox, &Team)>().into_iter()
         {
-            //are they compatible?
-            if !hurt_team.can_hurt(hit_team) {
-                continue;
-            }
-
             //are they touching?
             let dx = hit_pos.x - hurt_pos.x;
             let dy = hit_pos.y - hurt_pos.y;
@@ -93,6 +89,7 @@ pub fn ensure_damage(world: &mut World, events: &mut World) {
                 events.spawn((HitEvent {
                     who: hit_id,
                     by: hurt_id,
+                    can_hurt: hurt_team.can_hurt(hit_team)
                 },));
             }
         }

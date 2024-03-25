@@ -189,6 +189,10 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
         .into_iter()
         .filter(|event| event.1.who == player_id);
     for (_, event) in hit_events {
+        //can they hurt you?
+        if !event.can_hurt {
+            continue;
+        }
         //get damage
         let Ok(damage) = world.get::<&DamageDealer>(event.by) else {
             continue;

@@ -102,8 +102,15 @@ pub fn create_projectile(
 pub fn on_hurt(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     for (proj_id, _) in world.query_mut::<&Projectile>() {
         for (_, event) in events.query_mut::<&HitEvent>() {
+            //did it hurt?
+            if !event.can_hurt {
+                continue;
+            }
+            //despawn myself
             if event.by == proj_id {
                 cmd.despawn(proj_id);
+                //don't read other events
+                break;
             }
         }
     }

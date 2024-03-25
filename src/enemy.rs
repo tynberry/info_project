@@ -216,6 +216,10 @@ pub fn health(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     //get events concerning the player
     let hit_events = events.query_mut::<&HitEvent>().into_iter();
     for (_, event) in hit_events {
+        //can be hurt by it?
+        if !event.can_hurt {
+            continue;
+        }
         //get the enemy
         let Some(enemy_hp) = enemy_view.get_mut(event.who) else {
             continue;
