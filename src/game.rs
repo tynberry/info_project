@@ -6,7 +6,7 @@ use macroquad::{
     window::{screen_height, screen_width},
 };
 
-use crate::enemy::Enemy;
+use crate::{basic::Position, enemy::Enemy, player::Player};
 
 mod wave;
 
@@ -55,6 +55,13 @@ impl Default for EnemySpawner {
 pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
     //count enemies
     let enemy_count = world.query_mut::<&Enemy>().into_iter().count();
+    //get position of player
+    let (_, &player_pos) = world
+        .query_mut::<&Position>()
+        .with::<&Player>()
+        .into_iter()
+        .next()
+        .unwrap();
     //get spawner
     let (_, spawner) = world
         .query_mut::<&mut EnemySpawner>()
@@ -86,12 +93,12 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //init the wave
                 spawner.wave_counter += 1;
                 spawner.no_enemies = false;
-                spawner.wave_type = fastrand::u8(1..2);
+                spawner.wave_type = fastrand::u8(2..3);
                 //do the initial calls
                 match spawner.wave_type {
                     0 => wave::center_crunch(cmd),
                     1 => wave::tripleshot_init(time),
-                    //2 => one_side_opposites(cmd),
+                    2 => wave::salvo_init(time),
                     _ => unreachable!("Random number should not exceed its bounds!"),
                 }
                 //change states
@@ -108,6 +115,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //do the another wave calls
                 match spawner.wave_type {
                     1 => wave::tripleshot(cmd, time, data),
+                    2 => wave::salvo(cmd, &player_pos, time, data),
                     _ => (),
                 }
                 //change states

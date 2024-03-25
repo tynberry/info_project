@@ -4,7 +4,7 @@ use super::*;
 
 use macroquad::prelude::*;
 
-use crate::enemy;
+use crate::{enemy, player};
 
 pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //center crunch attack
@@ -108,21 +108,39 @@ pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
     }
 }
 
-pub(super) fn one_side_opposites(cmd: &mut CommandBuffer) {
-    //one side, both polarities, equal count
-    let side = get_side();
-    //spawn them
-    for _ in 0..3 {
-        cmd.spawn(enemy::create_charged_asteroid(
-            get_spawn_pos(side),
-            get_dir(side),
-            1,
-        ));
-        cmd.spawn(enemy::create_charged_asteroid(
-            get_spawn_pos(side),
-            get_dir(side),
-            -1,
-        ));
+#[inline]
+pub(super) fn salvo_init(timer: &mut f32) {
+    *timer = 3.0;
+}
+
+#[inline]
+pub(super) fn salvo(
+    cmd: &mut CommandBuffer,
+    player_pos: &Position,
+    timer: &mut f32,
+    data: &mut u8,
+) {
+    let mut shoot = || {
+        let side = get_side();
+        let pos = get_spawn_pos(side);
+        let dir = (vec2(player_pos.x, player_pos.y) - pos).normalize_or_zero();
+        let charge = fastrand::i8(0..=1) * 2 - 1;
+        cmd.spawn(enemy::create_charged_asteroid(pos, dir, charge))
+    };
+    *data = match *data {
+        0 => {
+            shoot();
+            1
+        }
+        x if x < 8 => {
+            if *timer <= (3.0 / 7.0) * (7 - x) as f32 {
+                shoot();
+                x + 1
+            } else {
+                x
+            }
+        }
+        x => x,
     }
 }
 
