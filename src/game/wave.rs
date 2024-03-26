@@ -4,7 +4,7 @@ use super::*;
 
 use macroquad::prelude::*;
 
-use crate::{enemy, player};
+use crate::enemy;
 
 pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //center crunch attack
