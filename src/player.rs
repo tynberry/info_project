@@ -88,7 +88,7 @@ pub fn new_entity() -> (
             color: WHITE,
             z_index: 0,
         },
-        ChargeReceiver { multiplier: 1.0 },
+        ChargeReceiver { multiplier: 0.2 },
         ChargeSender {
             force: PLAYER_CHARGE_FORCE,
             full_radius: PLAYER_CHARGE_FULL_RADIUS,
@@ -156,11 +156,11 @@ pub fn motion_update(world: &mut World, dt: f32) {
         .unwrap();
     //motion friction
     if is_mouse_button_down(MouseButton::Left) {
-        player_vel.vel.x *= 0.9_f32.powf(dt);
-        player_vel.vel.y *= 0.9_f32.powf(dt);
+        player_vel.vel.x *= 0.7_f32.powf(dt);
+        player_vel.vel.y *= 0.7_f32.powf(dt);
     } else {
-        player_vel.vel.x *= 0.5_f32.powf(dt);
-        player_vel.vel.y *= 0.5_f32.powf(dt);
+        player_vel.vel.x *= 0.3_f32.powf(dt);
+        player_vel.vel.y *= 0.3_f32.powf(dt);
     }
     //follow mouse
     let mouse_pos = mouse_position();
