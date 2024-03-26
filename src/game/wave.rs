@@ -144,6 +144,14 @@ pub(super) fn salvo(
     }
 }
 
+pub(super) fn single_big_asteroid(cmd: &mut CommandBuffer) {
+    let side = get_side();
+    let pos = get_spawn_pos(side);
+    let dir = get_dir(side);
+    let charge = fastrand::i8(0..=1) * 2 - 1;
+    cmd.spawn(enemy::create_big_asteroid(pos, dir, charge));
+}
+
 //------------------------------------------------------------------------------
 //HELPER FUNCTIONS
 //------------------------------------------------------------------------------

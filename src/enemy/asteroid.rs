@@ -1,3 +1,6 @@
+use std::f32::consts::PI;
+
+use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
 use crate::basic::{
@@ -7,6 +10,8 @@ use crate::basic::{
 };
 
 use super::Enemy;
+
+//ASTEROID STATS
 
 const ASTEROID_HEALTH: f32 = 1.0;
 const ASTEROID_SPEED: f32 = 50.0;
@@ -26,6 +31,29 @@ const ASTEROID_FORCE_F_RADIUS: f32 = 200.0;
 const ASTEROID_FORCE_RADIUS: f32 = 350.0;
 
 const ASTEROID_KNOCKBACK: f32 = 500.0;
+
+//BIG ASTEROID STATS
+
+const BIG_ASTEROID_HEALTH: f32 = 2.0;
+const BIG_ASTEROID_SPEED: f32 = 30.0;
+const BIG_ASTEROID_MASS: f32 = 30.0;
+
+const BIG_ASTEROID_SIZE: f32 = 200.0;
+const BIG_ASTEROID_SCALE: f32 = BIG_ASTEROID_SIZE / 512.0;
+
+const BIG_ASTEROID_DMG: f32 = 0.5;
+
+pub const BIG_ASTEROID_TEX_POSITIVE: &str = "asteroid_big_plus";
+pub const BIG_ASTEROID_TEX_NEGATIVE: &str = "asteroid__big_minus";
+
+const BIG_ASTEROID_FORCE: f32 = 950.0;
+const BIG_ASTEROID_FORCE_F_RADIUS: f32 = 250.0;
+const BIG_ASTEROID_FORCE_RADIUS: f32 = 400.0;
+
+const BIG_ASTEROID_KNOCKBACK: f32 = 700.0;
+
+#[derive(Clone, Copy, Debug)]
+pub struct BigAsteroid;
 
 //------------------------------------------------------------------------------
 //ENTITY CREATION
@@ -142,4 +170,105 @@ pub fn create_charged_asteroid(
             force: ASTEROID_KNOCKBACK,
         },
     )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn create_big_asteroid(
+    pos: Vec2,
+    dir: Vec2,
+    charge: i8,
+) -> (
+    Enemy,
+    Position,
+    BigAsteroid,
+    PhysicsMotion,
+    Sprite,
+    HitBox,
+    HurtBox,
+    Health,
+    DamageDealer,
+    Team,
+    DeleteOnWarp,
+    ChargeSender,
+    ChargeReceiver,
+    KnockbackDealer,
+) {
+    let texture = if charge > 0 {
+        BIG_ASTEROID_TEX_POSITIVE
+    } else {
+        BIG_ASTEROID_TEX_NEGATIVE
+    };
+
+    (
+        Enemy,
+        Position { x: pos.x, y: pos.y },
+        BigAsteroid,
+        PhysicsMotion {
+            vel: dir * BIG_ASTEROID_SPEED,
+            mass: BIG_ASTEROID_MASS,
+        },
+        Sprite {
+            texture,
+            scale: BIG_ASTEROID_SCALE,
+            color: WHITE,
+            z_index: 0,
+        },
+        HitBox {
+            radius: BIG_ASTEROID_SIZE / 2.0,
+        },
+        HurtBox {
+            radius: BIG_ASTEROID_SIZE / 2.0,
+        },
+        Health {
+            max_hp: BIG_ASTEROID_HEALTH,
+            hp: BIG_ASTEROID_HEALTH,
+        },
+        DamageDealer {
+            dmg: BIG_ASTEROID_DMG,
+        },
+        Team::Enemy,
+        DeleteOnWarp,
+        ChargeSender {
+            force: BIG_ASTEROID_FORCE * charge as f32,
+            full_radius: BIG_ASTEROID_FORCE_F_RADIUS,
+            no_radius: BIG_ASTEROID_FORCE_RADIUS,
+        },
+        ChargeReceiver {
+            multiplier: charge as f32,
+        },
+        KnockbackDealer {
+            force: BIG_ASTEROID_KNOCKBACK,
+        },
+    )
+}
+
+//------------------------------------------------------------------------------
+//SYSTEM PART
+//------------------------------------------------------------------------------
+
+pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer) {
+    for (_, (big_hp, big_pos, big_charge)) in world
+        .query_mut::<(&Health, &Position, &ChargeSender)>()
+        .with::<&BigAsteroid>()
+    {
+        //check if it is dead
+        if big_hp.hp <= 0.0 {
+            //spawn many smaller asteroids of the same charge
+            for i in 0..4 {
+                let offx = (fastrand::f32() * 2.0 - 1.0) * BIG_ASTEROID_SIZE / 3.0;
+                let offy = (fastrand::f32() * 2.0 - 1.0) * BIG_ASTEROID_SIZE / 3.0;
+
+                let dir = Vec2::from_angle(PI / 2.0 * (i as f32)).rotate(Vec2::X);
+
+                //let charge = big_charge.force.signum() as i8;
+                let charge = ((i % 2) << 1) - 1;
+
+                cmd.spawn(create_charged_asteroid(
+                    vec2(offx + big_pos.x, offy + big_pos.y),
+                    dir,
+                    charge,
+                ));
+            }
+        }
+    }
 }

@@ -5,17 +5,22 @@ mod player;
 pub mod projectile;
 
 use basic::{health::HealthDisplay, render::AssetManager, Position};
-use enemy::{ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL, ASTEROID_TEX_POSITIVE};
+use enemy::{
+    ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL, ASTEROID_TEX_POSITIVE, BIG_ASTEROID_TEX_NEGATIVE,
+    BIG_ASTEROID_TEX_POSITIVE,
+};
 use game::EnemySpawner;
 use hecs::CommandBuffer;
 use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
 use projectile::{PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
 
-const ASSETS: [(&str, &str); 7] = [
+const ASSETS: [(&str, &str); 9] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
+    (BIG_ASTEROID_TEX_POSITIVE, "res/asteroid_big_plus.png"),
+    (BIG_ASTEROID_TEX_NEGATIVE, "res/asteroid_big_minus.png"),
     (PLAYER_TEX_POSITIVE, "res/player_plus.png"),
     (PLAYER_TEX_NEGATIVE, "res/player_minus.png"),
     (PROJ_SMALL_TEX_NEG, "res/smal_proj_minus.png"),
@@ -52,7 +57,12 @@ async fn main() {
             max_width: 250.0,
             height: 6.0,
             color: RED,
-            max_color: Color { r: 0.4, g: 0.0, b: 0.0, a: 1.0 }
+            max_color: Color {
+                r: 0.4,
+                g: 0.0,
+                b: 0.0,
+                a: 1.0,
+            },
         },
     ));
 
@@ -62,22 +72,27 @@ async fn main() {
     loop {
         let dt = get_frame_time();
         //UPDATE WORLD
+        //PLAYER
         player::weapons(&mut world, &mut cmd, dt);
         player::motion_update(&mut world, dt);
 
+        //ENEMY AI
         enemy::shooter_ai(&mut world, &mut cmd, dt);
 
+        //GLOBAL SYSTEMS
         basic::motion::apply_physics(&mut world, dt);
         basic::motion::apply_motion(&mut world, dt);
 
         basic::ensure_wrapping(&mut world, &mut cmd);
         basic::ensure_damage(&mut world, &mut events);
-
         basic::motion::apply_knockback(&mut world, &mut events);
 
+        //AFTER EFFECTS
         player::health(&mut world, &mut events, dt);
         enemy::health(&mut world, &mut events, &mut cmd);
         projectile::on_hurt(&mut world, &mut events, &mut cmd);
+
+        enemy::big_asteroid(&mut world, &mut cmd);
 
         //spawn enemies
         game::enemy_spawning(&mut world, &mut cmd, dt);
