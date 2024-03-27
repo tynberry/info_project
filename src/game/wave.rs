@@ -10,50 +10,74 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //center crunch attack
     let charge = fastrand::i8(0..=1) * 2 - 1;
     //spawn them
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(-SPAWN_PUSHBACK, screen_height() / 2.0),
-        vec2(1.0, 0.0),
-        charge,
-    ));
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(screen_width() + SPAWN_PUSHBACK, screen_height() / 2.0),
-        vec2(-1.0, 0.0),
-        charge,
-    ));
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(screen_width() / 2.0, -SPAWN_PUSHBACK),
-        vec2(0.0, 1.0),
-        charge,
-    ));
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(screen_width() / 2.0, screen_height() + SPAWN_PUSHBACK),
-        vec2(0.0, -1.0),
-        charge,
-    ));
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(-SPAWN_PUSHBACK, screen_height() / 2.0),
+            vec2(1.0, 0.0),
+            charge,
+        )
+        .build(),
+    );
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(screen_width() + SPAWN_PUSHBACK, screen_height() / 2.0),
+            vec2(-1.0, 0.0),
+            charge,
+        )
+        .build(),
+    );
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(screen_width() / 2.0, -SPAWN_PUSHBACK),
+            vec2(0.0, 1.0),
+            charge,
+        )
+        .build(),
+    );
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(screen_width() / 2.0, screen_height() + SPAWN_PUSHBACK),
+            vec2(0.0, -1.0),
+            charge,
+        )
+        .build(),
+    );
     //spawn opposite charged corners
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(-SPAWN_PUSHBACK, -SPAWN_PUSHBACK),
-        vec2(1.0, 1.0),
-        -charge,
-    ));
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(screen_width() + SPAWN_PUSHBACK, -SPAWN_PUSHBACK),
-        vec2(-1.0, 1.0),
-        -charge,
-    ));
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(-SPAWN_PUSHBACK, screen_height() + SPAWN_PUSHBACK),
-        vec2(1.0, -1.0),
-        -charge,
-    ));
-    cmd.spawn(enemy::create_charged_asteroid(
-        vec2(
-            screen_width() + SPAWN_PUSHBACK,
-            screen_height() + SPAWN_PUSHBACK,
-        ),
-        vec2(-1.0, -1.0),
-        -charge,
-    ));
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(-SPAWN_PUSHBACK, -SPAWN_PUSHBACK),
+            vec2(1.0, 1.0),
+            -charge,
+        )
+        .build(),
+    );
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(screen_width() + SPAWN_PUSHBACK, -SPAWN_PUSHBACK),
+            vec2(-1.0, 1.0),
+            -charge,
+        )
+        .build(),
+    );
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(-SPAWN_PUSHBACK, screen_height() + SPAWN_PUSHBACK),
+            vec2(1.0, -1.0),
+            -charge,
+        )
+        .build(),
+    );
+    cmd.spawn(
+        enemy::create_charged_asteroid(
+            vec2(
+                screen_width() + SPAWN_PUSHBACK,
+                screen_height() + SPAWN_PUSHBACK,
+            ),
+            vec2(-1.0, -1.0),
+            -charge,
+        )
+        .build(),
+    );
 }
 
 #[inline]
@@ -69,17 +93,23 @@ pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
     let charge = fastrand::i8(0..=1) * 2 - 1;
     //genarate triple shot function
     let mut shoot = || {
-        cmd.spawn(enemy::create_charged_asteroid(center, dir * 1.6, charge));
-        cmd.spawn(enemy::create_charged_asteroid(
-            center + dir.perp() * 50.0,
-            Vec2::from_angle(PI / 6.0).rotate(dir) * 1.3,
-            -charge,
-        ));
-        cmd.spawn(enemy::create_charged_asteroid(
-            center - dir.perp() * 50.0,
-            Vec2::from_angle(-PI / 6.0).rotate(dir) * 1.3,
-            -charge,
-        ));
+        cmd.spawn(enemy::create_charged_asteroid(center, dir * 1.6, charge).build());
+        cmd.spawn(
+            enemy::create_charged_asteroid(
+                center + dir.perp() * 50.0,
+                Vec2::from_angle(PI / 6.0).rotate(dir) * 1.3,
+                -charge,
+            )
+            .build(),
+        );
+        cmd.spawn(
+            enemy::create_charged_asteroid(
+                center - dir.perp() * 50.0,
+                Vec2::from_angle(-PI / 6.0).rotate(dir) * 1.3,
+                -charge,
+            )
+            .build(),
+        );
     };
     //get state
     *data = match *data & 0x03 {
@@ -125,7 +155,7 @@ pub(super) fn salvo(
         let pos = get_spawn_pos(side);
         let dir = (vec2(player_pos.x, player_pos.y) - pos).normalize_or_zero();
         let charge = fastrand::i8(0..=1) * 2 - 1;
-        cmd.spawn(enemy::create_charged_asteroid(pos, dir, charge))
+        cmd.spawn(enemy::create_charged_asteroid(pos, dir, charge).build())
     };
     *data = match *data {
         0 => {
@@ -149,7 +179,7 @@ pub(super) fn single_big_asteroid(cmd: &mut CommandBuffer) {
     let pos = get_spawn_pos(side);
     let dir = get_dir(side);
     let charge = fastrand::i8(0..=1) * 2 - 1;
-    cmd.spawn(enemy::create_big_asteroid(pos, dir, charge));
+    cmd.spawn(enemy::create_big_asteroid(pos, dir, charge).build());
 }
 
 //------------------------------------------------------------------------------

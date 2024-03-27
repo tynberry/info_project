@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use hecs::{BuiltEntity, CommandBuffer, EntityBuilder, World};
+use hecs::{CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
 
 use crate::basic::{
@@ -61,7 +61,7 @@ pub struct BigAsteroid;
 //ENTITY CREATION
 //------------------------------------------------------------------------------
 
-pub fn create_asteroid<'a>(pos: Vec2, dir: Vec2) -> BuiltEntity<'a> {
+pub fn create_asteroid(pos: Vec2, dir: Vec2) -> EntityBuilder {
     let mut builder = EntityBuilder::new();
     builder.add_bundle((
         Enemy,
@@ -92,11 +92,11 @@ pub fn create_asteroid<'a>(pos: Vec2, dir: Vec2) -> BuiltEntity<'a> {
             force: ASTEROID_KNOCKBACK,
         },
     ));
-    builder.build()
+    builder
 }
 
 #[allow(clippy::type_complexity)]
-pub fn create_charged_asteroid<'a>(pos: Vec2, dir: Vec2, charge: i8) -> BuiltEntity<'a> {
+pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let texture = if charge > 0 {
         ASTEROID_TEX_POSITIVE
     } else {
@@ -151,39 +151,19 @@ pub fn create_charged_asteroid<'a>(pos: Vec2, dir: Vec2, charge: i8) -> BuiltEnt
             force: ASTEROID_KNOCKBACK,
         },
     ));
-    builder.build()
+    builder
 }
 
 #[allow(clippy::type_complexity)]
-pub fn create_big_asteroid(
-    pos: Vec2,
-    dir: Vec2,
-    charge: i8,
-) -> (
-    Enemy,
-    Position,
-    Rotation,
-    LinearTorgue,
-    BigAsteroid,
-    PhysicsMotion,
-    Sprite,
-    HitBox,
-    HurtBox,
-    Health,
-    DamageDealer,
-    Team,
-    DeleteOnWarp,
-    ChargeSender,
-    ChargeReceiver,
-    KnockbackDealer,
-) {
+pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let texture = if charge > 0 {
         BIG_ASTEROID_TEX_POSITIVE
     } else {
         BIG_ASTEROID_TEX_NEGATIVE
     };
 
-    (
+    let mut builder = EntityBuilder::default();
+    builder.add_bundle((
         Enemy,
         Position { x: pos.x, y: pos.y },
         Rotation {
@@ -218,6 +198,8 @@ pub fn create_big_asteroid(
         },
         Team::Enemy,
         DeleteOnWarp,
+    ));
+    builder.add_bundle((
         ChargeSender {
             force: BIG_ASTEROID_FORCE * charge as f32,
             full_radius: BIG_ASTEROID_FORCE_F_RADIUS,
@@ -229,7 +211,8 @@ pub fn create_big_asteroid(
         KnockbackDealer {
             force: BIG_ASTEROID_KNOCKBACK,
         },
-    )
+    ));
+    builder
 }
 
 //------------------------------------------------------------------------------
@@ -260,11 +243,14 @@ pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer) {
                 //let charge = big_charge.force.signum() as i8;
                 let charge = if i >= 4 { -1 } else { 1 } * big_charge.force.signum() as i8;
 
-                cmd.spawn(create_charged_asteroid(
-                    vec2(off.x + big_pos.x, off.y + big_pos.y),
-                    dir,
-                    charge,
-                ));
+                cmd.spawn(
+                    create_charged_asteroid(
+                        vec2(off.x + big_pos.x, off.y + big_pos.y),
+                        dir,
+                        charge,
+                    )
+                    .build(),
+                );
             }
         }
     }
