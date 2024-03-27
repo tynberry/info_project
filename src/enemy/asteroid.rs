@@ -112,7 +112,7 @@ pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilde
             angle: fastrand::f32() * 2.0 * PI,
         },
         LinearTorgue {
-            speed: fastrand::f32() * 0.05 - 0.025,
+            speed: fastrand::f32() * 1.0 - 0.50,
         },
         PhysicsMotion {
             vel: dir * ASTEROID_SPEED,
@@ -170,7 +170,7 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
             angle: fastrand::f32() * 2.0 * PI,
         },
         LinearTorgue {
-            speed: fastrand::f32() * 0.05 - 0.025,
+            speed: fastrand::f32() * 1.0 - 0.50,
         },
         BigAsteroid,
         PhysicsMotion {
