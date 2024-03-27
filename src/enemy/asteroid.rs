@@ -35,7 +35,7 @@ const ASTEROID_KNOCKBACK: f32 = 500.0;
 //BIG ASTEROID STATS
 
 const BIG_ASTEROID_HEALTH: f32 = 2.0;
-const BIG_ASTEROID_SPEED: f32 = 30.0;
+const BIG_ASTEROID_SPEED: f32 = 45.0;
 const BIG_ASTEROID_MASS: f32 = 30.0;
 
 const BIG_ASTEROID_SIZE: f32 = 200.0;
@@ -247,24 +247,31 @@ pub fn create_big_asteroid(
 //------------------------------------------------------------------------------
 
 pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer) {
-    for (_, (big_hp, big_pos, big_charge)) in world
-        .query_mut::<(&Health, &Position, &ChargeSender)>()
+    for (_, (big_hp, big_pos, big_phys, big_charge)) in world
+        .query_mut::<(&Health, &Position, &PhysicsMotion, &ChargeSender)>()
         .with::<&BigAsteroid>()
     {
         //check if it is dead
         if big_hp.hp <= 0.0 {
             //spawn many smaller asteroids of the same charge
-            for i in 0..4 {
-                let offx = (fastrand::f32() * 2.0 - 1.0) * BIG_ASTEROID_SIZE / 3.0;
-                let offy = (fastrand::f32() * 2.0 - 1.0) * BIG_ASTEROID_SIZE / 3.0;
+            for i in 0..8 {
+                let off =
+                    Vec2::from_angle(PI / 2.0 * (i as f32) + if i >= 4 { PI / 4.0 } else { 0.0 })
+                        .rotate(Vec2::X)
+                        * ASTEROID_SIZE
+                        * 1.3
+                        * if i >= 4 { 1.25 } else { 1.0 };
 
-                let dir = Vec2::from_angle(PI / 2.0 * (i as f32)).rotate(Vec2::X);
+                let dir =
+                    Vec2::from_angle(PI / 2.0 * (i as f32) + if i >= 4 { PI / 4.0 } else { 0.0 })
+                        .rotate(Vec2::X)
+                        + big_phys.vel / BIG_ASTEROID_SPEED;
 
                 //let charge = big_charge.force.signum() as i8;
-                let charge = ((i % 2) << 1) - 1;
+                let charge = if i >= 4 { -1 } else { 1 } * big_charge.force.signum() as i8;
 
                 cmd.spawn(create_charged_asteroid(
-                    vec2(offx + big_pos.x, offy + big_pos.y),
+                    vec2(off.x + big_pos.x, off.y + big_pos.y),
                     dir,
                     charge,
                 ));
