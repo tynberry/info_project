@@ -1,12 +1,14 @@
 use std::f32::consts::PI;
 
-use hecs::{CommandBuffer, World};
+use hecs::{BuiltEntity, CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
 
 use crate::basic::{
-    motion::{ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, PhysicsMotion},
+    motion::{
+        ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, LinearTorgue, PhysicsMotion,
+    },
     render::Sprite,
-    DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Team,
+    DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
 };
 
 use super::Enemy;
@@ -59,23 +61,9 @@ pub struct BigAsteroid;
 //ENTITY CREATION
 //------------------------------------------------------------------------------
 
-pub fn create_asteroid(
-    pos: Vec2,
-    dir: Vec2,
-) -> (
-    Enemy,
-    Position,
-    LinearMotion,
-    Sprite,
-    HitBox,
-    HurtBox,
-    Health,
-    DamageDealer,
-    Team,
-    DeleteOnWarp,
-    KnockbackDealer,
-) {
-    (
+pub fn create_asteroid<'a>(pos: Vec2, dir: Vec2) -> BuiltEntity<'a> {
+    let mut builder = EntityBuilder::new();
+    builder.add_bundle((
         Enemy,
         Position { x: pos.x, y: pos.y },
         LinearMotion {
@@ -103,36 +91,21 @@ pub fn create_asteroid(
         KnockbackDealer {
             force: ASTEROID_KNOCKBACK,
         },
-    )
+    ));
+    builder.build()
 }
 
 #[allow(clippy::type_complexity)]
-pub fn create_charged_asteroid(
-    pos: Vec2,
-    dir: Vec2,
-    charge: i8,
-) -> (
-    Enemy,
-    Position,
-    PhysicsMotion,
-    Sprite,
-    HitBox,
-    HurtBox,
-    Health,
-    DamageDealer,
-    Team,
-    DeleteOnWarp,
-    ChargeSender,
-    ChargeReceiver,
-    KnockbackDealer,
-) {
+pub fn create_charged_asteroid<'a>(pos: Vec2, dir: Vec2, charge: i8) -> BuiltEntity<'a> {
     let texture = if charge > 0 {
         ASTEROID_TEX_POSITIVE
     } else {
         ASTEROID_TEX_NEGATIVE
     };
 
-    (
+    let mut builder = EntityBuilder::default();
+
+    builder.add_bundle((
         Enemy,
         Position { x: pos.x, y: pos.y },
         PhysicsMotion {
@@ -148,6 +121,8 @@ pub fn create_charged_asteroid(
         HitBox {
             radius: ASTEROID_SIZE / 2.0,
         },
+    ));
+    builder.add_bundle((
         HurtBox {
             radius: ASTEROID_SIZE / 2.0,
         },
@@ -169,7 +144,8 @@ pub fn create_charged_asteroid(
         KnockbackDealer {
             force: ASTEROID_KNOCKBACK,
         },
-    )
+    ));
+    builder.build()
 }
 
 #[allow(clippy::type_complexity)]
