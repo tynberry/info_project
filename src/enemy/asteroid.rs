@@ -108,6 +108,12 @@ pub fn create_charged_asteroid<'a>(pos: Vec2, dir: Vec2, charge: i8) -> BuiltEnt
     builder.add_bundle((
         Enemy,
         Position { x: pos.x, y: pos.y },
+        Rotation {
+            angle: fastrand::f32() * 2.0 * PI,
+        },
+        LinearTorgue {
+            speed: fastrand::f32() * 0.05 - 0.025,
+        },
         PhysicsMotion {
             vel: dir * ASTEROID_SPEED,
             mass: ASTEROID_MASS,
@@ -156,6 +162,8 @@ pub fn create_big_asteroid(
 ) -> (
     Enemy,
     Position,
+    Rotation,
+    LinearTorgue,
     BigAsteroid,
     PhysicsMotion,
     Sprite,
@@ -178,6 +186,12 @@ pub fn create_big_asteroid(
     (
         Enemy,
         Position { x: pos.x, y: pos.y },
+        Rotation {
+            angle: fastrand::f32() * 2.0 * PI,
+        },
+        LinearTorgue {
+            speed: fastrand::f32() * 0.05 - 0.025,
+        },
         BigAsteroid,
         PhysicsMotion {
             vel: dir * BIG_ASTEROID_SPEED,
