@@ -95,7 +95,8 @@ async fn main() {
         enemy::health(&mut world, &mut events, &mut cmd);
         projectile::on_hurt(&mut world, &mut events, &mut cmd);
 
-        enemy::big_asteroid(&mut world, &mut cmd);
+        enemy::asteroid(&mut world, &mut fx);
+        enemy::big_asteroid(&mut world, &mut cmd, &mut fx);
 
         //spawn enemies
         game::enemy_spawning(&mut world, &mut cmd, dt);

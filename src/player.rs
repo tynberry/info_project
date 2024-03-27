@@ -240,6 +240,7 @@ pub fn visuals(world: &mut World, fx: &mut FxManager) {
                 max_size: 4.0,
                 color: ORANGE,
             },
+            4.0,
             PI / 8.0,
             7,
         )

@@ -36,11 +36,21 @@ impl FxManager {
         self.particles.push_front(particle);
     }
 
-    pub fn burst_particles(&mut self, base: Particle, angle_deviation: f32, count: usize) {
+    pub fn burst_particles(
+        &mut self,
+        base: Particle,
+        vel_deviation: f32,
+        angle_deviation: f32,
+        count: usize,
+    ) {
+        let vel_normal = base.vel.normalize_or_zero();
+        let vel_length = base.vel.length();
+
         for _ in 0..count {
             //apply angle deviation
             let vel = Vec2::from_angle(fastrand::f32() * 2.0 * angle_deviation - angle_deviation)
-                .rotate(base.vel);
+                .rotate(vel_normal)
+                * (vel_length + fastrand::f32() * 2.0 * vel_deviation - vel_deviation);
             //spawn it
             let mut particle = base;
             particle.vel = vel;

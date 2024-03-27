@@ -4,6 +4,7 @@ use hecs::{CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
 
 use crate::basic::{
+    fx::{FxManager, Particle},
     motion::{
         ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, LinearTorgue, PhysicsMotion,
     },
@@ -55,6 +56,9 @@ const BIG_ASTEROID_FORCE_RADIUS: f32 = 400.0;
 const BIG_ASTEROID_KNOCKBACK: f32 = 700.0;
 
 #[derive(Clone, Copy, Debug)]
+pub struct Asteroid;
+
+#[derive(Clone, Copy, Debug)]
 pub struct BigAsteroid;
 
 //------------------------------------------------------------------------------
@@ -65,6 +69,7 @@ pub fn create_asteroid(pos: Vec2, dir: Vec2) -> EntityBuilder {
     let mut builder = EntityBuilder::new();
     builder.add_bundle((
         Enemy,
+        Asteroid,
         Position { x: pos.x, y: pos.y },
         LinearMotion {
             vel: dir * ASTEROID_SPEED,
@@ -107,6 +112,7 @@ pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilde
 
     builder.add_bundle((
         Enemy,
+        Asteroid,
         Position { x: pos.x, y: pos.y },
         Rotation {
             angle: fastrand::f32() * 2.0 * PI,
@@ -165,6 +171,7 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let mut builder = EntityBuilder::default();
     builder.add_bundle((
         Enemy,
+        BigAsteroid,
         Position { x: pos.x, y: pos.y },
         Rotation {
             angle: fastrand::f32() * 2.0 * PI,
@@ -172,7 +179,6 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         LinearTorgue {
             speed: fastrand::f32() * 1.0 - 0.50,
         },
-        BigAsteroid,
         PhysicsMotion {
             vel: dir * BIG_ASTEROID_SPEED,
             mass: BIG_ASTEROID_MASS,
@@ -219,7 +225,35 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //SYSTEM PART
 //------------------------------------------------------------------------------
 
-pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer) {
+pub fn asteroid(world: &mut World, fx: &mut FxManager) {
+    for (_, (hp, pos)) in world
+        .query_mut::<(&Health, &Position)>()
+        .with::<&Asteroid>()
+    {
+        //check if it is dead
+        if hp.hp <= 0.0 {
+            //spawn random particles on destroy
+            for i in 1..=2 {
+                fx.burst_particles(
+                    Particle {
+                        pos: vec2(pos.x, pos.y),
+                        vel: vec2(30.0 * i as f32, 0.0),
+                        life: 1.0,
+                        max_life: 1.0,
+                        min_size: 0.0,
+                        max_size: 12.0,
+                        color: LIGHTGRAY,
+                    },
+                    14.0,
+                    2.0 * PI,
+                    4 * i,
+                );
+            }
+        }
+    }
+}
+
+pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
     for (_, (big_hp, big_pos, big_phys, big_charge)) in world
         .query_mut::<(&Health, &Position, &PhysicsMotion, &ChargeSender)>()
         .with::<&BigAsteroid>()
@@ -250,6 +284,23 @@ pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer) {
                         charge,
                     )
                     .build(),
+                );
+            }
+            //spawn random particles on destroy
+            for i in 1..5 {
+                fx.burst_particles(
+                    Particle {
+                        pos: vec2(big_pos.x, big_pos.y),
+                        vel: vec2(45.0 * i as f32, 0.0),
+                        life: 1.0,
+                        max_life: 1.0,
+                        min_size: 0.0,
+                        max_size: 20.0,
+                        color: LIGHTGRAY,
+                    },
+                    30.0,
+                    2.0 * PI,
+                    8 * i,
                 );
             }
         }
