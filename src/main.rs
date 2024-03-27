@@ -97,10 +97,6 @@ async fn main() {
 
         enemy::big_asteroid(&mut world, &mut cmd);
 
-        //DECORATIONS UPDATE
-
-        fx.update_particles(dt);
-
         //spawn enemies
         game::enemy_spawning(&mut world, &mut cmd, dt);
 
@@ -113,9 +109,11 @@ async fn main() {
         //RENDERING PHASE
         clear_background(BLACK);
 
-        //update visuals
+        //UPDATE VISUALS
 
-        player::visuals(&mut world);
+        fx.update_particles(dt);
+
+        player::visuals(&mut world, &mut fx);
 
         //actually render
 

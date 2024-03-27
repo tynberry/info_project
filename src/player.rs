@@ -1,8 +1,11 @@
+use std::f32::consts::PI;
+
 use hecs::World;
 use macroquad::prelude::*;
 
 use crate::{
     basic::{
+        fx::{FxManager, Particle},
         motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
         render::Sprite,
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
@@ -209,10 +212,10 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
     }
 }
 
-pub fn visuals(world: &mut World) {
+pub fn visuals(world: &mut World, fx: &mut FxManager) {
     //get player
-    let (_, (player, player_sprite)) = world
-        .query_mut::<(&Player, &mut Sprite)>()
+    let (_, (player, player_pos, player_rotation, player_sprite)) = world
+        .query_mut::<(&Player, &Position, &Rotation, &mut Sprite)>()
         .into_iter()
         .next()
         .unwrap();
@@ -222,5 +225,23 @@ pub fn visuals(world: &mut World) {
         PLAYER_TEX_POSITIVE
     } else {
         PLAYER_TEX_NEGATIVE
+    };
+
+    //emit fumes if running
+    if is_mouse_button_down(MouseButton::Left) {
+        fx.burst_particles(
+            Particle {
+                pos: vec2(player_pos.x, player_pos.y)
+                    + Vec2::from_angle(player_rotation.angle).rotate(-Vec2::X) * 15.0,
+                vel: Vec2::from_angle(player_rotation.angle).rotate(-Vec2::X) * 100.0,
+                life: fastrand::f32() * 0.8 + 0.2,
+                max_life: 1.0,
+                min_size: 1.0,
+                max_size: 4.0,
+                color: ORANGE,
+            },
+            PI / 8.0,
+            7,
+        )
     }
 }
