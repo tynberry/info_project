@@ -83,7 +83,7 @@ async fn main() {
         basic::motion::apply_physics(&mut world, dt);
         basic::motion::apply_motion(&mut world, dt);
 
-        basic::ensure_wrapping(&mut world, &mut cmd);
+        basic::ensure_wrapping(&mut world, &mut cmd, &assets);
         basic::ensure_damage(&mut world, &mut events);
         basic::motion::apply_knockback(&mut world, &mut events);
 
