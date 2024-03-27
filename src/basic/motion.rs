@@ -1,11 +1,16 @@
 use hecs::World;
 use macroquad::math::{vec2, Vec2};
 
-use super::{HitEvent, Position};
+use super::{HitEvent, Position, Rotation};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearMotion {
     pub vel: Vec2,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct LinearTorgue {
+    pub speed: f32,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -51,6 +56,10 @@ pub fn apply_motion(world: &mut World, dt: f32) {
     for (_, (linear, linear_pos)) in world.query_mut::<(&LinearMotion, &mut Position)>() {
         linear_pos.x += linear.vel.x * dt;
         linear_pos.y += linear.vel.y * dt;
+    }
+
+    for (_, (torgue, rotation)) in world.query_mut::<(&LinearTorgue, &mut Rotation)>() {
+        rotation.angle += torgue.speed * dt;
     }
 
     for (_, (physics, physics_pos)) in world.query_mut::<(&PhysicsMotion, &mut Position)>() {
