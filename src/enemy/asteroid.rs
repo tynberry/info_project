@@ -214,10 +214,10 @@ pub fn create_big_asteroid(
             z_index: 0,
         },
         HitBox {
-            radius: BIG_ASTEROID_SIZE / 2.0,
+            radius: BIG_ASTEROID_SIZE / 2.0 - 15.0,
         },
         HurtBox {
-            radius: BIG_ASTEROID_SIZE / 2.0,
+            radius: BIG_ASTEROID_SIZE / 2.0 - 15.0,
         },
         Health {
             max_hp: BIG_ASTEROID_HEALTH,
