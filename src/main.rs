@@ -4,7 +4,7 @@ pub mod game;
 mod player;
 pub mod projectile;
 
-use basic::{health::HealthDisplay, render::AssetManager, Position};
+use basic::{fx::FxManager, health::HealthDisplay, render::AssetManager, Position};
 use enemy::{
     ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL, ASTEROID_TEX_POSITIVE, BIG_ASTEROID_TEX_NEGATIVE,
     BIG_ASTEROID_TEX_POSITIVE,
@@ -34,6 +34,9 @@ async fn main() {
     for (asset_id, asset_path) in ASSETS {
         assets.load_texture(asset_id, asset_path).await.unwrap();
     }
+
+    //init particle system
+    let mut fx = FxManager::new(1024);
 
     //init world
     let mut world = hecs::World::default();
@@ -94,6 +97,10 @@ async fn main() {
 
         enemy::big_asteroid(&mut world, &mut cmd);
 
+        //DECORATIONS UPDATE
+
+        fx.update_particles(dt);
+
         //spawn enemies
         game::enemy_spawning(&mut world, &mut cmd, dt);
 
@@ -113,6 +120,8 @@ async fn main() {
         //actually render
 
         basic::render::render_all(&mut world, &assets);
+
+        fx.render_particles();
 
         basic::health::render_displays(&mut world);
 
