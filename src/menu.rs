@@ -20,15 +20,15 @@ pub fn render_title(world: &mut World, assets: &AssetManager) {
         //get font to render
         let font = assets.get_font(title.font);
         //render it center aligned
-        let dimensions = measure_text(title.text.as_str(), font, 64, title.size / 64.0);
+        let dimensions = measure_text(title.text.as_str(), font, title.size as u16, 1.0);
         draw_text_ex(
             title.text.as_str(),
             position.x - dimensions.width / 2.0,
             position.y - dimensions.height / 2.0,
             TextParams {
                 font,
-                font_size: 64,
-                font_scale: title.size / 64.0,
+                font_size: title.size as u16,
+                font_scale: 1.0,
                 color: title.color,
                 ..Default::default()
             },
