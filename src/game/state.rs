@@ -22,7 +22,7 @@ impl GameState {
         fx: &mut FxManager,
     ) {
         let new_state = match self {
-            GameState::MainMenu => main_menu_update(),
+            GameState::MainMenu => main_menu_update(world),
             GameState::Running => game_update(world, events, assets, dt, fx),
             GameState::Paused => todo!(),
         };
@@ -51,11 +51,18 @@ impl GameState {
 //MAIN MENU
 //-----------------------------------------------------------------------------
 
-fn main_menu_update() -> Option<GameState> {
-    None
+fn main_menu_update(world: &mut World) -> Option<GameState> {
+    let new_state = menu::handle_buttons(world);
+
+    if matches!(new_state, Some(GameState::Running)) {
+        super::init::init_game(world);
+    }
+
+    new_state
 }
 
 fn main_menu_render(world: &mut World, assets: &AssetManager) {
+    menu::button_colors(world);
     menu::render_title(world, assets);
 }
 

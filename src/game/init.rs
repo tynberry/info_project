@@ -3,7 +3,7 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{HealthDisplay, Position},
-    menu::Title,
+    menu::{Button, StartButton, Title},
     player,
 };
 
@@ -48,7 +48,7 @@ pub fn init_main_menu(world: &mut World) {
     world.spawn((
         Position {
             x: screen_width() / 2.0,
-            y: 150.0,
+            y: 120.0,
         },
         Title {
             text: "THE GAME".into(),
@@ -62,7 +62,7 @@ pub fn init_main_menu(world: &mut World) {
     world.spawn((
         Position {
             x: screen_width() / 2.0,
-            y: 300.0,
+            y: 280.0,
         },
         Title {
             text: "START".into(),
@@ -70,5 +70,14 @@ pub fn init_main_menu(world: &mut World) {
             size: 50.0,
             color: WHITE,
         },
+        Button {
+            width: 160.0,
+            height: 50.0,
+            neutral_color: WHITE,
+            hover_color: LIGHTGRAY,
+            active_color: GRAY,
+            clicked: false,
+        },
+        StartButton,
     ));
 }
