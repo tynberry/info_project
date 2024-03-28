@@ -8,6 +8,8 @@ use macroquad::{
 
 use crate::{basic::Position, enemy::Enemy, player::Player};
 
+pub mod init;
+pub mod state;
 mod wave;
 
 const SPAWN_FALLBACK_COOLDOWN: f32 = 10.0;
