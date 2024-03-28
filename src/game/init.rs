@@ -1,4 +1,4 @@
-use hecs::World;
+use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
     player,
 };
 
-use super::EnemySpawner;
+use super::{state::Pause, EnemySpawner};
 
 pub fn init_game(world: &mut World) {
     //clear remains of the previous state
@@ -80,4 +80,28 @@ pub fn init_main_menu(world: &mut World) {
         },
         StartButton,
     ));
+}
+
+pub fn init_pause(world: &mut World) {
+    world.spawn((
+        Position {
+            x: screen_width() / 2.0,
+            y: screen_width() / 2.0,
+        },
+        Title {
+            text: "PAUSED".into(),
+            font: "main_font",
+            size: 40.0,
+            color: WHITE,
+        },
+        Pause,
+    ));
+}
+
+pub fn clear_pause(world: &mut World) {
+    let mut cmd = CommandBuffer::new();
+    for (entity, _) in world.query_mut::<&Pause>() {
+        cmd.despawn(entity)
+    }
+    cmd.run_on(world);
 }

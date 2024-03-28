@@ -1,4 +1,5 @@
 use hecs::{CommandBuffer, World};
+use macroquad::prelude::*;
 
 use crate::{
     basic::{self, fx::FxManager, render::AssetManager},
@@ -12,6 +13,9 @@ pub enum GameState {
     Paused,
 }
 
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Pause;
+
 impl GameState {
     pub fn update(
         &mut self,
@@ -24,7 +28,7 @@ impl GameState {
         let new_state = match self {
             GameState::MainMenu => main_menu_update(world),
             GameState::Running => game_update(world, events, assets, dt, fx),
-            GameState::Paused => todo!(),
+            GameState::Paused => pause_update(world),
         };
         if let Some(state) = new_state {
             *self = state;
@@ -42,7 +46,7 @@ impl GameState {
         match self {
             GameState::MainMenu => main_menu_render(world, assets),
             GameState::Running => game_render(world, fx, assets),
-            GameState::Paused => todo!(),
+            GameState::Paused => pause_render(world, fx, assets),
         }
     }
 }
@@ -108,6 +112,12 @@ fn game_update(
     //Apply commands
     cmd.run_on(world);
 
+    //pausing
+    if is_key_pressed(KeyCode::Escape) {
+        super::init::init_pause(world);
+        return Some(GameState::Paused);
+    }
+
     None
 }
 
@@ -121,4 +131,37 @@ fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     fx.render_particles();
 
     basic::health::render_displays(world);
+}
+
+//-----------------------------------------------------------------------------
+//PAUSE
+//-----------------------------------------------------------------------------
+
+fn pause_update(world: &mut World) -> Option<GameState> {
+    if is_key_pressed(KeyCode::Escape) {
+        super::init::clear_pause(world);
+        Some(GameState::Running)
+    } else {
+        None
+    }
+}
+
+fn pause_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
+    //first render the game
+    game_render(world, fx, assets);
+    //overlap with transparent black
+    draw_rectangle(
+        0.0,
+        0.0,
+        screen_width(),
+        screen_height(),
+        Color {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 0.3,
+        },
+    );
+    //draw pause text
+    menu::render_title(world, assets);
 }
