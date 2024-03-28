@@ -1,6 +1,7 @@
 pub mod basic;
 pub mod enemy;
 pub mod game;
+pub mod menu;
 mod player;
 pub mod projectile;
 
@@ -14,7 +15,7 @@ use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
 use projectile::{PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
 
-const ASSETS: [(&str, &str); 9] = [
+const TEXTURES: [(&str, &str); 9] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
@@ -30,9 +31,15 @@ const ASSETS: [(&str, &str); 9] = [
 async fn main() {
     //load assets to render
     let mut assets = AssetManager::default();
-    for (asset_id, asset_path) in ASSETS {
+    for (asset_id, asset_path) in TEXTURES {
         assets.load_texture(asset_id, asset_path).await.unwrap();
     }
+
+    //load font
+    assets
+        .load_font("main_font", "res/NotoSans-Regular.ttf")
+        .await
+        .unwrap();
 
     //init particle system
     let mut fx = FxManager::new(1024);
@@ -42,10 +49,10 @@ async fn main() {
     //init events
     let mut events = hecs::World::default();
     //init game state
-    let mut state = GameState::Running;
+    let mut state = GameState::MainMenu;
 
     //init game
-    game::init::init_game(&mut world);
+    game::init::init_main_menu(&mut world);
 
     loop {
         let dt = get_frame_time();

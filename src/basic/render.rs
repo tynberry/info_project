@@ -7,6 +7,7 @@ use super::{Position, Rotation};
 #[derive(Debug, Default)]
 pub struct AssetManager {
     textures: fnv::FnvHashMap<&'static str, Texture2D>,
+    fonts: fnv::FnvHashMap<&'static str, Font>,
 }
 
 impl AssetManager {
@@ -24,6 +25,22 @@ impl AssetManager {
 
     pub fn get_texture(&self, id: &'static str) -> Option<&Texture2D> {
         self.textures.get(id)
+    }
+
+    pub async fn load_font(
+        &mut self,
+        id: &'static str,
+        path: &str,
+    ) -> Result<(), macroquad::Error> {
+        //load it
+        let font = load_ttf_font(path).await?;
+        //save it
+        self.fonts.insert(id, font);
+        Ok(())
+    }
+
+    pub fn get_font(&self, id: &'static str) -> Option<&Font> {
+        self.fonts.get(id)
     }
 }
 

@@ -3,6 +3,7 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{HealthDisplay, Position},
+    menu::Title,
     player,
 };
 
@@ -37,4 +38,23 @@ pub fn init_game(world: &mut World) {
 
     //add enemy spawner
     world.spawn((EnemySpawner::default(),));
+}
+
+pub fn init_main_menu(world: &mut World) {
+    //clear remains of the previous state
+    world.clear();
+
+    //add game title
+    world.spawn((
+        Position {
+            x: screen_width() / 2.0,
+            y: 100.0,
+        },
+        Title {
+            text: "THE GAME".into(),
+            font: "main_font",
+            size: 50.0,
+            color: WHITE,
+        },
+    ));
 }

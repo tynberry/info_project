@@ -2,7 +2,7 @@ use hecs::{CommandBuffer, World};
 
 use crate::{
     basic::{self, fx::FxManager, render::AssetManager},
-    enemy, player, projectile,
+    enemy, menu, player, projectile,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,7 +22,7 @@ impl GameState {
         fx: &mut FxManager,
     ) {
         let new_state = match self {
-            GameState::MainMenu => todo!(),
+            GameState::MainMenu => main_menu_update(),
             GameState::Running => game_update(world, events, assets, dt, fx),
             GameState::Paused => todo!(),
         };
@@ -40,12 +40,28 @@ impl GameState {
         fx: &mut FxManager,
     ) {
         match self {
-            GameState::MainMenu => todo!(),
+            GameState::MainMenu => main_menu_render(world, assets),
             GameState::Running => game_render(world, fx, assets),
             GameState::Paused => todo!(),
         }
     }
 }
+
+//-----------------------------------------------------------------------------
+//MAIN MENU
+//-----------------------------------------------------------------------------
+
+fn main_menu_update() -> Option<GameState> {
+    None
+}
+
+fn main_menu_render(world: &mut World, assets: &AssetManager) {
+    menu::render_title(world, assets);
+}
+
+//-----------------------------------------------------------------------------
+//GAME
+//-----------------------------------------------------------------------------
 
 fn game_update(
     world: &mut World,
