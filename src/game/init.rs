@@ -48,10 +48,24 @@ pub fn init_main_menu(world: &mut World) {
     world.spawn((
         Position {
             x: screen_width() / 2.0,
-            y: 100.0,
+            y: 150.0,
         },
         Title {
             text: "THE GAME".into(),
+            font: "main_font",
+            size: 100.0,
+            color: WHITE,
+        },
+    ));
+
+    //add start game button
+    world.spawn((
+        Position {
+            x: screen_width() / 2.0,
+            y: 300.0,
+        },
+        Title {
+            text: "START".into(),
             font: "main_font",
             size: 50.0,
             color: WHITE,
