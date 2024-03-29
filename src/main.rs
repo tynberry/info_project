@@ -13,9 +13,9 @@ use enemy::{
 use game::state::GameState;
 use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
-use projectile::{PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
+use projectile::{PROJ_MED_TEX_NEG, PROJ_MED_TEX_POS, PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
 
-const TEXTURES: [(&str, &str); 9] = [
+const TEXTURES: [(&str, &str); 11] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
@@ -25,6 +25,8 @@ const TEXTURES: [(&str, &str); 9] = [
     (PLAYER_TEX_NEGATIVE, "res/player_minus.png"),
     (PROJ_SMALL_TEX_NEG, "res/smal_proj_minus.png"),
     (PROJ_SMALL_TEX_POS, "res/smal_proj_plus.png"),
+    (PROJ_MED_TEX_NEG, "res/medium_proj_minus.png"),
+    (PROJ_MED_TEX_POS, "res/medium_proj_plus.png"),
 ];
 
 #[macroquad::main("Warping Warp")]

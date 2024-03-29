@@ -12,6 +12,7 @@ pub struct Projectile;
 #[derive(Clone, Debug)]
 pub enum ProjectileType {
     Small { charge: i8 },
+    Medium { charge: i8 },
 }
 
 pub const PROJ_SMALL_TEX_POS: &str = "proj_small_plus";
@@ -23,6 +24,16 @@ const PROJ_SMALL_CHARGE: f32 = 20.0;
 const PROJ_SMALL_CHARGE_MULT: f32 = 0.4;
 const PROJ_SMALL_F_RADIUS: f32 = 100.0;
 const PROJ_SMALL_RADIUS: f32 = 200.0;
+
+pub const PROJ_MED_TEX_POS: &str = "proj_medium_plus";
+pub const PROJ_MED_TEX_NEG: &str = "proj_medium_minus";
+
+const PROJ_MED_MASS: f32 = 1.0;
+const PROJ_MED_SIZE: f32 = 8.0;
+const PROJ_MED_CHARGE: f32 = 40.0;
+const PROJ_MED_CHARGE_MULT: f32 = 0.7;
+const PROJ_MED_F_RADIUS: f32 = 120.0;
+const PROJ_MED_RADIUS: f32 = 250.0;
 
 //-----------------------------------------------------------------------------
 //CONSTRUCT ENTITY
@@ -48,10 +59,12 @@ pub fn create_projectile(
     //get properties from type
     let size = match proj_type {
         ProjectileType::Small { .. } => PROJ_SMALL_SIZE,
+        ProjectileType::Medium { .. } => PROJ_MED_SIZE,
     };
 
     let mass = match proj_type {
         ProjectileType::Small { .. } => PROJ_SMALL_MASS,
+        ProjectileType::Medium { .. } => PROJ_MED_MASS,
     };
 
     let texture = match proj_type {
@@ -62,14 +75,27 @@ pub fn create_projectile(
                 PROJ_SMALL_TEX_NEG
             }
         }
+        ProjectileType::Medium { charge } => {
+            if charge > 0 {
+                PROJ_MED_TEX_POS
+            } else {
+                PROJ_MED_TEX_NEG
+            }
+        }
     };
 
-    let (charge, charge_mult, f_radius, n_radius) = match proj_type {
+    let (charge, charge_mult, _f_radius, _n_radius) = match proj_type {
         ProjectileType::Small { charge } => (
             charge as f32 * PROJ_SMALL_CHARGE,
             PROJ_SMALL_CHARGE_MULT,
             PROJ_SMALL_F_RADIUS,
             PROJ_SMALL_RADIUS,
+        ),
+        ProjectileType::Medium { charge } => (
+            charge as f32 * PROJ_MED_CHARGE,
+            PROJ_MED_CHARGE_MULT,
+            PROJ_MED_F_RADIUS,
+            PROJ_MED_RADIUS,
         ),
     };
 
