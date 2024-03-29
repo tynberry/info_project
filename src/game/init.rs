@@ -105,3 +105,31 @@ pub fn clear_pause(world: &mut World) {
     }
     cmd.run_on(world);
 }
+
+pub fn init_game_over(world: &mut World) {
+    world.spawn((
+        Position {
+            x: screen_width() / 2.0,
+            y: screen_height() / 2.0,
+        },
+        Title {
+            text: "GAME OVER".into(),
+            font: "main_font",
+            size: 60.0,
+            color: WHITE,
+        },
+    ));
+
+    world.spawn((
+        Position {
+            x: screen_width() / 2.0,
+            y: screen_height() / 2.0 + 60.0,
+        },
+        Title {
+            text: "Press escape to return to main menu".into(),
+            font: "main_font",
+            size: 40.0,
+            color: WHITE,
+        },
+    ));
+}

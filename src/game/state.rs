@@ -2,8 +2,10 @@ use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
 use crate::{
-    basic::{self, fx::FxManager, render::AssetManager},
-    enemy, menu, player, projectile,
+    basic::{self, fx::FxManager, render::AssetManager, Health},
+    enemy, menu,
+    player::{self, Player},
+    projectile,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -11,6 +13,7 @@ pub enum GameState {
     MainMenu,
     Running,
     Paused,
+    GameOver,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -29,6 +32,7 @@ impl GameState {
             GameState::MainMenu => main_menu_update(world),
             GameState::Running => game_update(world, events, assets, dt, fx),
             GameState::Paused => pause_update(world),
+            GameState::GameOver => game_over_update(world),
         };
         if let Some(state) = new_state {
             *self = state;
@@ -47,6 +51,7 @@ impl GameState {
             GameState::MainMenu => main_menu_render(world, assets),
             GameState::Running => game_render(world, fx, assets),
             GameState::Paused => pause_render(world, fx, assets),
+            GameState::GameOver => game_over_render(world, fx, assets),
         }
     }
 }
@@ -118,6 +123,19 @@ fn game_update(
         return Some(GameState::Paused);
     }
 
+    //check for game over
+    let (_, player_hp) = world
+        .query_mut::<&Health>()
+        .with::<&Player>()
+        .into_iter()
+        .next()
+        .unwrap();
+
+    if player_hp.hp <= 0.0 {
+        super::init::init_game_over(world);
+        return Some(GameState::GameOver);
+    }
+
     None
 }
 
@@ -163,5 +181,38 @@ fn pause_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
         },
     );
     //draw pause text
+    menu::render_title(world, assets);
+}
+
+//-----------------------------------------------------------------------------
+//GAME OVER
+//-----------------------------------------------------------------------------
+
+fn game_over_update(world: &mut World) -> Option<GameState> {
+    if is_key_pressed(KeyCode::Escape) {
+        super::init::init_main_menu(world);
+        Some(GameState::MainMenu)
+    } else {
+        None
+    }
+}
+
+fn game_over_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
+    //first render the game
+    game_render(world, fx, assets);
+    //overlap with transparent black
+    draw_rectangle(
+        0.0,
+        0.0,
+        screen_width(),
+        screen_height(),
+        Color {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0,
+            a: 0.3,
+        },
+    );
+    //draw game over text
     menu::render_title(world, assets);
 }
