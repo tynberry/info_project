@@ -47,7 +47,7 @@ pub struct HealthDisplay {
     pub max_width: f32,
     pub height: f32,
     pub color: Color,
-    pub max_color: Color
+    pub max_color: Color,
 }
 
 //-----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ pub fn render_displays(world: &mut World) {
         let mut target = world.query_one::<&Health>(display.target).unwrap();
         let target_hp = target.get().unwrap();
         //render a rect for their health
-        let current_width = (target_hp.hp / target_hp.max_hp) * display.max_width;
+        let current_width = ((target_hp.hp / target_hp.max_hp) * display.max_width).max(0.0);
 
         //draw background of max
         draw_rectangle(
@@ -99,7 +99,7 @@ pub fn ensure_damage(world: &mut World, events: &mut World) {
                 events.spawn((HitEvent {
                     who: hit_id,
                     by: hurt_id,
-                    can_hurt: hurt_team.can_hurt(hit_team)
+                    can_hurt: hurt_team.can_hurt(hit_team),
                 },));
             }
         }
