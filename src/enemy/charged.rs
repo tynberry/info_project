@@ -22,7 +22,7 @@ const ASTEROID_OUTLINE_SCALE: f32 = ASTEROID_SIZE / 544.0;
 
 const ASTEROID_CHARGED_FIRE_COOLDOWN: f32 = 1.0;
 const ASTEROID_CHARGED_PROJ_DMG: f32 = 0.2;
-const ASTEROID_CHARGED_PROJ_SPEED: f32 = 80.0;
+const ASTEROID_CHARGED_PROJ_SPEED: f32 = 180.0;
 
 #[derive(Clone, Copy, Debug)]
 pub struct ChargedAsteroid {

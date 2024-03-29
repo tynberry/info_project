@@ -44,6 +44,11 @@ pub struct ChargeReceiver {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
+pub struct ChargeDisable {
+    pub timer: f32,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
 pub struct KnockbackDealer {
     pub force: f32,
 }
@@ -82,10 +87,23 @@ pub fn apply_physics(world: &mut World, dt: f32) {
     }
 
     //apply all charges O(n^2)
-    for (a_ind, (a_charge, a_physics, a_pos)) in world
-        .query::<(&ChargeReceiver, &mut PhysicsMotion, &Position)>()
+    for (a_ind, (a_charge, a_physics, a_pos, a_disable)) in world
+        .query::<(
+            &ChargeReceiver,
+            &mut PhysicsMotion,
+            &Position,
+            Option<&mut ChargeDisable>,
+        )>()
         .into_iter()
     {
+        //is charge receiving disabled?
+        if let Some(disabler) = a_disable {
+            disabler.timer -= dt;
+            if disabler.timer > 0.0 {
+                continue;
+            }
+        }
+
         for (b_ind, (b_charge, b_pos)) in world.query::<(&ChargeSender, &Position)>().into_iter() {
             //ignore same entities
             if a_ind == b_ind {

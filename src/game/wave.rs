@@ -185,7 +185,7 @@ pub(super) fn single_big_asteroid(cmd: &mut CommandBuffer) {
 pub(super) fn single_charged_asteroid(world: &World, cmd: &mut CommandBuffer) {
     let side = get_side();
     let dir = get_dir(side);
-    let pos = get_spawn_pos(side) - dir * 120.0;
+    let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
     let charge = fastrand::i8(0..=1) * 2 - 1;
     enemy::charged::create_supercharged_asteroid(pos, dir, charge)(world, cmd);
 }

@@ -1,5 +1,5 @@
 use crate::basic::{
-    motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
+    motion::{ChargeDisable, ChargeReceiver, ChargeSender, PhysicsMotion},
     render::Sprite,
     DamageDealer, HitEvent, HurtBox, Position, Team,
 };
@@ -54,6 +54,7 @@ pub fn create_projectile(
     Sprite,
     //ChargeSender,
     ChargeReceiver,
+    ChargeDisable,
     PhysicsMotion,
 ) {
     //get properties from type
@@ -119,6 +120,7 @@ pub fn create_projectile(
         ChargeReceiver {
             multiplier: charge_mult * charge.signum(),
         },
+        ChargeDisable { timer: 0.2 },
         PhysicsMotion { vel, mass },
     )
 }
