@@ -65,11 +65,8 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
         .next()
         .unwrap();
     //get spawner
-    let (_, spawner) = world
-        .query_mut::<&mut EnemySpawner>()
-        .into_iter()
-        .next()
-        .unwrap();
+    let spawner_query = &mut world.query::<&mut EnemySpawner>();
+    let (_, spawner) = spawner_query.into_iter().next().unwrap();
     //advance state
     let new_state = match &mut spawner.state {
         SpawnState::Waiting { timer } => {
@@ -95,13 +92,14 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //init the wave
                 spawner.wave_counter += 1;
                 spawner.no_enemies = false;
-                spawner.wave_type = fastrand::u8(3..=3);
+                spawner.wave_type = fastrand::u8(4..=4);
                 //do the initial calls
                 match spawner.wave_type {
                     0 => wave::center_crunch(cmd),
                     1 => wave::tripleshot_init(time),
                     2 => wave::salvo_init(time),
                     3 => wave::single_big_asteroid(cmd),
+                    4 => wave::single_charged_asteroid(world, cmd),
                     _ => unreachable!("Random number should not exceed its bounds!"),
                 }
                 //change states

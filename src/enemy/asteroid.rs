@@ -16,24 +16,24 @@ use super::Enemy;
 
 //ASTEROID STATS
 
-const ASTEROID_HEALTH: f32 = 1.0;
-const ASTEROID_SPEED: f32 = 50.0;
-const ASTEROID_MASS: f32 = 18.0;
+pub(super) const ASTEROID_HEALTH: f32 = 1.0;
+pub(super) const ASTEROID_SPEED: f32 = 50.0;
+pub(super) const ASTEROID_MASS: f32 = 18.0;
 
-const ASTEROID_SIZE: f32 = 50.0;
-const ASTEROID_SCALE: f32 = ASTEROID_SIZE / 512.0;
+pub(super) const ASTEROID_SIZE: f32 = 50.0;
+pub(super) const ASTEROID_SCALE: f32 = ASTEROID_SIZE / 512.0;
 
-const ASTEROID_DMG: f32 = 0.5;
+pub(super) const ASTEROID_DMG: f32 = 0.5;
 
 pub const ASTEROID_TEX_NEUTRAL: &str = "asteroid";
 pub const ASTEROID_TEX_POSITIVE: &str = "asteroid_plus";
 pub const ASTEROID_TEX_NEGATIVE: &str = "asteroid_negative";
 
-const ASTEROID_FORCE: f32 = 750.0;
-const ASTEROID_FORCE_F_RADIUS: f32 = 200.0;
-const ASTEROID_FORCE_RADIUS: f32 = 350.0;
+pub(super) const ASTEROID_FORCE: f32 = 750.0;
+pub(super) const ASTEROID_FORCE_F_RADIUS: f32 = 200.0;
+pub(super) const ASTEROID_FORCE_RADIUS: f32 = 350.0;
 
-const ASTEROID_KNOCKBACK: f32 = 500.0;
+pub(super) const ASTEROID_KNOCKBACK: f32 = 500.0;
 
 //BIG ASTEROID STATS
 

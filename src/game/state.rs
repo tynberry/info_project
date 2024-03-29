@@ -99,6 +99,7 @@ fn game_update(
     player::motion_update(world, dt);
 
     //ENEMY AI
+    enemy::charged::supercharged_asteroid_ai(world, &mut cmd, dt);
 
     //GLOBAL SYSTEMS
     basic::motion::apply_physics(world, dt);
@@ -112,6 +113,9 @@ fn game_update(
     player::health(world, events, dt);
     enemy::health(world, events, &mut cmd);
     projectile::on_hurt(world, events, &mut cmd);
+
+    //PRE DEATH EFFECTS
+    enemy::charged::supercharged_asteroid_death(world, &mut cmd);
 
     enemy::asteroid_death(world, fx);
     enemy::big_asteroid_death(world, &mut cmd, fx);
@@ -146,6 +150,7 @@ fn game_update(
 
 fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     player::visuals(world, fx);
+    enemy::charged::supercharged_asteroid_visual(world, fx);
 
     //actually render
 

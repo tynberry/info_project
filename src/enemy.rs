@@ -1,4 +1,5 @@
 pub mod asteroid;
+pub mod charged;
 
 pub use asteroid::*;
 

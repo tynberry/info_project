@@ -7,18 +7,19 @@ pub mod projectile;
 
 use basic::{fx::FxManager, render::AssetManager};
 use enemy::{
-    ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL, ASTEROID_TEX_POSITIVE, BIG_ASTEROID_TEX_NEGATIVE,
-    BIG_ASTEROID_TEX_POSITIVE,
+    charged::ASTEROID_OUTLINE_TEX, ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL,
+    ASTEROID_TEX_POSITIVE, BIG_ASTEROID_TEX_NEGATIVE, BIG_ASTEROID_TEX_POSITIVE,
 };
 use game::state::GameState;
 use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
 use projectile::{PROJ_MED_TEX_NEG, PROJ_MED_TEX_POS, PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
 
-const TEXTURES: [(&str, &str); 11] = [
+const TEXTURES: [(&str, &str); 12] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
+    (ASTEROID_OUTLINE_TEX, "res/asteroid_outline.png"),
     (BIG_ASTEROID_TEX_POSITIVE, "res/asteroid_big_plus.png"),
     (BIG_ASTEROID_TEX_NEGATIVE, "res/asteroid_big_minus.png"),
     (PLAYER_TEX_POSITIVE, "res/player_plus.png"),
