@@ -7,7 +7,10 @@ use crate::{
     player,
 };
 
-use super::{state::Pause, EnemySpawner};
+use super::{
+    state::{GameOverTimer, Pause},
+    EnemySpawner,
+};
 
 pub fn init_game(world: &mut World) {
     //clear remains of the previous state
@@ -107,6 +110,8 @@ pub fn clear_pause(world: &mut World) {
 }
 
 pub fn init_game_over(world: &mut World) {
+    world.spawn((GameOverTimer { time: 0.0 },));
+
     world.spawn((
         Position {
             x: screen_width() / 2.0,

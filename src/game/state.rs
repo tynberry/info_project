@@ -3,7 +3,8 @@ use macroquad::prelude::*;
 
 use crate::{
     basic::{self, fx::FxManager, render::AssetManager, Health},
-    enemy, menu,
+    enemy,
+    menu::{self, Title},
     player::{self, Player},
     projectile,
 };
@@ -19,6 +20,11 @@ pub enum GameState {
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Pause;
 
+#[derive(Clone, Copy, Debug, Default)]
+pub struct GameOverTimer {
+    pub(crate) time: f32,
+}
+
 impl GameState {
     pub fn update(
         &mut self,
@@ -32,7 +38,7 @@ impl GameState {
             GameState::MainMenu => main_menu_update(world),
             GameState::Running => game_update(world, events, assets, dt, fx),
             GameState::Paused => pause_update(world),
-            GameState::GameOver => game_over_update(world),
+            GameState::GameOver => game_over_update(world, dt),
         };
         if let Some(state) = new_state {
             *self = state;
@@ -188,7 +194,14 @@ fn pause_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
 //GAME OVER
 //-----------------------------------------------------------------------------
 
-fn game_over_update(world: &mut World) -> Option<GameState> {
+const FULL_FADE_TIME: f32 = 1.0;
+
+fn game_over_update(world: &mut World, dt: f32) -> Option<GameState> {
+    //move timer
+    for (_, timer) in world.query_mut::<&mut GameOverTimer>() {
+        timer.time += dt;
+    }
+    //escape to safety when in gameover
     if is_key_pressed(KeyCode::Escape) {
         super::init::init_main_menu(world);
         Some(GameState::MainMenu)
@@ -198,6 +211,14 @@ fn game_over_update(world: &mut World) -> Option<GameState> {
 }
 
 fn game_over_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
+    //get time
+    let time = world
+        .query_mut::<&GameOverTimer>()
+        .into_iter()
+        .next()
+        .unwrap()
+        .1
+        .time;
     //first render the game
     game_render(world, fx, assets);
     //overlap with transparent black
@@ -210,9 +231,13 @@ fn game_over_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager
             r: 0.0,
             g: 0.0,
             b: 0.0,
-            a: 0.3,
+            a: 0.5 * (time / FULL_FADE_TIME).min(1.0),
         },
     );
+    //fade in the texts as well
+    for (_, title) in world.query_mut::<&mut Title>() {
+        title.color.a = (time / FULL_FADE_TIME).min(1.0);
+    }
     //draw game over text
     menu::render_title(world, assets);
 }
