@@ -41,7 +41,7 @@ pub fn create_projectile(
     HurtBox,
     DamageDealer,
     Sprite,
-    ChargeSender,
+    //ChargeSender,
     ChargeReceiver,
     PhysicsMotion,
 ) {
@@ -85,11 +85,11 @@ pub fn create_projectile(
             color: WHITE,
             z_index: -1,
         },
-        ChargeSender {
-            force: charge,
-            full_radius: f_radius,
-            no_radius: n_radius,
-        },
+        //ChargeSender {
+        //    force: charge,
+        //    full_radius: f_radius,
+        //    no_radius: n_radius,
+        //},
         ChargeReceiver {
             multiplier: charge_mult * charge.signum(),
         },
