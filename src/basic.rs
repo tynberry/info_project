@@ -59,31 +59,31 @@ pub struct DeleteOnWarp;
 //-----------------------------------------------------------------------------
 
 pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &AssetManager) {
-    for (_, wrap_pos) in world.query_mut::<&mut Position>().with::<&Wrapped>() {
+    for (_, pos) in world.query_mut::<&mut Position>().with::<&Wrapped>() {
         //if outside of screen tp them back
         //assumes position is center
-        if wrap_pos.x > screen_width() {
-            wrap_pos.x = 0.0;
+        if pos.x > screen_width() {
+            pos.x = 0.0;
         }
-        if wrap_pos.x < 0.0 {
-            wrap_pos.x = screen_width();
+        if pos.x < 0.0 {
+            pos.x = screen_width();
         }
 
-        if wrap_pos.y > screen_height() {
-            wrap_pos.y = 0.0;
+        if pos.y > screen_height() {
+            pos.y = 0.0;
         }
-        if wrap_pos.y < 0.0 {
-            wrap_pos.y = screen_height();
+        if pos.y < 0.0 {
+            pos.y = screen_height();
         }
     }
 
-    for (wrap_id, (wrap_pos, wrap_sprite)) in world
+    for (id, (pos, sprite)) in world
         .query_mut::<(&mut Position, Option<&Sprite>)>()
         .with::<&DeleteOnWarp>()
     {
         //calculate how far back it must be to be destroyed
         let pushback = 'here: {
-            match wrap_sprite {
+            match sprite {
                 Some(sprite) => {
                     //get underlying texture
                     let Some(texture) = assets.get_texture(sprite.texture) else {
@@ -98,18 +98,18 @@ pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &Asse
         };
         //if outside of screen tp them back
         //assumes position is center
-        if wrap_pos.x > screen_width() + pushback {
-            cmd.despawn(wrap_id);
+        if pos.x > screen_width() + pushback {
+            cmd.despawn(id);
         }
-        if wrap_pos.x < -pushback {
-            cmd.despawn(wrap_id);
+        if pos.x < -pushback {
+            cmd.despawn(id);
         }
 
-        if wrap_pos.y > screen_height() + pushback {
-            cmd.despawn(wrap_id);
+        if pos.y > screen_height() + pushback {
+            cmd.despawn(id);
         }
-        if wrap_pos.y < -pushback {
-            cmd.despawn(wrap_id);
+        if pos.y < -pushback {
+            cmd.despawn(id);
         }
     }
 }

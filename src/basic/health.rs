@@ -56,7 +56,7 @@ pub struct HealthDisplay {
 
 pub fn render_displays(world: &mut World) {
     //iterate over all displays
-    for (_, (display, display_pos)) in world.query::<(&HealthDisplay, &Position)>().into_iter() {
+    for (_, (display, pos)) in world.query::<(&HealthDisplay, &Position)>().into_iter() {
         //get the entity in question
         let mut target = world.query_one::<&Health>(display.target).unwrap();
         let target_hp = target.get().unwrap();
@@ -65,16 +65,16 @@ pub fn render_displays(world: &mut World) {
 
         //draw background of max
         draw_rectangle(
-            display_pos.x - display.max_width / 2.0,
-            display_pos.y - display.height / 2.0,
+            pos.x - display.max_width / 2.0,
+            pos.y - display.height / 2.0,
             display.max_width,
             display.height,
             display.max_color,
         );
         //draw actual health
         draw_rectangle(
-            display_pos.x - current_width / 2.0,
-            display_pos.y - display.height / 2.0,
+            pos.x - current_width / 2.0,
+            pos.y - display.height / 2.0,
             current_width,
             display.height,
             display.color,

@@ -225,13 +225,13 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //SYSTEM PART
 //------------------------------------------------------------------------------
 
-pub fn asteroid(world: &mut World, fx: &mut FxManager) {
-    for (_, (hp, pos)) in world
+pub fn asteroid_death(world: &mut World, fx: &mut FxManager) {
+    for (_, (health, pos)) in world
         .query_mut::<(&Health, &Position)>()
         .with::<&Asteroid>()
     {
         //check if it is dead
-        if hp.hp <= 0.0 {
+        if health.hp <= 0.0 {
             //spawn random particles on destroy
             for i in 1..=2 {
                 fx.burst_particles(
@@ -253,13 +253,13 @@ pub fn asteroid(world: &mut World, fx: &mut FxManager) {
     }
 }
 
-pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
-    for (_, (big_hp, big_pos, big_phys, big_charge)) in world
+pub fn big_asteroid_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
+    for (_, (health, pos, phys, charge)) in world
         .query_mut::<(&Health, &Position, &PhysicsMotion, &ChargeSender)>()
         .with::<&BigAsteroid>()
     {
         //check if it is dead
-        if big_hp.hp <= 0.0 {
+        if health.hp <= 0.0 {
             //spawn many smaller asteroids of the same charge
             for i in 0..8 {
                 let off =
@@ -272,25 +272,21 @@ pub fn big_asteroid(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManag
                 let dir =
                     Vec2::from_angle(PI / 2.0 * (i as f32) + if i >= 4 { PI / 4.0 } else { 0.0 })
                         .rotate(Vec2::X)
-                        + big_phys.vel / BIG_ASTEROID_SPEED;
+                        + phys.vel / BIG_ASTEROID_SPEED;
 
                 //let charge = big_charge.force.signum() as i8;
-                let charge = if i >= 4 { -1 } else { 1 } * big_charge.force.signum() as i8;
+                let charge = if i >= 4 { -1 } else { 1 } * charge.force.signum() as i8;
 
                 cmd.spawn(
-                    create_charged_asteroid(
-                        vec2(off.x + big_pos.x, off.y + big_pos.y),
-                        dir,
-                        charge,
-                    )
-                    .build(),
+                    create_charged_asteroid(vec2(off.x + pos.x, off.y + pos.y), dir, charge)
+                        .build(),
                 );
             }
             //spawn random particles on destroy
             for i in 1..5 {
                 fx.burst_particles(
                     Particle {
-                        pos: vec2(big_pos.x, big_pos.y),
+                        pos: vec2(pos.x, pos.y),
                         vel: vec2(45.0 * i as f32, 0.0),
                         life: 1.0,
                         max_life: 1.0,

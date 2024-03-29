@@ -110,10 +110,7 @@ pub fn new_entity() -> (
 
 pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
     //get player
-    let (
-        _,
-        (player, player_vel, player_angle, player_pos, player_charge_send, player_charge_receive),
-    ) = world
+    let (_, (player, vel, angle, pos, charge_send, charge_receive)) = world
         .query_mut::<(
             &mut Player,
             &PhysicsMotion,
@@ -133,9 +130,8 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
         player.fire_timer = PLAYER_FIRE_COOLDOWN;
         //fire
         cmd.spawn(projectile::create_projectile(
-            vec2(player_pos.x, player_pos.y),
-            Vec2::from_angle(player_angle.angle).rotate(Vec2::X) * 250.0
-                + vec2(player_vel.vel.x, player_vel.vel.y),
+            vec2(pos.x, pos.y),
+            Vec2::from_angle(angle.angle).rotate(Vec2::X) * 250.0 + vec2(vel.vel.x, vel.vel.y),
             0.2,
             Team::Player,
             ProjectileType::Small {
@@ -148,14 +144,14 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
     if is_key_pressed(KeyCode::A) {
         player.polarity = -player.polarity;
         //change charge
-        player_charge_receive.multiplier = 1.0 * player.polarity as f32;
-        player_charge_send.force = PLAYER_CHARGE_FORCE * player.polarity as f32;
+        charge_receive.multiplier = 1.0 * player.polarity as f32;
+        charge_send.force = PLAYER_CHARGE_FORCE * player.polarity as f32;
     }
 }
 
 pub fn motion_update(world: &mut World, dt: f32) {
     //get player
-    let (_, (player_vel, player_angle, player_pos)) = world
+    let (_, (vel, angle, pos)) = world
         .query_mut::<(&mut PhysicsMotion, &mut Rotation, &mut Position)>()
         .with::<&Player>()
         .into_iter()
@@ -163,23 +159,23 @@ pub fn motion_update(world: &mut World, dt: f32) {
         .unwrap();
     //motion friction
     if is_mouse_button_down(MouseButton::Left) {
-        player_vel.vel.x *= 0.7_f32.powf(dt);
-        player_vel.vel.y *= 0.7_f32.powf(dt);
+        vel.vel.x *= 0.7_f32.powf(dt);
+        vel.vel.y *= 0.7_f32.powf(dt);
     } else {
-        player_vel.vel.x *= 0.3_f32.powf(dt);
-        player_vel.vel.y *= 0.3_f32.powf(dt);
+        vel.vel.x *= 0.3_f32.powf(dt);
+        vel.vel.y *= 0.3_f32.powf(dt);
     }
     //follow mouse
     let mouse_pos = mouse_position();
-    player_angle.angle = (mouse_pos.1 - player_pos.y).atan2(mouse_pos.0 - player_pos.x);
+    angle.angle = (mouse_pos.1 - pos.y).atan2(mouse_pos.0 - pos.x);
     //input handling
     if is_mouse_button_down(MouseButton::Left) {
-        player_vel.vel.x += player_angle.angle.cos() * PLAYER_ACCEL * dt;
-        player_vel.vel.y += player_angle.angle.sin() * PLAYER_ACCEL * dt;
+        vel.vel.x += angle.angle.cos() * PLAYER_ACCEL * dt;
+        vel.vel.y += angle.angle.sin() * PLAYER_ACCEL * dt;
     }
     //euler integration
-    player_pos.x += player_vel.vel.x * dt;
-    player_pos.y += player_vel.vel.y * dt;
+    pos.x += vel.vel.x * dt;
+    pos.y += vel.vel.y * dt;
 }
 
 pub fn health(world: &mut World, events: &mut World, dt: f32) {
@@ -218,14 +214,14 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
 
 pub fn visuals(world: &mut World, fx: &mut FxManager) {
     //get player
-    let (_, (player, player_pos, player_rotation, player_sprite, player_health)) = world
+    let (_, (player, pos, rotation, sprite, health)) = world
         .query_mut::<(&mut Player, &Position, &Rotation, &mut Sprite, &Health)>()
         .into_iter()
         .next()
         .unwrap();
 
     //change texture based on polarity
-    player_sprite.texture = if player.polarity > 0 {
+    sprite.texture = if player.polarity > 0 {
         PLAYER_TEX_POSITIVE
     } else {
         PLAYER_TEX_NEGATIVE
@@ -235,9 +231,8 @@ pub fn visuals(world: &mut World, fx: &mut FxManager) {
     if is_mouse_button_down(MouseButton::Left) {
         fx.burst_particles(
             Particle {
-                pos: vec2(player_pos.x, player_pos.y)
-                    + Vec2::from_angle(player_rotation.angle).rotate(-Vec2::X) * 15.0,
-                vel: Vec2::from_angle(player_rotation.angle).rotate(-Vec2::X) * 100.0,
+                pos: vec2(pos.x, pos.y) + Vec2::from_angle(rotation.angle).rotate(-Vec2::X) * 15.0,
+                vel: Vec2::from_angle(rotation.angle).rotate(-Vec2::X) * 100.0,
                 life: fastrand::f32() * 0.8 + 0.2,
                 max_life: 1.0,
                 min_size: 1.0,
@@ -251,15 +246,15 @@ pub fn visuals(world: &mut World, fx: &mut FxManager) {
     }
 
     //explode if dead
-    if player_health.hp <= 0.0 && !player.dead_burst {
+    if health.hp <= 0.0 && !player.dead_burst {
         player.dead_burst = true;
         //make player's sprite not visible
-        player_sprite.scale = 0.0;
+        sprite.scale = 0.0;
         //emit dead particle
         for i in 1..5 {
             fx.burst_particles(
                 Particle {
-                    pos: vec2(player_pos.x, player_pos.y),
+                    pos: vec2(pos.x, pos.y),
                     vel: vec2(45.0 * i as f32, 0.0),
                     life: 1.0,
                     max_life: 1.0,

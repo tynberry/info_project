@@ -99,7 +99,6 @@ fn game_update(
     player::motion_update(world, dt);
 
     //ENEMY AI
-    enemy::shooter_ai(world, &mut cmd, dt);
 
     //GLOBAL SYSTEMS
     basic::motion::apply_physics(world, dt);
@@ -114,8 +113,8 @@ fn game_update(
     enemy::health(world, events, &mut cmd);
     projectile::on_hurt(world, events, &mut cmd);
 
-    enemy::asteroid(world, fx);
-    enemy::big_asteroid(world, &mut cmd, fx);
+    enemy::asteroid_death(world, fx);
+    enemy::big_asteroid_death(world, &mut cmd, fx);
 
     //spawn enemies
     super::enemy_spawning(world, &mut cmd, dt);

@@ -53,18 +53,18 @@ pub struct KnockbackDealer {
 //-----------------------------------------------------------------------------
 
 pub fn apply_motion(world: &mut World, dt: f32) {
-    for (_, (linear, linear_pos)) in world.query_mut::<(&LinearMotion, &mut Position)>() {
-        linear_pos.x += linear.vel.x * dt;
-        linear_pos.y += linear.vel.y * dt;
+    for (_, (linear, pos)) in world.query_mut::<(&LinearMotion, &mut Position)>() {
+        pos.x += linear.vel.x * dt;
+        pos.y += linear.vel.y * dt;
     }
 
     for (_, (torgue, rotation)) in world.query_mut::<(&LinearTorgue, &mut Rotation)>() {
         rotation.angle += torgue.speed * dt;
     }
 
-    for (_, (physics, physics_pos)) in world.query_mut::<(&PhysicsMotion, &mut Position)>() {
-        physics_pos.x += physics.vel.x * dt;
-        physics_pos.y += physics.vel.y * dt;
+    for (_, (physics, pos)) in world.query_mut::<(&PhysicsMotion, &mut Position)>() {
+        pos.x += physics.vel.x * dt;
+        pos.y += physics.vel.y * dt;
     }
 }
 
