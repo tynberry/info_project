@@ -39,7 +39,7 @@ pub fn render_title(world: &mut World, assets: &AssetManager) {
         draw_text_ex(
             title.text.as_str(),
             position.x - dimensions.width / 2.0,
-            position.y + dimensions.height / 2.0,
+            position.y + dimensions.offset_y / 2.0,
             TextParams {
                 font,
                 font_size: title.size as u16,

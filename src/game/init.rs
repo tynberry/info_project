@@ -86,7 +86,7 @@ pub fn init_pause(world: &mut World) {
     world.spawn((
         Position {
             x: screen_width() / 2.0,
-            y: screen_width() / 2.0,
+            y: screen_height() / 2.0,
         },
         Title {
             text: "PAUSED".into(),

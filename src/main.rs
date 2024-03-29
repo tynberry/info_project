@@ -38,6 +38,7 @@ async fn main() {
     //load font
     assets
         .load_font("main_font", "res/NotoSans-Regular.ttf")
+        //.load_font("main_font", "res/ShantellSans-Medium.ttf")
         .await
         .unwrap();
 
