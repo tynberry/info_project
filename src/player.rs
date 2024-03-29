@@ -37,6 +37,8 @@ pub struct Player {
     invul_timer: f32,
 
     polarity: i8,
+
+    dead_burst: bool,
 }
 
 impl Player {
@@ -46,6 +48,8 @@ impl Player {
             invul_timer: 0.0,
 
             polarity: 1,
+
+            dead_burst: false,
         }
     }
 }
@@ -214,8 +218,8 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
 
 pub fn visuals(world: &mut World, fx: &mut FxManager) {
     //get player
-    let (_, (player, player_pos, player_rotation, player_sprite)) = world
-        .query_mut::<(&Player, &Position, &Rotation, &mut Sprite)>()
+    let (_, (player, player_pos, player_rotation, player_sprite, player_health)) = world
+        .query_mut::<(&mut Player, &Position, &Rotation, &mut Sprite, &Health)>()
         .into_iter()
         .next()
         .unwrap();
@@ -244,5 +248,29 @@ pub fn visuals(world: &mut World, fx: &mut FxManager) {
             PI / 8.0,
             7,
         )
+    }
+
+    //explode if dead
+    if player_health.hp <= 0.0 && !player.dead_burst {
+        player.dead_burst = true;
+        //make player's sprite not visible
+        player_sprite.scale = 0.0;
+        //emit dead particle
+        for i in 1..5 {
+            fx.burst_particles(
+                Particle {
+                    pos: vec2(player_pos.x, player_pos.y),
+                    vel: vec2(45.0 * i as f32, 0.0),
+                    life: 1.0,
+                    max_life: 1.0,
+                    min_size: 0.0,
+                    max_size: 20.0,
+                    color: RED,
+                },
+                30.0,
+                2.0 * PI,
+                8 * i,
+            );
+        }
     }
 }
