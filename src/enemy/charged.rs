@@ -21,7 +21,7 @@ pub const ASTEROID_OUTLINE_TEX: &str = "asteroid_outline";
 const ASTEROID_OUTLINE_SCALE: f32 = ASTEROID_SIZE / 544.0;
 
 const ASTEROID_CHARGED_FIRE_COOLDOWN: f32 = 1.0;
-const ASTEROID_CHARGED_PROJ_DMG: f32 = 0.2;
+const ASTEROID_CHARGED_PROJ_DMG: f32 = 0.8;
 const ASTEROID_CHARGED_PROJ_SPEED: f32 = 180.0;
 
 #[derive(Clone, Copy, Debug)]
@@ -84,9 +84,9 @@ pub fn create_supercharged_asteroid(
         Team::Enemy,
         DeleteOnWarp,
         ChargeSender {
-            force: ASTEROID_FORCE * charge as f32,
-            full_radius: ASTEROID_FORCE_F_RADIUS,
-            no_radius: ASTEROID_FORCE_RADIUS,
+            force: ASTEROID_FORCE * charge as f32 / 4.0,
+            full_radius: 0.0,
+            no_radius: ASTEROID_FORCE_F_RADIUS / 1.5,
         },
         ChargeReceiver {
             multiplier: charge as f32,
