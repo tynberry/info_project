@@ -12,7 +12,7 @@ use crate::basic::{
     DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
 };
 
-use super::Enemy;
+use super::{charged::create_supercharged_asteroid, Enemy};
 
 //ASTEROID STATS
 
@@ -255,8 +255,9 @@ pub fn asteroid_death(world: &mut World, fx: &mut FxManager) {
 
 pub fn big_asteroid_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
     for (_, (health, pos, phys, charge)) in world
-        .query_mut::<(&Health, &Position, &PhysicsMotion, &ChargeSender)>()
+        .query::<(&Health, &Position, &PhysicsMotion, &ChargeSender)>()
         .with::<&BigAsteroid>()
+        .into_iter()
     {
         //check if it is dead
         if health.hp <= 0.0 {
@@ -277,10 +278,16 @@ pub fn big_asteroid_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut F
                 //let charge = big_charge.force.signum() as i8;
                 let charge = if i >= 4 { -1 } else { 1 } * charge.force.signum() as i8;
 
-                cmd.spawn(
-                    create_charged_asteroid(vec2(off.x + pos.x, off.y + pos.y), dir, charge)
-                        .build(),
-                );
+                if i < 4 {
+                    create_supercharged_asteroid(vec2(off.x + pos.x, off.y + pos.y), dir, charge)(
+                        world, cmd,
+                    );
+                } else {
+                    cmd.spawn(
+                        create_charged_asteroid(vec2(off.x + pos.x, off.y + pos.y), dir, charge)
+                            .build(),
+                    );
+                }
             }
             //spawn random particles on destroy
             for i in 1..5 {
