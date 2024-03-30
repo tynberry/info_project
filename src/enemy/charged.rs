@@ -21,7 +21,7 @@ pub const ASTEROID_OUTLINE_TEX: &str = "asteroid_outline";
 const ASTEROID_OUTLINE_SCALE: f32 = ASTEROID_SIZE / 544.0;
 
 const ASTEROID_CHARGED_FIRE_COOLDOWN: f32 = 1.0;
-const ASTEROID_CHARGED_PROJ_DMG: f32 = 0.8;
+const ASTEROID_CHARGED_PROJ_DMG: f32 = 1.5;
 const ASTEROID_CHARGED_PROJ_SPEED: f32 = 180.0;
 
 #[derive(Clone, Copy, Debug)]

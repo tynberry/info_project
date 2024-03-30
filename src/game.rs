@@ -92,7 +92,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //init the wave
                 spawner.wave_counter += 1;
                 spawner.no_enemies = false;
-                spawner.wave_type = fastrand::u8(4..=4);
+                spawner.wave_type = fastrand::u8(3..=3);
                 //do the initial calls
                 match spawner.wave_type {
                     0 => wave::center_crunch(cmd),
