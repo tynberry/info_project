@@ -87,13 +87,13 @@ pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &Asse
                 Some(sprite) => {
                     //get underlying texture
                     let Some(texture) = assets.get_texture(sprite.texture) else {
-                        break 'here 100.0;
+                        break 'here 50.0;
                     };
                     //get biggest side and scale it
                     let side = texture.width().max(texture.height());
-                    side * sprite.scale + 100.0
+                    side * sprite.scale + 5.0
                 }
-                None => 100.0,
+                None => 50.0,
             }
         };
         //if outside of screen tp them back
