@@ -198,6 +198,36 @@ pub(super) fn single_follower(cmd: &mut CommandBuffer) {
     cmd.spawn(enemy::follower::create_follower(pos, dir, charge).build())
 }
 
+pub(super) fn follower_salvo(
+    cmd: &mut CommandBuffer,
+    player_pos: &Position,
+    timer: &mut f32,
+    data: &mut u8,
+) {
+    let mut shoot = || {
+        let side = get_side();
+        let pos = get_spawn_pos(side);
+        let dir = (vec2(player_pos.x, player_pos.y) - pos).normalize_or_zero();
+        let charge = fastrand::i8(-1..=1);
+        cmd.spawn(enemy::follower::create_follower(pos, dir, charge).build())
+    };
+    *data = match *data {
+        0 => {
+            shoot();
+            1
+        }
+        x if x < 4 => {
+            if *timer <= (3 - x) as f32 {
+                shoot();
+                x + 1
+            } else {
+                x
+            }
+        }
+        x => x,
+    }
+}
+
 //------------------------------------------------------------------------------
 //HELPER FUNCTIONS
 //------------------------------------------------------------------------------

@@ -12,7 +12,8 @@ pub mod init;
 pub mod state;
 mod wave;
 
-const SPAWN_FALLBACK_COOLDOWN: f32 = 10.0;
+const SPAWN_INIT_COOLDOWN: f32 = 5.0;
+const SPAWN_FALLBACK_COOLDOWN: f32 = 30.0;
 const SPAWN_NO_ENEMY_TIMER: f32 = 3.0;
 const SPAWN_MARGIN: f32 = 20.0;
 const SPAWN_PUSHBACK: f32 = 10.0;
@@ -38,7 +39,7 @@ impl EnemySpawner {
             no_enemies: true,
             wave_type: 0,
             state: SpawnState::Waiting {
-                timer: SPAWN_FALLBACK_COOLDOWN,
+                timer: SPAWN_INIT_COOLDOWN,
             },
         }
     }
@@ -100,7 +101,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                     2 => wave::salvo_init(time),
                     3 => wave::single_big_asteroid(cmd),
                     4 => wave::single_charged_asteroid(world, cmd),
-                    5 => wave::single_follower(cmd),
+                    5 => wave::salvo_init(time),
                     _ => unreachable!("Random number should not exceed its bounds!"),
                 }
                 //change states
@@ -118,6 +119,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 match spawner.wave_type {
                     1 => wave::tripleshot(cmd, time, data),
                     2 => wave::salvo(cmd, &player_pos, time, data),
+                    5 => wave::follower_salvo(cmd, &player_pos, time, data),
                     _ => (),
                 }
                 //change states
