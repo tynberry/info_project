@@ -77,7 +77,13 @@ impl FxManager {
             let size = (particle.life / particle.max_life)
                 * (particle.max_size - particle.min_size)
                 + particle.min_size;
-            draw_rectangle(particle.pos.x, particle.pos.y, size, size, particle.color);
+            draw_rectangle(
+                particle.pos.x - size / 2.0,
+                particle.pos.y - size / 2.0,
+                size,
+                size,
+                particle.color,
+            );
         }
     }
 }
