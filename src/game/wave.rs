@@ -6,6 +6,18 @@ use macroquad::prelude::*;
 
 use crate::enemy;
 
+pub struct WavePreamble<'a> {
+    pub world: &'a World,
+    pub cmd: &'a mut CommandBuffer,
+    pub player_pos: &'a Position,
+    pub timer: &'a mut f32,
+    pub data: &'a mut u8,
+}
+
+//
+//WAVE PART
+//
+
 pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //center crunch attack
     let charge = fastrand::i8(0..=1) * 2 - 1;
@@ -139,42 +151,19 @@ pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
 }
 
 #[inline]
-pub(super) fn salvo_init(timer: &mut f32) {
-    *timer = 3.0;
+pub(super) fn salvo_init(timer: &mut f32, base_time: f32) {
+    *timer = base_time;
 }
 
-#[inline]
-pub(super) fn salvo(
-    cmd: &mut CommandBuffer,
-    player_pos: &Position,
-    timer: &mut f32,
-    data: &mut u8,
-) {
-    let mut shoot = || {
-        let side = get_side();
-        let pos = get_spawn_pos(side);
-        let dir = (vec2(player_pos.x, player_pos.y) - pos).normalize_or_zero();
-        let charge = fastrand::i8(0..=1) * 2 - 1;
-        cmd.spawn(enemy::create_charged_asteroid(pos, dir, charge).build())
-    };
-    *data = match *data {
-        0 => {
-            shoot();
-            1
-        }
-        x if x < 8 => {
-            if *timer <= (3.0 / 7.0) * (7 - x) as f32 {
-                shoot();
-                x + 1
-            } else {
-                x
-            }
-        }
-        x => x,
-    }
+pub(super) fn asteroid(_: &World, cmd: &mut CommandBuffer) {
+    let side = get_side();
+    let dir = get_dir(side);
+    let pos = get_spawn_pos(side) - dir * 120.0;
+    let charge = fastrand::i8(0..=1) * 2 - 1;
+    cmd.spawn(enemy::create_charged_asteroid(pos, dir, charge).build());
 }
 
-pub(super) fn single_big_asteroid(cmd: &mut CommandBuffer) {
+pub(super) fn big_asteroid(_: &World, cmd: &mut CommandBuffer) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * 120.0;
@@ -182,7 +171,7 @@ pub(super) fn single_big_asteroid(cmd: &mut CommandBuffer) {
     cmd.spawn(enemy::create_big_asteroid(pos, dir, charge).build());
 }
 
-pub(super) fn single_charged_asteroid(world: &World, cmd: &mut CommandBuffer) {
+pub(super) fn charged_asteroid(world: &World, cmd: &mut CommandBuffer) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
@@ -190,7 +179,7 @@ pub(super) fn single_charged_asteroid(world: &World, cmd: &mut CommandBuffer) {
     enemy::charged::create_supercharged_asteroid(pos, dir, charge)(world, cmd);
 }
 
-pub(super) fn single_follower(cmd: &mut CommandBuffer) {
+pub(super) fn follower(_: &World, cmd: &mut CommandBuffer) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
@@ -198,27 +187,20 @@ pub(super) fn single_follower(cmd: &mut CommandBuffer) {
     cmd.spawn(enemy::follower::create_follower(pos, dir, charge).build())
 }
 
-pub(super) fn follower_salvo(
-    cmd: &mut CommandBuffer,
-    player_pos: &Position,
-    timer: &mut f32,
-    data: &mut u8,
+pub(super) fn salvo_body(
+    preamble: WavePreamble,
+    base_time: f32,
+    count: u8,
+    shoot: impl Fn(&World, &mut CommandBuffer),
 ) {
-    let mut shoot = || {
-        let side = get_side();
-        let pos = get_spawn_pos(side);
-        let dir = (vec2(player_pos.x, player_pos.y) - pos).normalize_or_zero();
-        let charge = fastrand::i8(-1..=1);
-        cmd.spawn(enemy::follower::create_follower(pos, dir, charge).build())
-    };
-    *data = match *data {
+    *preamble.data = match *preamble.data {
         0 => {
-            shoot();
+            shoot(preamble.world, preamble.cmd);
             1
         }
-        x if x < 4 => {
-            if *timer <= (3 - x) as f32 {
-                shoot();
+        x if x < count => {
+            if *preamble.timer <= (base_time / (count) as f32) * (count - x) as f32 {
+                shoot(preamble.world, preamble.cmd);
                 x + 1
             } else {
                 x

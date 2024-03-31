@@ -8,6 +8,8 @@ use macroquad::{
 
 use crate::{basic::Position, enemy::Enemy, player::Player};
 
+use self::wave::WavePreamble;
+
 pub mod init;
 pub mod state;
 mod wave;
@@ -93,15 +95,15 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //init the wave
                 spawner.wave_counter += 1;
                 spawner.no_enemies = false;
-                spawner.wave_type = fastrand::u8(5..=5);
+                spawner.wave_type = fastrand::u8(0..=4);
                 //do the initial calls
                 match spawner.wave_type {
                     0 => wave::center_crunch(cmd),
-                    1 => wave::tripleshot_init(time),
-                    2 => wave::salvo_init(time),
-                    3 => wave::single_big_asteroid(cmd),
-                    4 => wave::single_charged_asteroid(world, cmd),
-                    5 => wave::salvo_init(time),
+                    //1 => wave::tripleshot_init(time),
+                    1 => wave::salvo_init(time, 3.0),
+                    2 => wave::salvo_init(time, 5.0),
+                    3 => wave::salvo_init(time, 4.0),
+                    4 => wave::salvo_init(time, 3.0),
                     _ => unreachable!("Random number should not exceed its bounds!"),
                 }
                 //change states
@@ -115,11 +117,20 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
             } else {
                 //move timer
                 *time -= dt;
+                //create wave preamble
+                let preamble = WavePreamble {
+                    world,
+                    cmd,
+                    player_pos: &player_pos,
+                    timer: time,
+                    data,
+                };
                 //do the another wave calls
                 match spawner.wave_type {
-                    1 => wave::tripleshot(cmd, time, data),
-                    2 => wave::salvo(cmd, &player_pos, time, data),
-                    5 => wave::follower_salvo(cmd, &player_pos, time, data),
+                    1 => wave::salvo_body(preamble, 3.0, 7, wave::asteroid),
+                    2 => wave::salvo_body(preamble, 5.0, 3, wave::big_asteroid),
+                    3 => wave::salvo_body(preamble, 4.0, 5, wave::charged_asteroid),
+                    4 => wave::salvo_body(preamble, 3.0, 4, wave::follower),
                     _ => (),
                 }
                 //change states
