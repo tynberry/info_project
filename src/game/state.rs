@@ -100,6 +100,7 @@ fn game_update(
 
     //ENEMY AI
     enemy::charged::supercharged_asteroid_ai(world, &mut cmd, dt);
+    enemy::follower::follower_ai(world, dt);
 
     //GLOBAL SYSTEMS
     basic::motion::apply_physics(world, dt);
@@ -119,6 +120,7 @@ fn game_update(
 
     enemy::asteroid_death(world, fx);
     enemy::big_asteroid_death(world, &mut cmd, fx);
+    enemy::follower::follower_death(world, fx);
 
     //spawn enemies
     super::enemy_spawning(world, &mut cmd, dt);

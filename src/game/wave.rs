@@ -190,6 +190,14 @@ pub(super) fn single_charged_asteroid(world: &World, cmd: &mut CommandBuffer) {
     enemy::charged::create_supercharged_asteroid(pos, dir, charge)(world, cmd);
 }
 
+pub(super) fn single_follower(cmd: &mut CommandBuffer) {
+    let side = get_side();
+    let dir = get_dir(side);
+    let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
+    //let charge = fastrand::i8(0..=1) * 2 - 1;
+    cmd.spawn(enemy::follower::create_follower(pos, dir).build())
+}
+
 //------------------------------------------------------------------------------
 //HELPER FUNCTIONS
 //------------------------------------------------------------------------------

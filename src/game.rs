@@ -92,7 +92,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //init the wave
                 spawner.wave_counter += 1;
                 spawner.no_enemies = false;
-                spawner.wave_type = fastrand::u8(3..=3);
+                spawner.wave_type = fastrand::u8(5..=5);
                 //do the initial calls
                 match spawner.wave_type {
                     0 => wave::center_crunch(cmd),
@@ -100,6 +100,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                     2 => wave::salvo_init(time),
                     3 => wave::single_big_asteroid(cmd),
                     4 => wave::single_charged_asteroid(world, cmd),
+                    5 => wave::single_follower(cmd),
                     _ => unreachable!("Random number should not exceed its bounds!"),
                 }
                 //change states
