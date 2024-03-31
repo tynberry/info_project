@@ -6,7 +6,7 @@ use macroquad::prelude::*;
 use crate::{
     basic::{
         fx::{FxManager, Particle},
-        motion::{KnockbackDealer, LinearTorgue, PhysicsMotion},
+        motion::{ChargeReceiver, KnockbackDealer, LinearTorgue, PhysicsMotion},
         render::Sprite,
         DamageDealer, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
@@ -25,23 +25,25 @@ const FOLLOWER_SIZE: f32 = 40.0;
 const FOLLOWER_DMG: f32 = 1.5;
 
 pub const FOLLOWER_TEX_NEUTRAL: &str = "follower";
-//pub const FOLLOWER_TEX_POSITIVE: &str = "follower_plus";
-//pub const FOLLOWER_TEX_NEGATIVE: &str = "follower_negative";
+pub const FOLLOWER_TEX_POSITIVE: &str = "follower_plus";
+pub const FOLLOWER_TEX_NEGATIVE: &str = "follower_negative";
 
 const FOLLOWER_KNOCKBACK: f32 = 150.0;
 
 #[derive(Clone, Copy, Default, Debug)]
-pub struct Follower;
+pub struct Follower {
+    pub charge: i8,
+}
 
 //-----------------------------------------------------------------------------
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
-pub fn create_follower(pos: Vec2, dir: Vec2) -> EntityBuilder {
+pub fn create_follower(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let mut builder = EntityBuilder::default();
     builder.add_bundle((
         Enemy,
-        Follower,
+        Follower { charge },
         Position { x: pos.x, y: pos.y },
         Rotation {
             angle: fastrand::f32() * 2.0 * PI,
@@ -54,7 +56,12 @@ pub fn create_follower(pos: Vec2, dir: Vec2) -> EntityBuilder {
             mass: FOLLOWER_MASS,
         },
         Sprite {
-            texture: FOLLOWER_TEX_NEUTRAL,
+            texture: match charge {
+                -1 => FOLLOWER_TEX_NEGATIVE,
+                0 => FOLLOWER_TEX_NEUTRAL,
+                1 => FOLLOWER_TEX_POSITIVE,
+                _ => unimplemented!("Charges different than -1,0,1 are not implemented!"),
+            },
             scale: FOLLOWER_SIZE / 512.0,
             color: WHITE,
             z_index: 1,
@@ -75,6 +82,13 @@ pub fn create_follower(pos: Vec2, dir: Vec2) -> EntityBuilder {
             hp: FOLLOWER_HEALTH,
         },
     ));
+
+    if charge != 0 {
+        builder.add(ChargeReceiver {
+            multiplier: 10.0 * charge as f32,
+        });
+    };
+
     builder
 }
 
