@@ -121,6 +121,7 @@ fn game_update(
     enemy::asteroid_death(world, fx);
     enemy::big_asteroid_death(world, &mut cmd, fx);
     enemy::follower::follower_death(world, fx);
+    enemy::mine::mine_death(world, &mut cmd, fx);
 
     //spawn enemies
     super::enemy_spawning(world, &mut cmd, dt);

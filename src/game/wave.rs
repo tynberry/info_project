@@ -187,6 +187,14 @@ pub(super) fn follower(_: &World, cmd: &mut CommandBuffer) {
     cmd.spawn(enemy::follower::create_follower(pos, dir, charge).build())
 }
 
+pub(super) fn mine(_: &World, cmd: &mut CommandBuffer) {
+    let side = get_side();
+    let dir = get_dir(side);
+    let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
+    let charge = fastrand::i8(-1..=1);
+    cmd.spawn(enemy::mine::create_mine(pos, dir, charge).build())
+}
+
 pub(super) fn salvo_body(
     preamble: WavePreamble,
     base_time: f32,

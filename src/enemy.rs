@@ -1,6 +1,7 @@
 pub mod asteroid;
 pub mod charged;
 pub mod follower;
+pub mod mine;
 
 pub use asteroid::*;
 

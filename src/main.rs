@@ -9,6 +9,7 @@ use basic::{fx::FxManager, render::AssetManager};
 use enemy::{
     charged::ASTEROID_OUTLINE_TEX,
     follower::{FOLLOWER_TEX_NEGATIVE, FOLLOWER_TEX_NEUTRAL, FOLLOWER_TEX_POSITIVE},
+    mine::{MINE_TEX_NEGATIVE, MINE_TEX_NEUTRAL, MINE_TEX_POSITIVE},
     ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_NEUTRAL, ASTEROID_TEX_POSITIVE, BIG_ASTEROID_TEX_NEGATIVE,
     BIG_ASTEROID_TEX_POSITIVE,
 };
@@ -17,7 +18,7 @@ use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
 use projectile::{PROJ_MED_TEX_NEG, PROJ_MED_TEX_POS, PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
 
-const TEXTURES: [(&str, &str); 15] = [
+const TEXTURES: [(&str, &str); 18] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
@@ -33,6 +34,9 @@ const TEXTURES: [(&str, &str); 15] = [
     (FOLLOWER_TEX_NEUTRAL, "res/saw_blade.png"),
     (FOLLOWER_TEX_POSITIVE, "res/saw_blade_plus.png"),
     (FOLLOWER_TEX_NEGATIVE, "res/saw_blade_minus.png"),
+    (MINE_TEX_NEUTRAL, "res/mine_neutral.png"),
+    (MINE_TEX_POSITIVE, "res/mine_plus.png"),
+    (MINE_TEX_NEGATIVE, "res/mine_minus.png"),
 ];
 
 #[macroquad::main("Warping Warp")]
