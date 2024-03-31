@@ -77,7 +77,7 @@ async fn main() {
         events.clear();
 
         //RENDERING PHASE
-        clear_background(BLACK);
+        clear_background(Color::new(0.0, 0.05, 0.1, 1.0));
 
         //UPDATE VISUALS
 
