@@ -6,9 +6,9 @@ use macroquad::prelude::*;
 use crate::{
     basic::{
         fx::{FxManager, Particle},
-        motion::{KnockbackDealer, PhysicsMotion},
+        motion::{KnockbackDealer, LinearTorgue, PhysicsMotion},
         render::Sprite,
-        DamageDealer, Health, HitBox, HurtBox, Position, Team,
+        DamageDealer, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
     player::Player,
 };
@@ -20,7 +20,7 @@ const FOLLOWER_SPEED: f32 = 240.0;
 const FOLLOWER_SPEED_CHANGE: f32 = 400.0;
 const FOLLOWER_MASS: f32 = 4.0;
 
-const FOLLOWER_SIZE: f32 = 30.0;
+const FOLLOWER_SIZE: f32 = 40.0;
 
 const FOLLOWER_DMG: f32 = 1.5;
 
@@ -43,6 +43,12 @@ pub fn create_follower(pos: Vec2, dir: Vec2) -> EntityBuilder {
         Enemy,
         Follower,
         Position { x: pos.x, y: pos.y },
+        Rotation {
+            angle: fastrand::f32() * 2.0 * PI,
+        },
+        LinearTorgue {
+            speed: fastrand::f32() * 30.0 - 15.0,
+        },
         PhysicsMotion {
             vel: dir * FOLLOWER_SPEED,
             mass: FOLLOWER_MASS,
