@@ -122,10 +122,7 @@ pub fn follower_ai(world: &mut World, dt: f32) {
 }
 
 pub fn follower_death(world: &mut World, fx: &mut FxManager) {
-    for (_, (hp, pos)) in world
-        .query_mut::<(&Health, &Position)>()
-        .with::<&Follower>()
-    {
+    for (_, (follower, hp, pos)) in world.query_mut::<(&Follower, &Health, &Position)>() {
         if hp.hp <= 0.0 {
             //spawn random particles on destroy
             for i in 1..=2 {
@@ -152,7 +149,14 @@ pub fn follower_death(world: &mut World, fx: &mut FxManager) {
                     max_life: 1.0,
                     min_size: 0.0,
                     max_size: 15.0,
-                    color: GREEN,
+                    color: match follower.charge {
+                        1 => RED,
+                        0 => GREEN,
+                        -1 => Color::new(0.0, 1.0, 1.0, 1.0),
+                        _ => {
+                            unimplemented!("Followers do not support charges different than 0,1,-1")
+                        }
+                    },
                 },
                 5.0,
                 2.0 * PI,
