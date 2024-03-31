@@ -16,9 +16,12 @@ use enemy::{
 use game::state::GameState;
 use macroquad::prelude::*;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
-use projectile::{PROJ_MED_TEX_NEG, PROJ_MED_TEX_POS, PROJ_SMALL_TEX_NEG, PROJ_SMALL_TEX_POS};
+use projectile::{
+    PROJ_MED_TEX_NEG, PROJ_MED_TEX_NEUTRAL, PROJ_MED_TEX_POS, PROJ_SMALL_TEX_NEG,
+    PROJ_SMALL_TEX_POS,
+};
 
-const TEXTURES: [(&str, &str); 18] = [
+const TEXTURES: [(&str, &str); 19] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
     (ASTEROID_TEX_NEGATIVE, "res/asteroid_minus.png"),
@@ -29,6 +32,7 @@ const TEXTURES: [(&str, &str); 18] = [
     (PLAYER_TEX_NEGATIVE, "res/player_minus.png"),
     (PROJ_SMALL_TEX_NEG, "res/smal_proj_minus.png"),
     (PROJ_SMALL_TEX_POS, "res/smal_proj_plus.png"),
+    (PROJ_MED_TEX_NEUTRAL, "res/medium_proj_neutral.png"),
     (PROJ_MED_TEX_NEG, "res/medium_proj_minus.png"),
     (PROJ_MED_TEX_POS, "res/medium_proj_plus.png"),
     (FOLLOWER_TEX_NEUTRAL, "res/saw_blade.png"),

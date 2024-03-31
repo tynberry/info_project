@@ -27,6 +27,7 @@ const PROJ_SMALL_RADIUS: f32 = 200.0;
 
 pub const PROJ_MED_TEX_POS: &str = "proj_medium_plus";
 pub const PROJ_MED_TEX_NEG: &str = "proj_medium_minus";
+pub const PROJ_MED_TEX_NEUTRAL: &str = "proj_medium_neutral";
 
 const PROJ_MED_MASS: f32 = 1.0;
 const PROJ_MED_SIZE: f32 = 8.0;
@@ -76,13 +77,12 @@ pub fn create_projectile(
                 PROJ_SMALL_TEX_NEG
             }
         }
-        ProjectileType::Medium { charge } => {
-            if charge > 0 {
-                PROJ_MED_TEX_POS
-            } else {
-                PROJ_MED_TEX_NEG
-            }
-        }
+        ProjectileType::Medium { charge } => match charge {
+            1 => PROJ_MED_TEX_POS,
+            -1 => PROJ_MED_TEX_NEG,
+            0 => PROJ_MED_TEX_NEUTRAL,
+            _ => panic!("Charge can only be 0,1,-1"),
+        },
     };
 
     let (charge, charge_mult, _f_radius, _n_radius) = match proj_type {
@@ -118,7 +118,11 @@ pub fn create_projectile(
         //    no_radius: n_radius,
         //},
         ChargeReceiver {
-            multiplier: charge_mult * charge.signum(),
+            multiplier: charge_mult
+                * match charge {
+                    x if x.abs() <= 0.01 => 0.0,
+                    x => x.signum(),
+                },
         },
         ChargeDisable { timer: 0.2 },
         PhysicsMotion { vel, mass },
