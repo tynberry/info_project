@@ -153,6 +153,7 @@ fn game_update(
 fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     player::visuals(world, fx);
     enemy::charged::supercharged_asteroid_visual(world, fx);
+    enemy::follower::follower_fx(world, fx);
 
     //actually render
 

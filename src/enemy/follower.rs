@@ -121,6 +121,32 @@ pub fn follower_ai(world: &mut World, dt: f32) {
     }
 }
 
+pub fn follower_fx(world: &mut World, fx: &mut FxManager) {
+    for (_, (follower, pos)) in world.query_mut::<(&Follower, &Position)>() {
+        fx.burst_particles(
+            Particle {
+                pos: vec2(pos.x, pos.y),
+                vel: vec2(0.0, 0.0),
+                life: 0.4,
+                max_life: 0.4,
+                min_size: 0.0,
+                max_size: 4.0,
+                color: match follower.charge {
+                    1 => RED,
+                    0 => GREEN,
+                    -1 => Color::new(0.0, 1.0, 1.0, 1.0),
+                    _ => {
+                        unimplemented!("Followers do not support charges different than 0,1,-1")
+                    }
+                },
+            },
+            0.0,
+            0.0,
+            1,
+        );
+    }
+}
+
 pub fn follower_death(world: &mut World, fx: &mut FxManager) {
     for (_, (follower, hp, pos)) in world.query_mut::<(&Follower, &Health, &Position)>() {
         if hp.hp <= 0.0 {
