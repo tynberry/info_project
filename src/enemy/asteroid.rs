@@ -212,7 +212,7 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
             no_radius: BIG_ASTEROID_FORCE_RADIUS,
         },
         ChargeReceiver {
-            multiplier: charge as f32,
+            multiplier: 0.2 * charge as f32,
         },
         KnockbackDealer {
             force: BIG_ASTEROID_KNOCKBACK,
