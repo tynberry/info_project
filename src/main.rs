@@ -29,7 +29,7 @@ const TEXTURES: [(&str, &str); 13] = [
     (PROJ_SMALL_TEX_POS, "res/smal_proj_plus.png"),
     (PROJ_MED_TEX_NEG, "res/medium_proj_minus.png"),
     (PROJ_MED_TEX_POS, "res/medium_proj_plus.png"),
-    (FOLLOWER_TEX_NEUTRAL, "res/asteroid.png"),
+    (FOLLOWER_TEX_NEUTRAL, "res/saw_blade.png"),
 ];
 
 #[macroquad::main("Warping Warp")]
