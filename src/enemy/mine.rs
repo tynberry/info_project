@@ -142,12 +142,13 @@ pub fn mine_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager
         //check if it is dead
         if health.hp <= 0.0 {
             //spawn many smaller asteroids of the same charge
-            for i in 0..24 {
-                let dir = Vec2::from_angle(PI / 4.0 * (i as f32)).rotate(Vec2::X);
+            for i in 0..16 {
+                let dir =
+                    Vec2::from_angle(PI / 4.0 * (i as f32) + if i >= 8 { PI / 8.0 } else { 0.0 })
+                        .rotate(Vec2::X);
                 let speed = match i {
                     x if (0..8).contains(&x) => MINE_PROJ_SPEED,
                     x if (8..16).contains(&x) => MINE_PROJ_SPEED / 2.0,
-                    x if (16..24).contains(&x) => MINE_PROJ_SPEED / 3.0,
                     _ => unreachable!(),
                 };
 
