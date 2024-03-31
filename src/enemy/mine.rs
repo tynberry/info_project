@@ -33,11 +33,15 @@ const MINE_FORCE_RADIUS: f32 = 200.0;
 
 const MINE_KNOCKBACK: f32 = 250.0;
 
+const MINE_DETONATION_TIMER: f32 = 4.0;
+const MINE_DETONATION_GROWING_TIMER: f32 = 1.0;
+
 const MINE_PROJ_SPEED: f32 = 200.0;
 const MINE_PROJ_DMG: f32 = 1.5;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Mine {
+    pub timer: f32,
     pub charge: i8,
 }
 
@@ -57,7 +61,10 @@ pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 
     builder.add_bundle((
         Enemy,
-        Mine { charge },
+        Mine {
+            timer: MINE_DETONATION_TIMER,
+            charge,
+        },
         Position { x: pos.x, y: pos.y },
         Rotation {
             angle: fastrand::f32() * 2.0 * PI,
@@ -108,6 +115,27 @@ pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //-----------------------------------------------------------------------------
 //SYSTEM PART
 //-----------------------------------------------------------------------------
+
+pub fn mine_ai(world: &mut World, dt: f32) {
+    for (_, (health, mine)) in world.query_mut::<(&mut Health, &mut Mine)>() {
+        //bring detonation timer closer to death
+        mine.timer -= dt;
+        //if timer dead, explode imediately
+        if mine.timer <= 0.0 {
+            health.hp = -69.0;
+        }
+    }
+}
+
+pub fn mine_fx(world: &mut World) {
+    for (_, (mine, sprite)) in world.query_mut::<(&Mine, &mut Sprite)>() {
+        if mine.timer <= MINE_DETONATION_GROWING_TIMER {
+            sprite.scale = (MINE_SIZE / 512.0) * (2.0 - mine.timer / MINE_DETONATION_GROWING_TIMER);
+            sprite.color.g = mine.timer / MINE_DETONATION_GROWING_TIMER;
+            sprite.color.b = mine.timer / MINE_DETONATION_GROWING_TIMER;
+        }
+    }
+}
 
 pub fn mine_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
     for (_, (health, pos, mine)) in world.query::<(&Health, &Position, &Mine)>().into_iter() {

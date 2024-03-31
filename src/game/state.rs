@@ -101,6 +101,7 @@ fn game_update(
     //ENEMY AI
     enemy::charged::supercharged_asteroid_ai(world, &mut cmd, dt);
     enemy::follower::follower_ai(world, dt);
+    enemy::mine::mine_ai(world, dt);
 
     //GLOBAL SYSTEMS
     basic::motion::apply_physics(world, dt);
@@ -155,6 +156,7 @@ fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     player::visuals(world, fx);
     enemy::charged::supercharged_asteroid_visual(world, fx);
     enemy::follower::follower_fx(world, fx);
+    enemy::mine::mine_fx(world);
 
     //actually render
 
