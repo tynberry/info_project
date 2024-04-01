@@ -26,6 +26,15 @@ pub struct Health {
     pub hp: f32,
 }
 
+impl Health {
+    pub fn heal(&mut self, amount: f32) {
+        self.hp += amount;
+        if self.hp > self.max_hp {
+            self.hp = self.max_hp;
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default)]
 pub struct DamageDealer {
     pub dmg: f32,

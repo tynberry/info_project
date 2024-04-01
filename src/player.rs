@@ -21,6 +21,7 @@ const PLAYER_CHARGE_FULL_RADIUS: f32 = 150.0;
 const PLAYER_CHARGE_RADIUS: f32 = 300.0;
 
 const PLAYER_MAX_BASE_HP: f32 = 10.0;
+const PLAYER_BASE_HP_REGEN: f32 = 0.3;
 
 const PLAYER_FIRE_COOLDOWN: f32 = 0.15;
 const PLAYER_INVUL_COOLDOWN: f32 = 1.0;
@@ -187,6 +188,8 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
     if player.invul_timer > 0.0 {
         return;
     }
+    //health regen
+    player_hp.heal(PLAYER_BASE_HP_REGEN * dt);
     //get events concerning the player
     let hit_events = events
         .query_mut::<&HitEvent>()
