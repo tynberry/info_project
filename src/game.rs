@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, thread::spawn};
+use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, World};
 use macroquad::{

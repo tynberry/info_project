@@ -4,11 +4,8 @@ use hecs::{CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
 
 use crate::{
-    basic::{
-        motion::{ChargeReceiver, PhysicsMotion},
-        Health, HitEvent, HurtBox, Position, Team,
-    },
-    player::{self, Player},
+    basic::{motion::PhysicsMotion, Health, HitEvent, HurtBox, Position, Team},
+    player::Player,
 };
 
 const COLLECT_RADIUS: f32 = 10.0;

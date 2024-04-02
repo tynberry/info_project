@@ -93,10 +93,12 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
 }
 
 #[inline]
+#[allow(dead_code)]
 pub(super) fn tripleshot_init(timer: &mut f32) {
     *timer = 2.0;
 }
 
+#[allow(dead_code)]
 pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
     //get side
     let side = get_side();
@@ -228,6 +230,7 @@ fn get_side() -> u8 {
 }
 
 #[inline]
+#[allow(dead_code)]
 fn get_opposite_side(side: u8) -> u8 {
     match side {
         0 => 1,
