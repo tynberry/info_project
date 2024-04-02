@@ -11,6 +11,7 @@ use crate::{
         DamageDealer, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
     player::Player,
+    xp::BurstXpOnDeath,
 };
 
 use super::Enemy;
@@ -29,6 +30,8 @@ pub const FOLLOWER_TEX_POSITIVE: &str = "follower_plus";
 pub const FOLLOWER_TEX_NEGATIVE: &str = "follower_negative";
 
 const FOLLOWER_KNOCKBACK: f32 = 150.0;
+
+const FOLLOWER_XP: u32 = 30;
 
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Follower {
@@ -80,6 +83,9 @@ pub fn create_follower(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         Health {
             max_hp: FOLLOWER_HEALTH,
             hp: FOLLOWER_HEALTH,
+        },
+        BurstXpOnDeath {
+            amount: FOLLOWER_XP,
         },
     ));
 

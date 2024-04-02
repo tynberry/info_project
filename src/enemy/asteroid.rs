@@ -3,13 +3,17 @@ use std::f32::consts::PI;
 use hecs::{CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
 
-use crate::basic::{
-    fx::{FxManager, Particle},
-    motion::{
-        ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, LinearTorgue, PhysicsMotion,
+use crate::{
+    basic::{
+        fx::{FxManager, Particle},
+        motion::{
+            ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, LinearTorgue,
+            PhysicsMotion,
+        },
+        render::Sprite,
+        DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
-    render::Sprite,
-    DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
+    xp::BurstXpOnDeath,
 };
 
 use super::{charged::create_supercharged_asteroid, Enemy};
@@ -35,6 +39,8 @@ pub(super) const ASTEROID_FORCE_RADIUS: f32 = 350.0;
 
 pub(super) const ASTEROID_KNOCKBACK: f32 = 500.0;
 
+const ASTEROID_XP: u32 = 10;
+
 //BIG ASTEROID STATS
 
 const BIG_ASTEROID_HEALTH: f32 = 2.0;
@@ -54,6 +60,8 @@ const BIG_ASTEROID_FORCE_F_RADIUS: f32 = 250.0;
 const BIG_ASTEROID_FORCE_RADIUS: f32 = 400.0;
 
 const BIG_ASTEROID_KNOCKBACK: f32 = 700.0;
+
+const BIG_ASTEROID_XP: u32 = 20;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Asteroid;
@@ -95,6 +103,9 @@ pub fn create_asteroid(pos: Vec2, dir: Vec2) -> EntityBuilder {
         DeleteOnWarp,
         KnockbackDealer {
             force: ASTEROID_KNOCKBACK,
+        },
+        BurstXpOnDeath {
+            amount: ASTEROID_XP,
         },
     ));
     builder
@@ -156,6 +167,9 @@ pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilde
         KnockbackDealer {
             force: ASTEROID_KNOCKBACK,
         },
+        BurstXpOnDeath {
+            amount: ASTEROID_XP,
+        },
     ));
     builder
 }
@@ -216,6 +230,9 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         },
         KnockbackDealer {
             force: BIG_ASTEROID_KNOCKBACK,
+        },
+        BurstXpOnDeath {
+            amount: BIG_ASTEROID_XP,
         },
     ));
     builder

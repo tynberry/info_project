@@ -40,6 +40,8 @@ const MINE_DETONATION_GROWING_TIMER: f32 = 1.0;
 const MINE_PROJ_SPEED: f32 = 200.0;
 const MINE_PROJ_DMG: f32 = 1.5;
 
+const MINE_XP: u32 = 20;
+
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Mine {
     pub timer: f32,
@@ -109,7 +111,7 @@ pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         KnockbackDealer {
             force: MINE_KNOCKBACK,
         },
-        BurstXpOnDeath { amount: 100 },
+        BurstXpOnDeath { amount: MINE_XP },
     ));
     builder
 }

@@ -12,6 +12,7 @@ use crate::{
     },
     player::Player,
     projectile::{self, ProjectileType},
+    xp::BurstXpOnDeath,
 };
 
 use super::asteroid::*;
@@ -23,6 +24,8 @@ const ASTEROID_OUTLINE_SCALE: f32 = ASTEROID_SIZE / 544.0;
 const ASTEROID_CHARGED_FIRE_COOLDOWN: f32 = 4.0;
 const ASTEROID_CHARGED_PROJ_DMG: f32 = 1.5;
 const ASTEROID_CHARGED_PROJ_SPEED: f32 = 180.0;
+
+const ASTEROID_CHARGED_XP: u32 = 15;
 
 #[derive(Clone, Copy, Debug)]
 pub struct ChargedAsteroid {
@@ -93,6 +96,9 @@ pub fn create_supercharged_asteroid(
         },
         KnockbackDealer {
             force: ASTEROID_KNOCKBACK,
+        },
+        BurstXpOnDeath {
+            amount: ASTEROID_CHARGED_XP,
         },
     ));
 
