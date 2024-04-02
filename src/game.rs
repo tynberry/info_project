@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, thread::spawn};
 
 use hecs::{CommandBuffer, World};
 use macroquad::{
@@ -25,6 +25,7 @@ pub struct EnemySpawner {
     pub wave_counter: u32,
     pub no_enemies: bool,
     pub wave_type: u8,
+    pub last_wave_type: u8,
     pub state: SpawnState,
 }
 
@@ -40,6 +41,7 @@ impl EnemySpawner {
             wave_counter: 0,
             no_enemies: true,
             wave_type: 0,
+            last_wave_type: 0,
             state: SpawnState::Waiting {
                 timer: SPAWN_INIT_COOLDOWN,
             },
@@ -95,7 +97,11 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
                 //init the wave
                 spawner.wave_counter += 1;
                 spawner.no_enemies = false;
-                spawner.wave_type = fastrand::u8(5..=5);
+                spawner.last_wave_type = spawner.wave_type;
+                spawner.wave_type = fastrand::u8(0..=5);
+                if spawner.wave_type == spawner.last_wave_type {
+                    spawner.wave_type = fastrand::u8(0..=5);
+                }
                 //do the initial calls
                 match spawner.wave_type {
                     0 => wave::center_crunch(cmd),
