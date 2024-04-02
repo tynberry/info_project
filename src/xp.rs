@@ -11,6 +11,7 @@ use crate::{
     player::{self, Player},
 };
 
+const COLLECT_RADIUS: f32 = 10.0;
 const MAX_RADIUS: f32 = 3.0;
 const RADIUS_COEFF: f32 = 0.1;
 const MIN_RADIUS: f32 = 1.0;
@@ -42,7 +43,9 @@ pub fn create_orb(pos: Vec2, vel: Vec2, amount: u32) -> EntityBuilder {
             mass: 0.25 * amount as f32,
         },
         XpOrb { amount },
-        HurtBox { radius: MAX_RADIUS },
+        HurtBox {
+            radius: COLLECT_RADIUS,
+        },
         crate::basic::render::Circle {
             radius: MIN_RADIUS
                 + (MAX_RADIUS - MIN_RADIUS) * (1.0 - 1.0 / (RADIUS_COEFF * amount as f32 + 1.0)),
