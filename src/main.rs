@@ -4,6 +4,7 @@ pub mod game;
 pub mod menu;
 mod player;
 pub mod projectile;
+pub mod xp;
 
 use basic::{fx::FxManager, render::AssetManager};
 use enemy::{

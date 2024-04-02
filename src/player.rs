@@ -40,6 +40,8 @@ pub struct Player {
     polarity: i8,
 
     dead_burst: bool,
+
+    pub xp: u32,
 }
 
 impl Player {
@@ -51,6 +53,8 @@ impl Player {
             polarity: 1,
 
             dead_burst: false,
+
+            xp: 0,
         }
     }
 }

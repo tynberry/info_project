@@ -11,6 +11,7 @@ use crate::{
         DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
     projectile::ProjectileType,
+    xp::BurstXpOnDeath,
 };
 
 use super::Enemy;
@@ -108,6 +109,7 @@ pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         KnockbackDealer {
             force: MINE_KNOCKBACK,
         },
+        BurstXpOnDeath { amount: 100 },
     ));
     builder
 }

@@ -6,7 +6,7 @@ use crate::{
     enemy,
     menu::{self, Title},
     player::{self, Player},
-    projectile,
+    projectile, xp,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -103,6 +103,8 @@ fn game_update(
     enemy::follower::follower_ai(world, dt);
     enemy::mine::mine_ai(world, dt);
 
+    xp::xp_attraction(world, dt);
+
     //GLOBAL SYSTEMS
     basic::motion::apply_physics(world, dt);
     basic::motion::apply_motion(world, dt);
@@ -116,6 +118,8 @@ fn game_update(
     enemy::health(world, events, &mut cmd);
     projectile::on_hurt(world, events, &mut cmd);
 
+    xp::xp_absorbtion(world, events, &mut cmd);
+
     //PRE DEATH EFFECTS
     enemy::charged::supercharged_asteroid_death(world, &mut cmd);
 
@@ -123,6 +127,7 @@ fn game_update(
     enemy::big_asteroid_death(world, &mut cmd, fx);
     enemy::follower::follower_death(world, fx);
     enemy::mine::mine_death(world, &mut cmd, fx);
+    xp::xp_bursts(world, &mut cmd);
 
     //spawn enemies
     super::enemy_spawning(world, &mut cmd, dt);
