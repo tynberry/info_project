@@ -100,6 +100,10 @@ pub fn ensure_damage(world: &mut World, events: &mut World) {
         for (hurt_id, (hurt_pos, hurt_box, hurt_team)) in
             world.query::<(&Position, &HurtBox, &Team)>().into_iter()
         {
+            //ignore self collisions
+            if hurt_id == hit_id {
+                continue;
+            }
             //are they touching?
             let dx = hit_pos.x - hurt_pos.x;
             let dy = hit_pos.y - hurt_pos.y;
