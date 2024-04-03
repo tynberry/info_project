@@ -13,8 +13,9 @@ const MAX_RADIUS: f32 = 3.0;
 const RADIUS_COEFF: f32 = 0.1;
 const MIN_RADIUS: f32 = 1.0;
 
-const ATTRACTION_RADIUS: f32 = 100.0;
+const ATTRACTION_RADIUS: f32 = 300.0;
 const ATTRACTION_FORCE: f32 = 200.0;
+const ATTRACTION_MULT_PER_SEC: f32 = 1.5;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BurstXpOnDeath {
@@ -24,6 +25,7 @@ pub struct BurstXpOnDeath {
 #[derive(Clone, Copy, Debug, Default)]
 pub struct XpOrb {
     pub amount: u32,
+    pub follow_mult: f32,
 }
 
 //-----------------------------------------------------------------------------
@@ -39,7 +41,10 @@ pub fn create_orb(pos: Vec2, vel: Vec2, amount: u32) -> EntityBuilder {
             vel,
             mass: 0.25 * amount as f32,
         },
-        XpOrb { amount },
+        XpOrb {
+            amount,
+            follow_mult: 0.0,
+        },
         HurtBox {
             radius: COLLECT_RADIUS,
         },
@@ -104,18 +109,16 @@ pub fn xp_attraction(world: &mut World, dt: f32) {
         .next()
         .unwrap();
 
-    for (_, (pos, vel)) in world
-        .query_mut::<(&Position, &mut PhysicsMotion)>()
-        .with::<&XpOrb>()
-    {
+    for (_, (pos, vel, orb)) in world.query_mut::<(&Position, &mut PhysicsMotion, &mut XpOrb)>() {
         let delta = vec2(player_pos.x - pos.x, player_pos.y - pos.y);
         if delta.length() <= ATTRACTION_RADIUS {
-            vel.vel += ATTRACTION_FORCE * delta.normalize_or_zero() * dt;
-            //friction the force in wrong directions
-            let delta = delta.normalize_or_zero();
-            let pro = vel.vel.dot(delta);
-            let anti = vel.vel.perp_dot(delta);
-            vel.vel = pro * delta + 0.5f32.powf(dt) * anti * delta.perp();
+            vel.vel += ATTRACTION_FORCE * delta.normalize_or_zero() * dt * (1.0 + orb.follow_mult);
+            orb.follow_mult += dt * ATTRACTION_MULT_PER_SEC;
+        } else {
+            orb.follow_mult -= dt * ATTRACTION_MULT_PER_SEC;
+            if orb.follow_mult < 0.0 {
+                orb.follow_mult = 0.0;
+            }
         }
     }
 }
