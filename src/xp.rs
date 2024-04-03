@@ -1,10 +1,10 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, num::Wrapping};
 
 use hecs::{CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
 
 use crate::{
-    basic::{motion::PhysicsMotion, Health, HitEvent, HurtBox, Position, Team},
+    basic::{motion::PhysicsMotion, Health, HitEvent, HurtBox, Position, Team, Wrapped},
     player::Player,
 };
 
@@ -55,6 +55,7 @@ pub fn create_orb(pos: Vec2, vel: Vec2, amount: u32) -> EntityBuilder {
             z_index: 0,
         },
         Team::Player,
+        Wrapped,
     ));
 
     builder
