@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, num::Wrapping};
+use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, EntityBuilder, World};
 use macroquad::prelude::*;
@@ -121,6 +121,8 @@ pub fn xp_attraction(world: &mut World, dt: f32) {
                 orb.follow_mult = 0.0;
             }
         }
+        //orb friction
+        vel.vel *= 0.7_f32.powf(dt);
     }
 }
 
