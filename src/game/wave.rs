@@ -4,7 +4,7 @@ use super::*;
 
 use macroquad::prelude::*;
 
-use crate::enemy;
+use crate::{enemy, SPACE_HEIGHT, SPACE_WIDTH};
 
 pub struct WavePreamble<'a> {
     pub world: &'a World,
@@ -24,7 +24,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //spawn them
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(-SPAWN_PUSHBACK, screen_height() / 2.0),
+            vec2(-SPAWN_PUSHBACK, SPACE_HEIGHT / 2.0),
             vec2(1.0, 0.0),
             charge,
         )
@@ -32,7 +32,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(screen_width() + SPAWN_PUSHBACK, screen_height() / 2.0),
+            vec2(SPACE_WIDTH + SPAWN_PUSHBACK, SPACE_HEIGHT / 2.0),
             vec2(-1.0, 0.0),
             charge,
         )
@@ -40,7 +40,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(screen_width() / 2.0, -SPAWN_PUSHBACK),
+            vec2(SPACE_WIDTH / 2.0, -SPAWN_PUSHBACK),
             vec2(0.0, 1.0),
             charge,
         )
@@ -48,7 +48,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(screen_width() / 2.0, screen_height() + SPAWN_PUSHBACK),
+            vec2(SPACE_WIDTH / 2.0, SPACE_HEIGHT + SPAWN_PUSHBACK),
             vec2(0.0, -1.0),
             charge,
         )
@@ -65,7 +65,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(screen_width() + SPAWN_PUSHBACK, -SPAWN_PUSHBACK),
+            vec2(SPACE_WIDTH + SPAWN_PUSHBACK, -SPAWN_PUSHBACK),
             vec2(-1.0, 1.0),
             -charge,
         )
@@ -73,7 +73,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(-SPAWN_PUSHBACK, screen_height() + SPAWN_PUSHBACK),
+            vec2(-SPAWN_PUSHBACK, SPACE_HEIGHT + SPAWN_PUSHBACK),
             vec2(1.0, -1.0),
             -charge,
         )
@@ -81,10 +81,7 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
     cmd.spawn(
         enemy::create_charged_asteroid(
-            vec2(
-                screen_width() + SPAWN_PUSHBACK,
-                screen_height() + SPAWN_PUSHBACK,
-            ),
+            vec2(SPACE_WIDTH + SPAWN_PUSHBACK, SPACE_HEIGHT + SPAWN_PUSHBACK),
             vec2(-1.0, -1.0),
             -charge,
         )
@@ -247,29 +244,29 @@ fn get_spawn_pos(side: u8) -> Vec2 {
         0 => {
             //TOP
             vec2(
-                fastrand::f32() * (screen_width() - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
+                fastrand::f32() * (SPACE_WIDTH - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
                 -SPAWN_PUSHBACK,
             )
         }
         1 => {
             //BOTTOM
             vec2(
-                fastrand::f32() * (screen_width() - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
-                screen_height() + SPAWN_PUSHBACK,
+                fastrand::f32() * (SPACE_WIDTH - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
+                SPACE_HEIGHT + SPAWN_PUSHBACK,
             )
         }
         2 => {
             //LEFT
             vec2(
                 -SPAWN_PUSHBACK,
-                fastrand::f32() * (screen_height() - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
+                fastrand::f32() * (SPACE_HEIGHT - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
             )
         }
         3 => {
             //RIGHT
             vec2(
-                screen_width() + SPAWN_PUSHBACK,
-                fastrand::f32() * (screen_height() - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
+                SPACE_WIDTH + SPAWN_PUSHBACK,
+                fastrand::f32() * (SPACE_HEIGHT - 2.0 * SPAWN_MARGIN) + SPAWN_MARGIN,
             )
         }
         _ => unreachable!("Random number should not exceed range 0..4"),
@@ -281,19 +278,19 @@ fn get_center_pos(side: u8) -> Vec2 {
     match side {
         0 => {
             //TOP
-            vec2(screen_width() / 2.0, -SPAWN_PUSHBACK)
+            vec2(SPACE_WIDTH / 2.0, -SPAWN_PUSHBACK)
         }
         1 => {
             //BOTTOM
-            vec2(screen_width() / 2.0, screen_height() + SPAWN_PUSHBACK)
+            vec2(SPACE_WIDTH / 2.0, SPACE_HEIGHT + SPAWN_PUSHBACK)
         }
         2 => {
             //LEFT
-            vec2(-SPAWN_PUSHBACK, screen_height() / 2.0)
+            vec2(-SPAWN_PUSHBACK, SPACE_HEIGHT / 2.0)
         }
         3 => {
             //RIGHT
-            vec2(screen_width() + SPAWN_PUSHBACK, screen_height() / 2.0)
+            vec2(SPACE_WIDTH + SPAWN_PUSHBACK, SPACE_HEIGHT / 2.0)
         }
         _ => unreachable!("Random number should not exceed range 0..4"),
     }

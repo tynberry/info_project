@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 use crate::{
     basic::{HealthDisplay, Position},
     menu::{Button, StartButton, Title},
-    player,
+    player, SPACE_HEIGHT, SPACE_WIDTH,
 };
 
 use super::{
@@ -22,8 +22,8 @@ pub fn init_game(world: &mut World) {
     //add player health display
     world.spawn((
         Position {
-            x: screen_width() / 2.0,
-            y: screen_height() - 3.0,
+            x: SPACE_WIDTH / 2.0,
+            y: SPACE_HEIGHT - 3.0,
         },
         HealthDisplay {
             target: player_id,
@@ -50,7 +50,7 @@ pub fn init_main_menu(world: &mut World) {
     //add game title
     world.spawn((
         Position {
-            x: screen_width() / 2.0,
+            x: SPACE_WIDTH / 2.0,
             y: 120.0,
         },
         Title {
@@ -64,7 +64,7 @@ pub fn init_main_menu(world: &mut World) {
     //add start game button
     world.spawn((
         Position {
-            x: screen_width() / 2.0,
+            x: SPACE_WIDTH / 2.0,
             y: 280.0,
         },
         Title {
@@ -88,8 +88,8 @@ pub fn init_main_menu(world: &mut World) {
 pub fn init_pause(world: &mut World) {
     world.spawn((
         Position {
-            x: screen_width() / 2.0,
-            y: screen_height() / 2.0,
+            x: SPACE_WIDTH / 2.0,
+            y: SPACE_HEIGHT / 2.0,
         },
         Title {
             text: "PAUSED".into(),
@@ -114,8 +114,8 @@ pub fn init_game_over(world: &mut World) {
 
     world.spawn((
         Position {
-            x: screen_width() / 2.0,
-            y: screen_height() / 2.0,
+            x: SPACE_WIDTH / 2.0,
+            y: SPACE_HEIGHT / 2.0,
         },
         Title {
             text: "GAME OVER".into(),
@@ -127,8 +127,8 @@ pub fn init_game_over(world: &mut World) {
 
     world.spawn((
         Position {
-            x: screen_width() / 2.0,
-            y: screen_height() / 2.0 + 60.0,
+            x: SPACE_WIDTH / 2.0,
+            y: SPACE_HEIGHT / 2.0 + 60.0,
         },
         Title {
             text: "Press escape to return to main menu".into(),

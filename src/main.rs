@@ -22,6 +22,20 @@ use projectile::{
     PROJ_SMALL_TEX_POS,
 };
 
+pub const SPACE_WIDTH: f32 = 960.0;
+pub const SPACE_HEIGHT: f32 = 540.0;
+
+pub fn world_mouse_pos() -> Vec2 {
+    let (mx, my) = mouse_position();
+    let camera = &Camera2D::from_display_rect(Rect {
+        x: 0.0,
+        y: SPACE_HEIGHT,
+        w: SPACE_WIDTH,
+        h: -SPACE_HEIGHT,
+    });
+    camera.screen_to_world(vec2(mx, my))
+}
+
 const TEXTURES: [(&str, &str); 19] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
@@ -44,7 +58,16 @@ const TEXTURES: [(&str, &str); 19] = [
     (MINE_TEX_NEGATIVE, "res/mine_minus.png"),
 ];
 
-#[macroquad::main("Warping Warp")]
+fn conf() -> Conf {
+    Conf {
+        window_title: "Warping Warp".to_owned(),
+        window_width: SPACE_WIDTH as i32,
+        window_height: SPACE_HEIGHT as i32,
+        ..Default::default()
+    }
+}
+
+#[macroquad::main(conf)]
 async fn main() {
     //load assets to render
     let mut assets = AssetManager::default();
@@ -85,6 +108,12 @@ async fn main() {
         clear_background(Color::new(0.0, 0.05, 0.1, 1.0));
 
         //UPDATE VISUALS
+        set_camera(&Camera2D::from_display_rect(Rect {
+            x: 0.0,
+            y: SPACE_HEIGHT,
+            w: SPACE_WIDTH,
+            h: -SPACE_HEIGHT,
+        }));
 
         fx.update_particles(dt);
 

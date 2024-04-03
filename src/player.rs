@@ -11,6 +11,7 @@ use crate::{
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
     projectile::{self, ProjectileType},
+    world_mouse_pos, SPACE_HEIGHT, SPACE_WIDTH,
 };
 
 const PLAYER_ACCEL: f32 = 600.0;
@@ -79,8 +80,8 @@ pub fn new_entity() -> (
     (
         Player::new(),
         Position {
-            x: screen_width() / 2.0,
-            y: screen_height() / 2.0,
+            x: SPACE_WIDTH / 2.0,
+            y: SPACE_HEIGHT / 2.0,
         },
         PhysicsMotion {
             vel: Vec2::ZERO,
@@ -171,8 +172,8 @@ pub fn motion_update(world: &mut World, dt: f32) {
         vel.vel.y *= 0.3_f32.powf(dt);
     }
     //follow mouse
-    let mouse_pos = mouse_position();
-    angle.angle = (mouse_pos.1 - pos.y).atan2(mouse_pos.0 - pos.x);
+    let mouse_pos = world_mouse_pos();
+    angle.angle = (mouse_pos.y - pos.y).atan2(mouse_pos.x - pos.x);
     //input handling
     if is_mouse_button_down(MouseButton::Left) {
         vel.vel.x += angle.angle.cos() * PLAYER_ACCEL * dt;

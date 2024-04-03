@@ -1,10 +1,7 @@
 use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, World};
-use macroquad::{
-    math::{vec2, Vec2},
-    window::{screen_height, screen_width},
-};
+use macroquad::math::{vec2, Vec2};
 
 use crate::{basic::Position, enemy::Enemy, player::Player};
 

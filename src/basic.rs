@@ -8,6 +8,8 @@ pub mod render;
 
 pub use health::*;
 
+use crate::{SPACE_HEIGHT, SPACE_WIDTH};
+
 use self::render::{AssetManager, Sprite};
 
 //-----------------------------------------------------------------------------
@@ -62,18 +64,18 @@ pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &Asse
     for (_, pos) in world.query_mut::<&mut Position>().with::<&Wrapped>() {
         //if outside of screen tp them back
         //assumes position is center
-        if pos.x > screen_width() {
+        if pos.x > SPACE_WIDTH {
             pos.x = 0.0;
         }
         if pos.x < 0.0 {
-            pos.x = screen_width();
+            pos.x = SPACE_WIDTH;
         }
 
-        if pos.y > screen_height() {
+        if pos.y > SPACE_HEIGHT {
             pos.y = 0.0;
         }
         if pos.y < 0.0 {
-            pos.y = screen_height();
+            pos.y = SPACE_HEIGHT;
         }
     }
 
@@ -98,14 +100,14 @@ pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &Asse
         };
         //if outside of screen tp them back
         //assumes position is center
-        if pos.x > screen_width() + pushback {
+        if pos.x > SPACE_WIDTH + pushback {
             cmd.despawn(id);
         }
         if pos.x < -pushback {
             cmd.despawn(id);
         }
 
-        if pos.y > screen_height() + pushback {
+        if pos.y > SPACE_HEIGHT + pushback {
             cmd.despawn(id);
         }
         if pos.y < -pushback {

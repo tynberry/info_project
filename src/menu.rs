@@ -4,6 +4,7 @@ use macroquad::prelude::*;
 use crate::{
     basic::{render::AssetManager, Position},
     game::state::GameState,
+    world_mouse_pos,
 };
 
 #[derive(Clone, Debug)]
@@ -55,11 +56,11 @@ pub fn button_colors(world: &mut World) {
     for (_, (position, button, title)) in world.query_mut::<(&Position, &mut Button, &mut Title)>()
     {
         //check for overlap
-        let mouse_pos = mouse_position();
-        let hover = mouse_pos.0 <= position.x + button.width / 2.0
-            && mouse_pos.0 >= position.x - button.width / 2.0
-            && mouse_pos.1 <= position.y + button.height / 2.0
-            && mouse_pos.1 >= position.y - button.height / 2.0;
+        let mouse_pos = world_mouse_pos();
+        let hover = mouse_pos.x <= position.x + button.width / 2.0
+            && mouse_pos.x >= position.x - button.width / 2.0
+            && mouse_pos.y <= position.y + button.height / 2.0
+            && mouse_pos.y >= position.y - button.height / 2.0;
         let click = hover && is_mouse_button_pressed(MouseButton::Left);
         //set color
         title.color = if click {
