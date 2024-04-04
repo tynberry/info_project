@@ -6,7 +6,7 @@ use crate::{
     enemy,
     menu::{self, Title},
     player::{self, Player},
-    projectile, xp,
+    projectile, score, xp,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -160,6 +160,7 @@ fn game_update(
 
 fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     player::visuals(world, fx);
+    score::score_display(world);
     enemy::charged::supercharged_asteroid_visual(world, fx);
     enemy::follower::follower_fx(world, fx);
     enemy::mine::mine_fx(world);
@@ -171,6 +172,7 @@ fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     fx.render_particles();
 
     basic::health::render_displays(world);
+    menu::render_title(world, assets);
 }
 
 //-----------------------------------------------------------------------------

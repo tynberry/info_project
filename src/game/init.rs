@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 use crate::{
     basic::{HealthDisplay, Position},
     menu::{Button, StartButton, Title},
-    player, SPACE_HEIGHT, SPACE_WIDTH,
+    player, score, SPACE_HEIGHT, SPACE_WIDTH,
 };
 
 use super::{
@@ -38,6 +38,9 @@ pub fn init_game(world: &mut World) {
             },
         },
     ));
+
+    //add player's score display
+    world.spawn(score::create_score_display(vec2(SPACE_WIDTH / 2.0, 20.0), player_id).build());
 
     //add enemy spawner
     world.spawn((EnemySpawner::default(),));

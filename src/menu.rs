@@ -43,8 +43,8 @@ pub fn render_title(world: &mut World, assets: &AssetManager) {
             position.y + dimensions.offset_y / 2.0,
             TextParams {
                 font,
-                font_size: title.size as u16,
-                font_scale: 1.0,
+                font_size: title.size as u16 * 2,
+                font_scale: 0.5,
                 color: title.color,
                 ..Default::default()
             },
