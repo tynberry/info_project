@@ -14,8 +14,8 @@ const RADIUS_COEFF: f32 = 0.1;
 const MIN_RADIUS: f32 = 1.0;
 
 const ATTRACTION_RADIUS: f32 = 300.0;
-const ATTRACTION_FORCE: f32 = 200.0;
-const ATTRACTION_MULT_PER_SEC: f32 = 1.5;
+const ATTRACTION_SPEED: f32 = 100.0;
+const ATTRACTION_MULT_PER_SEC: f32 = 0.8;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BurstXpOnDeath {
@@ -113,7 +113,7 @@ pub fn xp_attraction(world: &mut World, dt: f32) {
     for (_, (pos, vel, orb)) in world.query_mut::<(&Position, &mut PhysicsMotion, &mut XpOrb)>() {
         let delta = vec2(player_pos.x - pos.x, player_pos.y - pos.y);
         if delta.length() <= ATTRACTION_RADIUS {
-            vel.vel += ATTRACTION_FORCE * delta.normalize_or_zero() * dt * (1.0 + orb.follow_mult);
+            vel.vel = ATTRACTION_SPEED * delta.normalize_or_zero() * (1.0 + orb.follow_mult);
             orb.follow_mult += dt * ATTRACTION_MULT_PER_SEC;
         } else {
             orb.follow_mult -= dt * ATTRACTION_MULT_PER_SEC;
