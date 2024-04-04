@@ -82,7 +82,7 @@ pub fn render_displays(world: &mut World) {
         );
         //draw actual health
         draw_rectangle(
-            pos.x - current_width / 2.0,
+            pos.x - display.max_width / 2.0,
             pos.y - display.height / 2.0,
             current_width,
             display.height,
