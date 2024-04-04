@@ -6,7 +6,9 @@ use macroquad::prelude::*;
 use crate::{
     basic::{
         fx::{FxManager, Particle},
-        motion::{ChargeReceiver, ChargeSender, KnockbackDealer, LinearTorgue, PhysicsMotion},
+        motion::{
+            ChargeReceiver, ChargeSender, KnockbackDealer, LinearTorgue, MaxVelocity, PhysicsMotion,
+        },
         render::Sprite,
         DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
@@ -99,6 +101,9 @@ pub fn create_supercharged_asteroid(
         },
         BurstXpOnDeath {
             amount: ASTEROID_CHARGED_XP,
+        },
+        MaxVelocity {
+            max_velocity: ASTEROID_SPEED * 2.0,
         },
     ));
 

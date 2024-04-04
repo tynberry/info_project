@@ -6,7 +6,9 @@ use macroquad::prelude::*;
 use crate::{
     basic::{
         fx::{FxManager, Particle},
-        motion::{ChargeReceiver, ChargeSender, KnockbackDealer, LinearTorgue, PhysicsMotion},
+        motion::{
+            ChargeReceiver, ChargeSender, KnockbackDealer, LinearTorgue, MaxVelocity, PhysicsMotion,
+        },
         render::Sprite,
         DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
@@ -112,6 +114,9 @@ pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
             force: MINE_KNOCKBACK,
         },
         BurstXpOnDeath { amount: MINE_XP },
+        MaxVelocity {
+            max_velocity: MINE_SPEED * 2.0,
+        },
     ));
     builder
 }

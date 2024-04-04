@@ -6,7 +6,7 @@ use macroquad::prelude::*;
 use crate::{
     basic::{
         fx::{FxManager, Particle},
-        motion::{ChargeReceiver, KnockbackDealer, LinearTorgue, PhysicsMotion},
+        motion::{ChargeReceiver, KnockbackDealer, LinearTorgue, MaxVelocity, PhysicsMotion},
         render::Sprite,
         DamageDealer, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
@@ -86,6 +86,9 @@ pub fn create_follower(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         },
         BurstXpOnDeath {
             amount: FOLLOWER_XP,
+        },
+        MaxVelocity {
+            max_velocity: FOLLOWER_SPEED * 2.0,
         },
     ));
 

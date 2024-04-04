@@ -7,7 +7,7 @@ use crate::{
     basic::{
         fx::{FxManager, Particle},
         motion::{
-            ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, LinearTorgue,
+            ChargeReceiver, ChargeSender, KnockbackDealer, LinearMotion, LinearTorgue, MaxVelocity,
             PhysicsMotion,
         },
         render::Sprite,
@@ -170,6 +170,9 @@ pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilde
         BurstXpOnDeath {
             amount: ASTEROID_XP,
         },
+        MaxVelocity {
+            max_velocity: ASTEROID_SPEED * 2.0,
+        },
     ));
     builder
 }
@@ -233,6 +236,9 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
         },
         BurstXpOnDeath {
             amount: BIG_ASTEROID_XP,
+        },
+        MaxVelocity {
+            max_velocity: BIG_ASTEROID_SPEED * 2.0,
         },
     ));
     builder

@@ -32,6 +32,11 @@ pub struct PhysicsDamping {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
+pub struct MaxVelocity {
+    pub max_velocity: f32,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeSender {
     pub force: f32,
     pub full_radius: f32,
@@ -83,6 +88,13 @@ pub fn apply_physics(world: &mut World, dt: f32) {
             physics.vel = Vec2::ZERO;
         } else {
             physics.vel -= damping.flat_factor * dt * physics.vel.normalize_or_zero();
+        }
+    }
+
+    //apply max velocity
+    for (_, (vel, max)) in world.query_mut::<(&mut PhysicsMotion, &MaxVelocity)>() {
+        if vel.vel.length_squared() > max.max_velocity.powi(2) {
+            vel.vel = vel.vel.normalize_or_zero() * max.max_velocity;
         }
     }
 

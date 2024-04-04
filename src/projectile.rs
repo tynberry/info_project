@@ -1,5 +1,5 @@
 use crate::basic::{
-    motion::{ChargeDisable, ChargeReceiver, PhysicsMotion},
+    motion::{ChargeDisable, ChargeReceiver, MaxVelocity, PhysicsMotion},
     render::Sprite,
     DamageDealer, HitEvent, HurtBox, Position, Team,
 };
@@ -57,6 +57,7 @@ pub fn create_projectile(
     ChargeReceiver,
     ChargeDisable,
     PhysicsMotion,
+    MaxVelocity,
 ) {
     //get properties from type
     let size = match proj_type {
@@ -126,6 +127,9 @@ pub fn create_projectile(
         },
         ChargeDisable { timer: 0.2 },
         PhysicsMotion { vel, mass },
+        MaxVelocity {
+            max_velocity: vel.length() * 2.0,
+        },
     )
 }
 
