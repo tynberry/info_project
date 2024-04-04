@@ -23,12 +23,12 @@ pub fn init_game(world: &mut World) {
     world.spawn((
         Position {
             x: SPACE_WIDTH / 2.0,
-            y: SPACE_HEIGHT - 3.0,
+            y: SPACE_HEIGHT - 6.0,
         },
         HealthDisplay {
             target: player_id,
-            max_width: 250.0,
-            height: 6.0,
+            max_width: 300.0,
+            height: 8.0,
             color: RED,
             max_color: Color {
                 r: 0.4,
