@@ -22,8 +22,8 @@ use projectile::{
     PROJ_SMALL_TEX_POS,
 };
 
-pub const SPACE_WIDTH: f32 = 960.0;
-pub const SPACE_HEIGHT: f32 = 540.0;
+pub const SPACE_WIDTH: f32 = 1280.0;
+pub const SPACE_HEIGHT: f32 = 720.0;
 
 pub fn world_mouse_pos() -> Vec2 {
     let (mx, my) = mouse_position();
