@@ -16,6 +16,7 @@ pub struct WavePreamble<'a> {
 //WAVE PART
 //
 
+#[allow(dead_code)]
 pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //center crunch attack
     let charge = fastrand::i8(0..=1) * 2 - 1;
@@ -148,6 +149,7 @@ pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
 }
 
 #[inline]
+#[allow(dead_code)]
 pub(super) fn salvo_init(timer: &mut f32, base_time: f32) {
     *timer = base_time;
 }
