@@ -99,6 +99,7 @@ fn game_update(
     player::motion_update(world, dt);
 
     //ENEMY AI
+    enemy::big_asteroid_ai(world, dt);
     enemy::charged::supercharged_asteroid_ai(world, &mut cmd, dt);
     enemy::follower::follower_ai(world, dt);
     enemy::mine::mine_ai(world, dt);

@@ -13,6 +13,7 @@ use crate::{
         render::Sprite,
         DamageDealer, DeleteOnWarp, Health, HitBox, HurtBox, Position, Rotation, Team,
     },
+    player::Player,
     xp::BurstXpOnDeath,
 };
 
@@ -62,6 +63,8 @@ const BIG_ASTEROID_FORCE_RADIUS: f32 = 400.0;
 const BIG_ASTEROID_KNOCKBACK: f32 = 700.0;
 
 const BIG_ASTEROID_XP: u32 = 20;
+
+const BIG_ASTEROID_FOLLOW: f32 = 20.0;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Asteroid;
@@ -247,6 +250,27 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //------------------------------------------------------------------------------
 //SYSTEM PART
 //------------------------------------------------------------------------------
+
+pub fn big_asteroid_ai(world: &mut World, dt: f32) {
+    //get player's position
+    let (_, &player_pos) = world
+        .query_mut::<&Position>()
+        .with::<&Player>()
+        .into_iter()
+        .next()
+        .unwrap();
+    //update velocity
+    for (_, (pos, vel)) in world
+        .query_mut::<(&Position, &mut PhysicsMotion)>()
+        .with::<&BigAsteroid>()
+    {
+        //speed up towards player
+        let acceleration = vec2(player_pos.x - pos.x, player_pos.y - pos.y).normalize_or_zero()
+            * BIG_ASTEROID_FOLLOW
+            * dt;
+        vel.vel += acceleration;
+    }
+}
 
 pub fn asteroid_death(world: &mut World, fx: &mut FxManager) {
     for (_, (health, pos)) in world
