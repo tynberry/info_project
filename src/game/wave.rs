@@ -10,8 +10,6 @@ pub struct WavePreamble<'a> {
     pub world: &'a World,
     pub cmd: &'a mut CommandBuffer,
     pub player_pos: &'a Position,
-    pub timer: &'a mut f32,
-    pub data: &'a mut u8,
 }
 
 //
@@ -154,67 +152,52 @@ pub(super) fn salvo_init(timer: &mut f32, base_time: f32) {
     *timer = base_time;
 }
 
-pub(super) fn asteroid(_: &World, cmd: &mut CommandBuffer) {
+pub(super) fn asteroid(preamble: WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * 120.0;
     let charge = fastrand::i8(0..=1) * 2 - 1;
-    cmd.spawn(enemy::create_charged_asteroid(pos, dir, charge).build());
+    preamble
+        .cmd
+        .spawn(enemy::create_charged_asteroid(pos, dir, charge).build());
 }
 
-pub(super) fn big_asteroid(_: &World, cmd: &mut CommandBuffer) {
+pub(super) fn big_asteroid(preamble: WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * 120.0;
     let charge = fastrand::i8(0..=1) * 2 - 1;
-    cmd.spawn(enemy::create_big_asteroid(pos, dir, charge).build());
+    preamble
+        .cmd
+        .spawn(enemy::create_big_asteroid(pos, dir, charge).build());
 }
 
-pub(super) fn charged_asteroid(world: &World, cmd: &mut CommandBuffer) {
+pub(super) fn charged_asteroid(preamble: WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
     let charge = fastrand::i8(0..=1) * 2 - 1;
-    enemy::charged::create_supercharged_asteroid(pos, dir, charge)(world, cmd);
+    enemy::charged::create_supercharged_asteroid(pos, dir, charge)(preamble.world, preamble.cmd);
 }
 
-pub(super) fn follower(_: &World, cmd: &mut CommandBuffer) {
+pub(super) fn follower(preamble: WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
     let charge = fastrand::i8(-1..=1);
-    cmd.spawn(enemy::follower::create_follower(pos, dir, charge).build())
+    preamble
+        .cmd
+        .spawn(enemy::follower::create_follower(pos, dir, charge).build())
 }
 
-pub(super) fn mine(_: &World, cmd: &mut CommandBuffer) {
+pub(super) fn mine(preamble: WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
     let charge = fastrand::i8(-1..=1);
-    cmd.spawn(enemy::mine::create_mine(pos, dir, charge).build())
-}
-
-pub(super) fn salvo_body(
-    preamble: WavePreamble,
-    base_time: f32,
-    count: u8,
-    shoot: impl Fn(&World, &mut CommandBuffer),
-) {
-    *preamble.data = match *preamble.data {
-        0 => {
-            shoot(preamble.world, preamble.cmd);
-            1
-        }
-        x if x < count => {
-            if *preamble.timer <= (base_time / (count) as f32) * (count - x) as f32 {
-                shoot(preamble.world, preamble.cmd);
-                x + 1
-            } else {
-                x
-            }
-        }
-        x => x,
-    }
+    preamble
+        .cmd
+        .spawn(enemy::mine::create_mine(pos, dir, charge).build())
 }
 
 //------------------------------------------------------------------------------

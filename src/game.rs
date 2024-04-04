@@ -1,4 +1,4 @@
-use std::f32::consts::PI;
+use std::{borrow::Borrow, cell::OnceCell, f32::consts::PI};
 
 use hecs::{CommandBuffer, World};
 use macroquad::math::{vec2, Vec2};
@@ -11,37 +11,73 @@ pub mod init;
 pub mod state;
 mod wave;
 
-const SPAWN_INIT_COOLDOWN: f32 = 5.0;
-const SPAWN_FALLBACK_COOLDOWN: f32 = 30.0;
-const SPAWN_NO_ENEMY_TIMER: f32 = 3.0;
+const INIT_CREDITS: f32 = 50.0;
+const CREDITS_PER_SEC: f32 = 3.0;
+
+const INIT_COOLDOWN: f32 = 5.0;
+const MIN_SPAWN_COOLDOWN: f32 = 3.0;
+const MAX_SPAWN_COOLDOWN: f32 = 5.0;
+
+const MAX_ENTITIES: usize = 15;
+
+const DOUBLE_CHANCE: f32 = 0.33;
+const TRIPLE_CHANCE: f32 = 0.5; //chance when double was rolled
+
+#[derive(Clone, Copy, Debug)]
+struct Wave {
+    cost: f32,
+    gain: f32,
+    weight: u32,
+    spawn: fn(WavePreamble),
+}
+
+const WAVES: [Wave; 5] = [
+    Wave {
+        cost: 10.0,
+        gain: 20.0,
+        weight: 10,
+        spawn: wave::asteroid,
+    },
+    Wave {
+        cost: 15.0,
+        gain: 20.0,
+        weight: 20,
+        spawn: wave::charged_asteroid,
+    },
+    Wave {
+        cost: 40.0,
+        gain: 10.0,
+        weight: 30,
+        spawn: wave::big_asteroid,
+    },
+    Wave {
+        cost: 30.0,
+        gain: 10.0,
+        weight: 30,
+        spawn: wave::follower,
+    },
+    Wave {
+        cost: 40.0,
+        gain: 10.0,
+        weight: 30,
+        spawn: wave::mine,
+    },
+];
+
 const SPAWN_MARGIN: f32 = 20.0;
 const SPAWN_PUSHBACK: f32 = 10.0;
 
 #[derive(Clone, Copy, Debug)]
 pub struct EnemySpawner {
-    pub wave_counter: u32,
-    pub no_enemies: bool,
-    pub wave_type: u8,
-    pub last_wave_type: u8,
-    pub state: SpawnState,
-}
-
-#[derive(Clone, Copy, Debug)]
-pub enum SpawnState {
-    Waiting { timer: f32 },
-    Spawning { time: f32, data: u8 },
+    pub credits: f32,
+    pub cooldown: f32,
 }
 
 impl EnemySpawner {
     pub fn new() -> Self {
         Self {
-            wave_counter: 0,
-            no_enemies: true,
-            wave_type: 0,
-            last_wave_type: 0,
-            state: SpawnState::Waiting {
-                timer: SPAWN_INIT_COOLDOWN,
-            },
+            credits: INIT_CREDITS,
+            cooldown: INIT_COOLDOWN,
         }
     }
 }
@@ -69,88 +105,68 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
     //get spawner
     let spawner_query = &mut world.query::<&mut EnemySpawner>();
     let (_, spawner) = spawner_query.into_iter().next().unwrap();
+    //give credits
+    spawner.credits += CREDITS_PER_SEC * dt;
     //advance state
-    let new_state = match &mut spawner.state {
-        SpawnState::Waiting { timer } => {
-            //if there are no enemies, time travel the timer
-            if enemy_count == 0 && !spawner.no_enemies {
-                *timer = SPAWN_NO_ENEMY_TIMER;
-                spawner.no_enemies = true;
-            }
-            //move the timer
-            *timer -= dt;
-            //change state
-            if *timer <= 0.0 {
-                Some(SpawnState::Spawning {
-                    time: std::f32::NAN,
-                    data: 0,
-                })
+    spawner.cooldown -= dt;
+    if spawner.cooldown > 0.0 {
+        return;
+    }
+    //TOO MANY ENEMIES
+    if enemy_count >= MAX_ENTITIES {
+        //set new cooldown
+        spawner.cooldown =
+            (MAX_SPAWN_COOLDOWN - MIN_SPAWN_COOLDOWN) * fastrand::f32() + MIN_SPAWN_COOLDOWN;
+        return;
+    }
+    //get weight sum
+    let weight_sum = WAVES
+        .iter()
+        .filter(|wave| wave.cost <= spawner.credits)
+        .fold(0, |acc, wave| acc + wave.weight);
+    //cannot afford any
+    if weight_sum == 0 {
+        //set new cooldown
+        spawner.cooldown =
+            (MAX_SPAWN_COOLDOWN - MIN_SPAWN_COOLDOWN) * fastrand::f32() + MIN_SPAWN_COOLDOWN;
+        return;
+    }
+    //randomly choose wave
+    let mut value = fastrand::u32(0..weight_sum);
+    let wave = 'outer: {
+        for wave in WAVES {
+            if wave.weight <= value {
+                value -= wave.weight
             } else {
-                None
-            }
+                break 'outer wave;
+            };
         }
-        SpawnState::Spawning { time, data } => {
-            if time.is_nan() {
-                //init the wave
-                spawner.wave_counter += 1;
-                spawner.no_enemies = false;
-                spawner.last_wave_type = spawner.wave_type;
-                spawner.wave_type = fastrand::u8(0..=5);
-                if spawner.wave_type == spawner.last_wave_type {
-                    spawner.wave_type = fastrand::u8(0..=5);
-                }
-                //do the initial calls
-                match spawner.wave_type {
-                    0 => wave::center_crunch(cmd),
-                    //1 => wave::tripleshot_init(time),
-                    1 => wave::salvo_init(time, 3.0),
-                    2 => wave::salvo_init(time, 5.0),
-                    3 => wave::salvo_init(time, 4.0),
-                    4 => wave::salvo_init(time, 3.0),
-                    5 => wave::salvo_init(time, 3.0),
-                    _ => unreachable!("Random number should not exceed its bounds!"),
-                }
-                //change states
-                if time.is_nan() {
-                    Some(SpawnState::Waiting {
-                        timer: SPAWN_FALLBACK_COOLDOWN,
-                    })
-                } else {
-                    None
-                }
-            } else {
-                //move timer
-                *time -= dt;
-                //create wave preamble
-                let preamble = WavePreamble {
-                    world,
-                    cmd,
-                    player_pos: &player_pos,
-                    timer: time,
-                    data,
-                };
-                //do the another wave calls
-                match spawner.wave_type {
-                    1 => wave::salvo_body(preamble, 3.0, 7, wave::asteroid),
-                    2 => wave::salvo_body(preamble, 5.0, 3, wave::big_asteroid),
-                    3 => wave::salvo_body(preamble, 4.0, 5, wave::charged_asteroid),
-                    4 => wave::salvo_body(preamble, 3.0, 4, wave::follower),
-                    5 => wave::salvo_body(preamble, 3.0, 3, wave::mine),
-                    _ => (),
-                }
-                //change states
-                if *time <= 0.0 {
-                    Some(SpawnState::Waiting {
-                        timer: SPAWN_FALLBACK_COOLDOWN,
-                    })
-                } else {
-                    None
-                }
-            }
-        }
+        WAVES[0]
     };
-    //apply new state
-    if let Some(state) = new_state {
-        spawner.state = state;
+    //how many times?
+    let double = fastrand::f32() <= DOUBLE_CHANCE;
+    let triple = fastrand::f32() <= TRIPLE_CHANCE;
+    let times = match (double, triple) {
+        (true, true) => 3,
+        (true, false) => 2,
+        _ => 1,
     };
+    //substract costs
+    spawner.credits -= wave.cost * ((times - 1) as f32 * 0.5 + 1.0);
+    //add gains
+    spawner.credits += wave.gain * times as f32;
+    if spawner.credits < 0.0 {
+        spawner.credits = 0.0;
+    }
+    //SPAWN!!
+    for _ in 0..times {
+        (wave.spawn)(WavePreamble {
+            world,
+            cmd,
+            player_pos: &player_pos,
+        })
+    }
+    //set new cooldown
+    spawner.cooldown =
+        (MAX_SPAWN_COOLDOWN - MIN_SPAWN_COOLDOWN) * fastrand::f32() + MIN_SPAWN_COOLDOWN;
 }
