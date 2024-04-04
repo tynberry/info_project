@@ -154,7 +154,7 @@ pub(super) fn salvo_init(timer: &mut f32, base_time: f32) {
     *timer = base_time;
 }
 
-pub(super) fn asteroid(preamble: WavePreamble) {
+pub(super) fn asteroid(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * 120.0;
@@ -164,7 +164,7 @@ pub(super) fn asteroid(preamble: WavePreamble) {
         .spawn(enemy::create_charged_asteroid(pos, dir, charge).build());
 }
 
-pub(super) fn big_asteroid(preamble: WavePreamble) {
+pub(super) fn big_asteroid(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * 120.0;
@@ -174,7 +174,7 @@ pub(super) fn big_asteroid(preamble: WavePreamble) {
         .spawn(enemy::create_big_asteroid(pos, dir, charge).build());
 }
 
-pub(super) fn charged_asteroid(preamble: WavePreamble) {
+pub(super) fn charged_asteroid(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
@@ -182,7 +182,7 @@ pub(super) fn charged_asteroid(preamble: WavePreamble) {
     enemy::charged::create_supercharged_asteroid(pos, dir, charge)(preamble.world, preamble.cmd);
 }
 
-pub(super) fn follower(preamble: WavePreamble) {
+pub(super) fn follower(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;
@@ -192,7 +192,7 @@ pub(super) fn follower(preamble: WavePreamble) {
         .spawn(enemy::follower::create_follower(pos, dir, charge).build())
 }
 
-pub(super) fn mine(preamble: WavePreamble) {
+pub(super) fn mine(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
     let pos = get_spawn_pos(side) - dir * SPAWN_PUSHBACK;

@@ -30,44 +30,55 @@ const MAX_ENTITIES: usize = 15;
 const DOUBLE_CHANCE: f32 = 0.33;
 const TRIPLE_CHANCE: f32 = 0.5; //chance when double was rolled
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 struct Wave {
     cost: f32,
     gain: f32,
     weight: u32,
-    spawn: fn(WavePreamble),
+    spawn: &'static dyn Fn(&mut WavePreamble),
+}
+
+const fn wave_mult(
+    fun: impl Fn(&mut WavePreamble),
+    count: usize,
+) -> impl Fn(&mut WavePreamble<'_>) {
+    move |preamble: &mut WavePreamble<'_>| {
+        for _ in 0..count {
+            fun(preamble)
+        }
+    }
 }
 
 const WAVES: [Wave; 5] = [
     Wave {
         cost: 10.0,
         gain: 20.0,
-        weight: 10,
-        spawn: wave::asteroid,
+        weight: 15,
+        spawn: &wave_mult(wave::asteroid, 4),
     },
     Wave {
         cost: 15.0,
         gain: 20.0,
         weight: 20,
-        spawn: wave::charged_asteroid,
+        spawn: &wave_mult(wave::charged_asteroid, 3),
     },
     Wave {
         cost: 40.0,
         gain: 10.0,
         weight: 30,
-        spawn: wave::big_asteroid,
+        spawn: &wave::big_asteroid,
     },
     Wave {
         cost: 30.0,
         gain: 10.0,
         weight: 30,
-        spawn: wave::follower,
+        spawn: &wave_mult(wave::follower, 3),
     },
     Wave {
         cost: 40.0,
         gain: 10.0,
         weight: 30,
-        spawn: wave::mine,
+        spawn: &wave_mult(wave::mine, 2),
     },
 ];
 
@@ -175,7 +186,7 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
     }
     //SPAWN!!
     for _ in 0..times {
-        (wave.spawn)(WavePreamble {
+        (wave.spawn)(&mut WavePreamble {
             world,
             cmd,
             player_pos: &player_pos,
