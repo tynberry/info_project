@@ -15,8 +15,15 @@ const INIT_CREDITS: f32 = 50.0;
 const CREDITS_PER_SEC: f32 = 3.0;
 
 const INIT_COOLDOWN: f32 = 5.0;
-const MIN_SPAWN_COOLDOWN: f32 = 3.0;
-const MAX_SPAWN_COOLDOWN: f32 = 5.0;
+const MIN_SPAWN_COOLDOWN: f32 = 1.0;
+const MAX_SPAWN_COOLDOWN: f32 = 3.0;
+
+const MIN_BREAK_COOLDOWN: f32 = 20.0;
+const MAX_BREAK_COOLDOWN: f32 = 40.0;
+const NO_ENEMIES_BREAK_COOLDOWN: f32 = 3.0;
+
+const MIN_SPAWNS_BEFORE_BREAK: u32 = 4;
+const MAX_SPAWNS_BEFORE_BREAK: u32 = 7;
 
 const MAX_ENTITIES: usize = 15;
 
@@ -69,6 +76,7 @@ const SPAWN_PUSHBACK: f32 = 10.0;
 
 #[derive(Clone, Copy, Debug)]
 pub struct EnemySpawner {
+    pub before_break: u32,
     pub credits: f32,
     pub cooldown: f32,
 }
@@ -76,6 +84,7 @@ pub struct EnemySpawner {
 impl EnemySpawner {
     pub fn new() -> Self {
         Self {
+            before_break: MIN_SPAWNS_BEFORE_BREAK,
             credits: INIT_CREDITS,
             cooldown: INIT_COOLDOWN,
         }
@@ -107,9 +116,15 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
     let (_, spawner) = spawner_query.into_iter().next().unwrap();
     //give credits
     spawner.credits += CREDITS_PER_SEC * dt;
+    //is break over due to lack of enemies
+    if spawner.before_break == 0 && enemy_count == 0 {
+        spawner.cooldown = NO_ENEMIES_BREAK_COOLDOWN;
+        //new before break
+        spawner.before_break = fastrand::u32(MIN_SPAWNS_BEFORE_BREAK..=MAX_SPAWNS_BEFORE_BREAK);
+    }
     //advance state
     spawner.cooldown -= dt;
-    if spawner.cooldown > 0.0 {
+    if spawner.cooldown > 0.0 || spawner.before_break == 0 {
         return;
     }
     //TOO MANY ENEMIES
@@ -166,6 +181,15 @@ pub fn enemy_spawning(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
             player_pos: &player_pos,
         })
     }
+    //break time????
+    if spawner.before_break == 1 {
+        spawner.before_break = 0;
+        //set new cooldown
+        spawner.cooldown =
+            (MAX_BREAK_COOLDOWN - MIN_BREAK_COOLDOWN) * fastrand::f32() + MIN_BREAK_COOLDOWN;
+        return;
+    }
+    spawner.before_break -= 1;
     //set new cooldown
     spawner.cooldown =
         (MAX_SPAWN_COOLDOWN - MIN_SPAWN_COOLDOWN) * fastrand::f32() + MIN_SPAWN_COOLDOWN;
