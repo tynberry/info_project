@@ -28,7 +28,7 @@ pub(super) const ASTEROID_MASS: f32 = 18.0;
 pub(super) const ASTEROID_SIZE: f32 = 50.0;
 pub(super) const ASTEROID_SCALE: f32 = ASTEROID_SIZE / 512.0;
 
-pub(super) const ASTEROID_DMG: f32 = 1.5;
+pub(super) const ASTEROID_DMG: f32 = 2.0;
 
 pub const ASTEROID_TEX_NEUTRAL: &str = "asteroid";
 pub const ASTEROID_TEX_POSITIVE: &str = "asteroid_plus";

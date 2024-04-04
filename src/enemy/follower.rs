@@ -23,7 +23,7 @@ const FOLLOWER_MASS: f32 = 4.0;
 
 const FOLLOWER_SIZE: f32 = 40.0;
 
-const FOLLOWER_DMG: f32 = 1.5;
+const FOLLOWER_DMG: f32 = 2.0;
 
 pub const FOLLOWER_TEX_NEUTRAL: &str = "follower";
 pub const FOLLOWER_TEX_POSITIVE: &str = "follower_plus";

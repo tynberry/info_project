@@ -40,7 +40,7 @@ const MINE_DETONATION_TIMER: f32 = 4.0;
 const MINE_DETONATION_GROWING_TIMER: f32 = 1.0;
 
 const MINE_PROJ_SPEED: f32 = 200.0;
-const MINE_PROJ_DMG: f32 = 1.5;
+const MINE_PROJ_DMG: f32 = 2.0;
 
 const MINE_XP: u32 = 20;
 
