@@ -281,7 +281,13 @@ pub fn audio_visuals(world: &mut World, fx: &mut FxManager, assets: &AssetManage
     //shooting sound
     if player.shoot_sound {
         player.shoot_sound = false;
-        macroquad::audio::play_sound_once(assets.get_sound("pew_pew").unwrap());
+        macroquad::audio::play_sound(
+            assets.get_sound("pew_pew").unwrap(),
+            PlaySoundParams {
+                looped: false,
+                volume: 0.4,
+            },
+        );
     }
 
     //explode if dead

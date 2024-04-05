@@ -1,6 +1,6 @@
 use hecs::World;
 use macroquad::{
-    audio,
+    audio::{self, PlaySoundParams},
     math::{vec2, Vec2},
 };
 
@@ -184,6 +184,12 @@ pub fn apply_knockback(world: &mut World, event: &mut World, assets: &AssetManag
         let normal = vec2(victim_pos.x - deal_pos.x, victim_pos.y - deal_pos.y).normalize_or_zero();
         victim_vel.apply_force(normal * deal.force, 1.0);
         //play sound to knockback
-        audio::play_sound_once(assets.get_sound("knockback").unwrap());
+        audio::play_sound(
+            assets.get_sound("knockback").unwrap(),
+            PlaySoundParams {
+                looped: false,
+                volume: 0.5,
+            },
+        );
     }
 }
