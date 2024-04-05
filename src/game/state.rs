@@ -166,7 +166,7 @@ fn game_update(
 }
 
 fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager, persist: &Persistent) {
-    player::visuals(world, fx);
+    player::audio_visuals(world, fx, assets);
     score::score_display(world, persist);
     enemy::charged::supercharged_asteroid_visual(world, fx);
     enemy::follower::follower_fx(world, fx);

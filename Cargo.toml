@@ -10,5 +10,5 @@ enum_dispatch = "0.3.12"
 fastrand = "2.0.1"
 fnv = "1.0.7"
 hecs = "0.10.4"
-macroquad = "0.4.5"
+macroquad = { version = "0.4.5", features = ["audio"] }
 nanoserde = "0.1.37"

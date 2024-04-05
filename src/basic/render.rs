@@ -1,6 +1,9 @@
 use enum_dispatch::enum_dispatch;
 use hecs::World;
-use macroquad::prelude::*;
+use macroquad::{
+    audio::{load_sound, Sound},
+    prelude::*,
+};
 
 use super::{Position, Rotation};
 
@@ -8,6 +11,7 @@ use super::{Position, Rotation};
 pub struct AssetManager {
     textures: fnv::FnvHashMap<&'static str, Texture2D>,
     fonts: fnv::FnvHashMap<&'static str, Font>,
+    sound: fnv::FnvHashMap<&'static str, Sound>,
 }
 
 impl AssetManager {
@@ -41,6 +45,22 @@ impl AssetManager {
 
     pub fn get_font(&self, id: &'static str) -> Option<&Font> {
         self.fonts.get(id)
+    }
+
+    pub async fn load_sound(
+        &mut self,
+        id: &'static str,
+        path: &str,
+    ) -> Result<(), macroquad::Error> {
+        //load it
+        let sound = load_sound(path).await?;
+        //save it
+        self.sound.insert(id, sound);
+        Ok(())
+    }
+
+    pub fn get_sound(&self, id: &'static str) -> Option<&Sound> {
+        self.sound.get(id)
     }
 }
 

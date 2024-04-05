@@ -1,13 +1,13 @@
 use std::f32::consts::PI;
 
 use hecs::World;
-use macroquad::prelude::*;
+use macroquad::{audio::PlaySoundParams, prelude::*};
 
 use crate::{
     basic::{
         fx::{FxManager, Particle},
         motion::{ChargeReceiver, ChargeSender, PhysicsMotion},
-        render::Sprite,
+        render::{AssetManager, Sprite},
         DamageDealer, Health, HitBox, HitEvent, Position, Rotation, Team, Wrapped,
     },
     projectile::{self, ProjectileType},
@@ -42,6 +42,8 @@ pub struct Player {
 
     dead_burst: bool,
 
+    jet_sound_playing: bool,
+
     pub xp: u32,
 }
 
@@ -54,6 +56,8 @@ impl Player {
             polarity: 1,
 
             dead_burst: false,
+
+            jet_sound_playing: false,
 
             xp: 0,
         }
@@ -220,7 +224,7 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
     }
 }
 
-pub fn visuals(world: &mut World, fx: &mut FxManager) {
+pub fn audio_visuals(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     //get player
     let (_, (player, pos, rotation, sprite, health)) = world
         .query_mut::<(&mut Player, &Position, &Rotation, &mut Sprite, &Health)>()
@@ -250,7 +254,24 @@ pub fn visuals(world: &mut World, fx: &mut FxManager) {
             4.0,
             PI / 8.0,
             7,
-        )
+        );
+        //jet sound
+        if !player.jet_sound_playing {
+            player.jet_sound_playing = true;
+            macroquad::audio::play_sound(
+                assets.get_sound("player_jet").unwrap(),
+                PlaySoundParams {
+                    looped: true,
+                    volume: 1.0,
+                },
+            );
+        }
+    } else {
+        //anti jet sound
+        if player.jet_sound_playing {
+            player.jet_sound_playing = false;
+            macroquad::audio::stop_sound(assets.get_sound("player_jet").unwrap());
+        }
     }
 
     //explode if dead

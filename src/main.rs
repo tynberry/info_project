@@ -61,6 +61,8 @@ const TEXTURES: [(&str, &str); 19] = [
     (MINE_TEX_NEGATIVE, "res/mine_minus.png"),
 ];
 
+const SOUNDS: [(&str, &str); 1] = [("player_jet", "res/sound/movement.wav")];
+
 fn conf() -> Conf {
     Conf {
         window_title: "Warping Warp".to_owned(),
@@ -79,6 +81,9 @@ async fn main() {
     let mut assets = AssetManager::default();
     for (asset_id, asset_path) in TEXTURES {
         assets.load_texture(asset_id, asset_path).await.unwrap();
+    }
+    for (asset_id, asset_path) in SOUNDS {
+        assets.load_sound(asset_id, asset_path).await.unwrap();
     }
 
     //load font
