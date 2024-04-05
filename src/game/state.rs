@@ -116,7 +116,7 @@ fn game_update(
 
     basic::ensure_wrapping(world, &mut cmd, assets);
     basic::ensure_damage(world, events);
-    basic::motion::apply_knockback(world, events);
+    basic::motion::apply_knockback(world, events, assets);
 
     //AFTER EFFECTS
     player::health(world, events, dt);

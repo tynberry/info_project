@@ -1,7 +1,10 @@
 use hecs::World;
-use macroquad::math::{vec2, Vec2};
+use macroquad::{
+    audio,
+    math::{vec2, Vec2},
+};
 
-use super::{HitEvent, Position, Rotation};
+use super::{render::AssetManager, HitEvent, Position, Rotation};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearMotion {
@@ -146,7 +149,7 @@ pub fn apply_physics(world: &mut World, dt: f32) {
     }
 }
 
-pub fn apply_knockback(world: &mut World, event: &mut World) {
+pub fn apply_knockback(world: &mut World, event: &mut World, assets: &AssetManager) {
     //for all events
     for (_, event) in event.query_mut::<&HitEvent>() {
         //is the producer equal to the consumer?
@@ -180,5 +183,7 @@ pub fn apply_knockback(world: &mut World, event: &mut World) {
         //deal force
         let normal = vec2(victim_pos.x - deal_pos.x, victim_pos.y - deal_pos.y).normalize_or_zero();
         victim_vel.apply_force(normal * deal.force, 1.0);
+        //play sound to knockback
+        audio::play_sound_once(assets.get_sound("knockback").unwrap());
     }
 }
