@@ -5,6 +5,7 @@ use crate::{
     basic::{self, fx::FxManager, render::AssetManager, Health},
     enemy,
     menu::{self, Title},
+    persist::Persistent,
     player::{self, Player},
     projectile, score, xp,
 };
@@ -33,10 +34,11 @@ impl GameState {
         assets: &AssetManager,
         dt: f32,
         fx: &mut FxManager,
+        persist: &mut Persistent,
     ) {
         let new_state = match self {
             GameState::MainMenu => main_menu_update(world),
-            GameState::Running => game_update(world, events, assets, dt, fx),
+            GameState::Running => game_update(world, events, assets, dt, fx, persist),
             GameState::Paused => pause_update(world),
             GameState::GameOver => game_over_update(world, dt),
         };
@@ -52,12 +54,13 @@ impl GameState {
         assets: &AssetManager,
         _dt: f32,
         fx: &mut FxManager,
+        persist: &Persistent,
     ) {
         match self {
             GameState::MainMenu => main_menu_render(world, assets),
-            GameState::Running => game_render(world, fx, assets),
-            GameState::Paused => pause_render(world, fx, assets),
-            GameState::GameOver => game_over_render(world, fx, assets),
+            GameState::Running => game_render(world, fx, assets, persist),
+            GameState::Paused => pause_render(world, fx, assets, persist),
+            GameState::GameOver => game_over_render(world, fx, assets, persist),
         }
     }
 }
@@ -91,6 +94,7 @@ fn game_update(
     assets: &AssetManager,
     dt: f32,
     fx: &mut FxManager,
+    persist: &mut Persistent,
 ) -> Option<GameState> {
     //Command buffer
     let mut cmd = CommandBuffer::new();
@@ -143,14 +147,17 @@ fn game_update(
     }
 
     //check for game over
-    let (_, player_hp) = world
-        .query_mut::<&Health>()
-        .with::<&Player>()
+    let (_, (player_hp, player)) = world
+        .query_mut::<(&Health, &Player)>()
         .into_iter()
         .next()
         .unwrap();
 
     if player_hp.hp <= 0.0 {
+        //save high score
+        persist.high_score = persist.high_score.max(player.xp);
+        let _ = persist.save();
+        //show game over screen
         super::init::init_game_over(world);
         return Some(GameState::GameOver);
     }
@@ -158,9 +165,9 @@ fn game_update(
     None
 }
 
-fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
+fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager, persist: &Persistent) {
     player::visuals(world, fx);
-    score::score_display(world);
+    score::score_display(world, persist);
     enemy::charged::supercharged_asteroid_visual(world, fx);
     enemy::follower::follower_fx(world, fx);
     enemy::mine::mine_fx(world);
@@ -188,9 +195,14 @@ fn pause_update(world: &mut World) -> Option<GameState> {
     }
 }
 
-fn pause_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
+fn pause_render(
+    world: &mut World,
+    fx: &mut FxManager,
+    assets: &AssetManager,
+    persist: &Persistent,
+) {
     //first render the game
-    game_render(world, fx, assets);
+    game_render(world, fx, assets, persist);
     //overlap with transparent black
     draw_rectangle(
         0.0,
@@ -228,7 +240,12 @@ fn game_over_update(world: &mut World, dt: f32) -> Option<GameState> {
     }
 }
 
-fn game_over_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
+fn game_over_render(
+    world: &mut World,
+    fx: &mut FxManager,
+    assets: &AssetManager,
+    persist: &Persistent,
+) {
     //get time
     let time = world
         .query_mut::<&GameOverTimer>()
@@ -238,7 +255,7 @@ fn game_over_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager
         .1
         .time;
     //first render the game
-    game_render(world, fx, assets);
+    game_render(world, fx, assets, persist);
     //overlap with transparent black
     draw_rectangle(
         0.0,

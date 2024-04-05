@@ -2,6 +2,7 @@ pub mod basic;
 pub mod enemy;
 pub mod game;
 pub mod menu;
+pub mod persist;
 mod player;
 pub mod projectile;
 pub mod score;
@@ -17,6 +18,7 @@ use enemy::{
 };
 use game::state::GameState;
 use macroquad::prelude::*;
+use persist::Persistent;
 use player::{PLAYER_TEX_NEGATIVE, PLAYER_TEX_POSITIVE};
 use projectile::{
     PROJ_MED_TEX_NEG, PROJ_MED_TEX_NEUTRAL, PROJ_MED_TEX_POS, PROJ_SMALL_TEX_NEG,
@@ -70,6 +72,9 @@ fn conf() -> Conf {
 
 #[macroquad::main(conf)]
 async fn main() {
+    //load persitent as a resource
+    let mut persist = Persistent::load().await.unwrap_or_default();
+
     //load assets to render
     let mut assets = AssetManager::default();
     for (asset_id, asset_path) in TEXTURES {
@@ -100,7 +105,7 @@ async fn main() {
         let dt = get_frame_time();
         //UPDATE WORLD
 
-        state.update(&mut world, &mut events, &assets, dt, &mut fx);
+        state.update(&mut world, &mut events, &assets, dt, &mut fx, &mut persist);
 
         //CLEAR ALL EVENTS
         events.clear();
@@ -118,7 +123,7 @@ async fn main() {
 
         fx.update_particles(dt);
 
-        state.render(&mut world, &mut events, &assets, dt, &mut fx);
+        state.render(&mut world, &mut events, &assets, dt, &mut fx, &persist);
 
         next_frame().await;
     }

@@ -140,4 +140,7 @@ pub fn init_game_over(world: &mut World) {
             color: WHITE,
         },
     ));
+
+    //add highscore
+    world.spawn(score::create_highscore_display(vec2(SPACE_WIDTH / 2.0, 45.0)).build());
 }
