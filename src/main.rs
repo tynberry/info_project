@@ -61,9 +61,10 @@ const TEXTURES: [(&str, &str); 19] = [
     (MINE_TEX_NEGATIVE, "res/mine_minus.png"),
 ];
 
-const SOUNDS: [(&str, &str); 2] = [
+const SOUNDS: [(&str, &str); 3] = [
     ("player_jet", "res/sound/movement.wav"),
     ("knockback", "res/sound/boing.wav"),
+    ("pew_pew", "res/sound/pew_pew.wav"),
 ];
 
 fn conf() -> Conf {

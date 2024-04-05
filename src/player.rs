@@ -43,6 +43,7 @@ pub struct Player {
     dead_burst: bool,
 
     jet_sound_playing: bool,
+    shoot_sound: bool,
 
     pub xp: u32,
 }
@@ -58,6 +59,7 @@ impl Player {
             dead_burst: false,
 
             jet_sound_playing: false,
+            shoot_sound: false,
 
             xp: 0,
         }
@@ -148,6 +150,8 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
                 charge: -player.polarity,
             },
         ));
+        //schedule to play sound
+        player.shoot_sound = true;
     }
 
     //polarity switching
@@ -272,6 +276,12 @@ pub fn audio_visuals(world: &mut World, fx: &mut FxManager, assets: &AssetManage
             player.jet_sound_playing = false;
             macroquad::audio::stop_sound(assets.get_sound("player_jet").unwrap());
         }
+    }
+
+    //shooting sound
+    if player.shoot_sound {
+        player.shoot_sound = false;
+        macroquad::audio::play_sound_once(assets.get_sound("pew_pew").unwrap());
     }
 
     //explode if dead
