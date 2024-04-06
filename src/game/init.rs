@@ -57,7 +57,7 @@ pub fn init_main_menu(world: &mut World) {
             y: 120.0,
         },
         Title {
-            text: "THE GAME".into(),
+            text: "MAGNET FURY".into(),
             font: "main_font",
             size: 100.0,
             color: WHITE,

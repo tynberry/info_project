@@ -69,7 +69,7 @@ const SOUNDS: [(&str, &str); 3] = [
 
 fn conf() -> Conf {
     Conf {
-        window_title: "Warping Warp".to_owned(),
+        window_title: "Magnet fury".to_owned(),
         window_width: SPACE_WIDTH as i32,
         window_height: SPACE_HEIGHT as i32,
         ..Default::default()
