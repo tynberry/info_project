@@ -1,4 +1,4 @@
-//! Enemy spawning handling code.
+//! General game state functions and Enemy spawning handling code.
 
 use std::f32::consts::PI;
 
