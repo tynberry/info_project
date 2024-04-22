@@ -1,3 +1,4 @@
+//! Health, Damage and Collision handling systems and structs.
 use hecs::{Entity, World};
 use macroquad::{color::Color, shapes::draw_rectangle};
 
@@ -9,10 +10,16 @@ use super::Team;
 //EVENT PART
 //-----------------------------------------------------------------------------
 
+/// Event representing collision between two entities.
 #[derive(Clone, Copy, Debug)]
 pub struct HitEvent {
+    /// Entity id of the entity that was hit.
+    /// This entity has HitBox.
     pub who: Entity,
+    /// Entity id of the entity that hit the `who` entity.
+    /// This entity has HurtBox.
     pub by: Entity,
+    /// Can the `by` entity deal damage to the `who` entity?
     pub can_hurt: bool,
 }
 
@@ -20,13 +27,19 @@ pub struct HitEvent {
 //COMPONENT PART
 //-----------------------------------------------------------------------------
 
+/// Health of the entity. When `hp` <= 0.0, then the entity is dead.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Health {
+    /// Max health the entity can have.
+    /// Used to limit `heal` method.
     pub max_hp: f32,
+    /// Amount of health the entity currently has.
     pub hp: f32,
 }
 
 impl Health {
+    /// Increases `hp` by `amount` while no going over
+    /// max health.
     pub fn heal(&mut self, amount: f32) {
         self.hp += amount;
         if self.hp > self.max_hp {
@@ -35,27 +48,42 @@ impl Health {
     }
 }
 
+/// Denotes an entity that can deal damage to other ones.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct DamageDealer {
+    /// Amount of damage this entity does on hit.
     pub dmg: f32,
 }
 
+/// Circle around which the entity can hit entites with `HitBox`.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct HurtBox {
     pub radius: f32,
 }
 
+/// Circle around which the entity can get hit by entites with `HurtBox`.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct HitBox {
     pub radius: f32,
 }
 
+/// Component that shows a health bar that represents the entity's health
+/// stored in `Health`.
 #[derive(Clone, Copy, Debug)]
 pub struct HealthDisplay {
+    /// Entity whose `Health` is being shown.
+    /// The entity must have `Health`.
     pub target: Entity,
+    /// Width of the bar when health is at its maximum.
     pub max_width: f32,
+    /// Height of the bar.
     pub height: f32,
+    /// Color of foreground of the bar.
+    /// Foreground shows the current amount of health.
     pub color: Color,
+    /// Color of background of the bar.
+    /// Background shows the max health the entity can have
+    /// (According to its `Health` component).
     pub max_color: Color,
 }
 
@@ -63,6 +91,7 @@ pub struct HealthDisplay {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// Renders `HealthDisplay`s
 pub fn render_displays(world: &mut World) {
     //iterate over all displays
     for (_, (display, pos)) in world.query::<(&HealthDisplay, &Position)>().into_iter() {
@@ -91,6 +120,7 @@ pub fn render_displays(world: &mut World) {
     }
 }
 
+/// Handles collision detection between `HitBox`es and `HurtBox`es.
 pub fn ensure_damage(world: &mut World, events: &mut World) {
     //iterate through all hitable
     for (hit_id, (hit_pos, hit_box, hit_team)) in

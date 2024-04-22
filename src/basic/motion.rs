@@ -1,3 +1,4 @@
+//! Motion and physics components and systems.
 use hecs::World;
 use macroquad::{
     audio::{self, PlaySoundParams},
@@ -6,58 +7,102 @@ use macroquad::{
 
 use super::{render::AssetManager, HitEvent, Position, Rotation};
 
+/// Moves an entity in a linear way.
+/// It does not accelerate, decelerate, change directions
+/// nor is affected by physics, knockback or charges.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearMotion {
+    /// Velocity of the entity.
     pub vel: Vec2,
 }
 
+/// Component that rotates an entity constantly.
+/// It does not change speed nor direction.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearTorgue {
+    /// Speed of rotation in radians per second.
     pub speed: f32,
 }
 
+/// Introduces an entity into physics simulation.
+/// Entity with this component can be affected by charges or knockback.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PhysicsMotion {
+    /// Velocity of the entity.
     pub vel: Vec2,
+    /// Mass of the entity.
+    /// Affects the velocity change of a force.
     pub mass: f32,
 }
 
 impl PhysicsMotion {
+    /// Applies a force on the entity.
+    /// # Arguments
+    /// * `force` - the force to apply
+    /// * `dt` - how long should the force be applied
     pub fn apply_force(&mut self, force: Vec2, dt: f32) {
         self.vel += force * dt / self.mass;
     }
 }
 
+/// Makes an entity to slow down its motions on its own.
+/// It only dampens `PhysicsMotion`.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PhysicsDamping {
+    /// By this factor the entity's velocity is multiplied
+    /// every second. It is integrated with respect to time.
     pub mul_factor: f32,
+    /// By how many length units the entity's velocity is
+    /// being reduced every second. It is integrated with
+    /// respect to time.
+    ///
+    /// This factor cannot make the entity's  
+    /// velocity face opposite direction than it already faced.
     pub flat_factor: f32,
 }
 
+/// Limits an entity's velocity to some amount.
+/// It only affects `PhysicsMotion`.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct MaxVelocity {
+    /// Max velocity the entity can achieve.
     pub max_velocity: f32,
 }
 
+/// Makes an entity produce electric field.
+/// This field affects all entities with `ĆhargeReceiver`.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeSender {
+    /// Force that is applied on all affected entites.
     pub force: f32,
+    /// Distance from the entity where the force is applied
+    /// at full strength.
     pub full_radius: f32,
+    /// Distance from the entity where the force is first zero.
+    /// All entites closer than `no_radius` are affected by force.
     pub no_radius: f32,
 }
 
+/// Makes an entity respond to electric fields.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeReceiver {
+    /// Multiplier to the force received.
     pub multiplier: f32,
 }
 
+/// Makes an entity temporalily immune to charge forces.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeDisable {
+    /// Time before the entity becomes affected by charges.
     pub timer: f32,
 }
 
+/// Makes an entity deal knockback to other entities.
+/// This applies when any two entities collide with each other
+/// no matter their team.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct KnockbackDealer {
+    /// Force magnitude that is dealt on collision.
     pub force: f32,
 }
 
@@ -65,22 +110,29 @@ pub struct KnockbackDealer {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// Add `LinearMotion`, `LinearTorgue` and `PhysicsMotion`
+/// velocities to entities' positions and/or rotations.
 pub fn apply_motion(world: &mut World, dt: f32) {
+    //apply linear motion
     for (_, (linear, pos)) in world.query_mut::<(&LinearMotion, &mut Position)>() {
         pos.x += linear.vel.x * dt;
         pos.y += linear.vel.y * dt;
     }
 
+    //apply linear torgue
     for (_, (torgue, rotation)) in world.query_mut::<(&LinearTorgue, &mut Rotation)>() {
         rotation.angle += torgue.speed * dt;
     }
 
+    //apply physics motion
     for (_, (physics, pos)) in world.query_mut::<(&PhysicsMotion, &mut Position)>() {
         pos.x += physics.vel.x * dt;
         pos.y += physics.vel.y * dt;
     }
 }
 
+/// Advance physics simulation.
+/// Handles the logic of `PhysicsDamping`, `MaxVelocity` and charges.
 pub fn apply_physics(world: &mut World, dt: f32) {
     //apply damping
     for (_, (physics, damping)) in world.query_mut::<(&mut PhysicsMotion, &PhysicsDamping)>() {
