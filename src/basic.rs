@@ -1,3 +1,4 @@
+//! Basic, general types, that can be used to a wide range of entities.
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
@@ -16,6 +17,8 @@ use self::render::{AssetManager, Sprite};
 //UTILS PART
 //-----------------------------------------------------------------------------
 
+///Team of the entity.
+///This determines hurting between entities.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub enum Team {
     #[default]
@@ -25,6 +28,7 @@ pub enum Team {
 }
 
 impl Team {
+    /// Can the `self` team hurt the `other` team.
     #[inline]
     pub fn can_hurt(&self, other: &Team) -> bool {
         self != other
@@ -35,20 +39,25 @@ impl Team {
 //COMPONENT PART
 //-----------------------------------------------------------------------------
 
+/// Position of an entity in World coordinates.
+/// Represents the center of the entity.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Position {
     pub x: f32,
     pub y: f32,
 }
 
+/// Rotation of an entity along its center.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Rotation {
     pub angle: f32,
 }
 
+/// Marker of entites that should wrap around when going out of bounds.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Wrapped;
 
+/// Marker of entities that should be deleted entirely when out of bounds.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct DeleteOnWarp;
 
@@ -60,7 +69,9 @@ pub struct DeleteOnWarp;
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// Handles the wrapping and deletion of entities marked by Wrapped or DeleteOnWarp.
 pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &AssetManager) {
+    //handle Wrapped wraping
     for (_, pos) in world.query_mut::<&mut Position>().with::<&Wrapped>() {
         //if outside of screen tp them back
         //assumes position is center
@@ -79,6 +90,7 @@ pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &Asse
         }
     }
 
+    //handle DeleteOnWarp deleting
     for (id, (pos, sprite)) in world
         .query_mut::<(&mut Position, Option<&Sprite>)>()
         .with::<&DeleteOnWarp>()
@@ -98,7 +110,7 @@ pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &Asse
                 None => 50.0,
             }
         };
-        //if outside of screen tp them back
+        //if outside of screen tp delete them
         //assumes position is center
         if pos.x > SPACE_WIDTH + pushback {
             cmd.despawn(id);

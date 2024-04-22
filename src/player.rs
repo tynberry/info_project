@@ -1,3 +1,5 @@
+//! Player logic and creation.
+
 use std::f32::consts::PI;
 
 use hecs::World;
@@ -14,41 +16,62 @@ use crate::{
     world_mouse_pos, SPACE_HEIGHT, SPACE_WIDTH,
 };
 
+/// Player's acceleration when thrusters are on.
 const PLAYER_ACCEL: f32 = 600.0;
+/// Player's mass for physics
 const PLAYER_MASS: f32 = 10.0;
 
+/// Force applied by Player's charge.
 const PLAYER_CHARGE_FORCE: f32 = 200.0;
+/// Radius where Player's charge is at strongest.
 const PLAYER_CHARGE_FULL_RADIUS: f32 = 150.0;
+/// Radius where Player's charge is first zero.
+/// Points closer than this distance are affected by non-zero charge force.
 const PLAYER_CHARGE_RADIUS: f32 = 300.0;
 
+/// Player's max health.
 const PLAYER_MAX_BASE_HP: f32 = 10.0;
+/// Player's health regeneration.
 const PLAYER_BASE_HP_REGEN: f32 = 0.3;
 
+/// Player's cooldown between projectiles.
 const PLAYER_FIRE_COOLDOWN: f32 = 0.15;
+/// Player's cooldown between hits.
 const PLAYER_INVUL_COOLDOWN: f32 = 1.0;
 
+/// Player's texture ID representing positive player.
 pub const PLAYER_TEX_POSITIVE: &str = "player_plus";
+/// Player's texture ID representing negative player.
 pub const PLAYER_TEX_NEGATIVE: &str = "player_negative";
 
+/// Size of the Player.
+/// Also influences the size of Player's Hit/HurtBox.
 const PLAYER_SIZE: f32 = 30.0;
 
+/// This componenet handles all of the player's logic.
 #[derive(Debug)]
 pub struct Player {
+    /// Time before another shot can be fired.
     fire_timer: f32,
-
+    /// Time before another hit can be taken.
     invul_timer: f32,
-
+    /// Charge of the player. 
+    /// 1 => positive
+    /// -1 => negative
     polarity: i8,
-
+    /// Has the player already exploded into particles when dead?
     dead_burst: bool,
-
+    /// Should the thruster's sound play?
     jet_sound_playing: bool,
+    /// Should the shooting sound play?
     shoot_sound: bool,
 
+    /// Score the player got this game.
     pub xp: u32,
 }
 
 impl Player {
+    /// Creates a new default Player component.
     pub fn new() -> Self {
         Self {
             fire_timer: 0.0,
@@ -70,6 +93,7 @@ impl Player {
 //ENTITY GEN
 //-----------------------------------------------------------------------------
 
+/// Create an entire feature complete Player.
 pub fn new_entity() -> (
     Player,
     Position,
@@ -120,6 +144,7 @@ pub fn new_entity() -> (
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// Handles the weapon logic of the player.
 pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
     //get player
     let (_, (player, vel, angle, pos, charge_send, charge_receive)) = world
@@ -163,6 +188,7 @@ pub fn weapons(world: &mut World, cmd: &mut hecs::CommandBuffer, dt: f32) {
     }
 }
 
+/// Handles thruster and mouse following logic of Player.
 pub fn motion_update(world: &mut World, dt: f32) {
     //get player
     let (_, (vel, angle, pos)) = world
@@ -192,6 +218,7 @@ pub fn motion_update(world: &mut World, dt: f32) {
     pos.y += vel.vel.y * dt;
 }
 
+/// Handles Player damage reception and invulnerability frames.
 pub fn health(world: &mut World, events: &mut World, dt: f32) {
     //get player
     let player_query = &mut world.query::<(&mut Player, &mut Health)>();
@@ -221,13 +248,10 @@ pub fn health(world: &mut World, events: &mut World, dt: f32) {
         player_hp.hp -= damage.dmg;
         //set invul frames
         player.invul_timer = PLAYER_INVUL_COOLDOWN;
-        //check for death
-        if player_hp.hp <= 0.0 {
-            //TODO DEATH
-        }
     }
 }
 
+/// Handles the sound and visuals (particles) the Player makes.
 pub fn audio_visuals(world: &mut World, fx: &mut FxManager, assets: &AssetManager) {
     //get player
     let (_, (player, pos, rotation, sprite, health)) = world

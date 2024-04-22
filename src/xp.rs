@@ -1,3 +1,5 @@
+//! Xp orbs logic and creation
+
 use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, EntityBuilder, World};
@@ -8,23 +10,38 @@ use crate::{
     player::Player,
 };
 
+/// Distance at which the orb is absorbed into the player.
 const COLLECT_RADIUS: f32 = 10.0;
+/// Max radius of the Xp orb.
 const MAX_RADIUS: f32 = 3.0;
+/// Coefficient of the hyperbolic relation ship used to determine the size of the orbs.
 const RADIUS_COEFF: f32 = 0.1;
+/// Min radius of the Xp orb.
 const MIN_RADIUS: f32 = 1.0;
 
+/// Distance from the player the orb is attracted at.
 const ATTRACTION_RADIUS: f32 = 300.0;
+/// Speed at which the orb is attracted.
 const ATTRACTION_SPEED: f32 = 100.0;
+/// Multiplier of the speed every second the orb is attracted.
+/// Diminishes when player out of the attraction range.
+/// Multiplicative.
 const ATTRACTION_MULT_PER_SEC: f32 = 0.8;
 
+/// Component that spawns xp orbs on entities death (hp <= 0.0).
 #[derive(Clone, Copy, Debug, Default)]
 pub struct BurstXpOnDeath {
+    /// Total Xp that should be enclosed in the spawned xp orbs.
     pub amount: u32,
 }
 
+/// Xp orb component.
+/// Gives Xp to player and is attracted by them.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct XpOrb {
+    /// Amount of xp this orb contains.
     pub amount: u32,
+    /// Current speed multiplier of attraction speed.
     pub follow_mult: f32,
 }
 
@@ -32,6 +49,7 @@ pub struct XpOrb {
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
+/// Create a xp orb entity.
 pub fn create_orb(pos: Vec2, vel: Vec2, amount: u32) -> EntityBuilder {
     let mut builder = EntityBuilder::new();
 
@@ -65,9 +83,12 @@ pub fn create_orb(pos: Vec2, vel: Vec2, amount: u32) -> EntityBuilder {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// Handles xp orb spawning on death of `BurstXpOnDeath` entites.
 pub fn xp_bursts(world: &mut World, cmd: &mut CommandBuffer) {
     for (_, (burst, pos, health)) in world.query_mut::<(&BurstXpOnDeath, &Position, &Health)>() {
+        //get spawning position
         let pos = vec2(pos.x, pos.y);
+        //is the entity dead?
         if health.hp <= 0.0 {
             //spawn xp's if dead
             let mut big_xp = burst.amount / 2;
@@ -101,6 +122,7 @@ pub fn xp_bursts(world: &mut World, cmd: &mut CommandBuffer) {
     }
 }
 
+/// Attracts `XpOrb` entites to the player, if in range.
 pub fn xp_attraction(world: &mut World, dt: f32) {
     //find player
     let (_, &player_pos) = world
@@ -126,6 +148,7 @@ pub fn xp_attraction(world: &mut World, dt: f32) {
     }
 }
 
+/// Absorbs the xp orbs into player when in range.
 pub fn xp_absorbtion(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     //find player
     let mut player_query = world.query::<&mut Player>();

@@ -1,3 +1,9 @@
+//! This module initialises the game, all of its assets and 
+//! required systems to function.
+//! It also handles the main loop, update and render of Gamestates.
+//! 
+
+
 pub mod basic;
 pub mod enemy;
 pub mod game;
@@ -25,9 +31,14 @@ use projectile::{
     PROJ_SMALL_TEX_POS,
 };
 
+/// Internal logical space width.
+/// Values outside this range are not rendered.
 pub const SPACE_WIDTH: f32 = 1280.0;
+/// Internal logical space height.
+/// Values outside this range are not rendered.
 pub const SPACE_HEIGHT: f32 = 720.0;
 
+/// Returns the position of the mouse in world coordinates.
 pub fn world_mouse_pos() -> Vec2 {
     let (mx, my) = mouse_position();
     let camera = &Camera2D::from_display_rect(Rect {
@@ -39,6 +50,7 @@ pub fn world_mouse_pos() -> Vec2 {
     camera.screen_to_world(vec2(mx, my))
 }
 
+/// Texture assets id, location, lookup table.
 const TEXTURES: [(&str, &str); 19] = [
     (ASTEROID_TEX_NEUTRAL, "res/asteroid.png"),
     (ASTEROID_TEX_POSITIVE, "res/asteroid_plus.png"),
@@ -61,12 +73,15 @@ const TEXTURES: [(&str, &str); 19] = [
     (MINE_TEX_NEGATIVE, "res/mine_minus.png"),
 ];
 
+/// Sound assets id, location, lookup table.
 const SOUNDS: [(&str, &str); 3] = [
     ("player_jet", "res/sound/movement.wav"),
     ("knockback", "res/sound/boing.wav"),
     ("pew_pew", "res/sound/pew_pew.wav"),
 ];
 
+/// Returns requested properties of the window.
+/// It sets the title and window size.
 fn conf() -> Conf {
     Conf {
         window_title: "Magnet fury".to_owned(),
@@ -76,6 +91,7 @@ fn conf() -> Conf {
     }
 }
 
+/// Entry point of the application.
 #[macroquad::main(conf)]
 async fn main() {
     //load persitent as a resource

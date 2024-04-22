@@ -1,3 +1,5 @@
+//! General enemy components
+
 pub mod asteroid;
 pub mod charged;
 pub mod follower;
@@ -9,6 +11,8 @@ use hecs::{CommandBuffer, World};
 
 use crate::basic::{DamageDealer, Health, HitEvent};
 
+///Marker of enemy entities.
+///Every enemy should have this marker.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Enemy;
 
@@ -16,6 +20,8 @@ pub struct Enemy;
 //SYSTEM PART
 //------------------------------------------------------------------------------
 
+/// Handles hurting of enemies by hostile hurt events.
+/// Calculates resulting health and despawns dead (hp <= 0.0) enemies.
 pub fn health(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     {
         //get enemy view

@@ -1,3 +1,5 @@
+//! Projectiles logic and creation.
+
 use crate::basic::{
     motion::{ChargeDisable, ChargeReceiver, MaxVelocity, PhysicsMotion},
     render::Sprite,
@@ -6,40 +8,80 @@ use crate::basic::{
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
+/// Marker of projectile entities.
 #[derive(Clone, Copy, Debug)]
 pub struct Projectile;
 
+/// Defines the type of projectile to spawn.
 #[derive(Clone, Debug)]
 pub enum ProjectileType {
-    Small { charge: i8 },
-    Medium { charge: i8 },
+    Small { 
+        /// Sets the polarity of the projectile.
+        /// x > 0 => positively charged
+        /// x = 0 => neutral
+        /// x < 0 => negatively charged
+        charge: i8 
+    },
+    Medium { 
+        /// Sets the polarity of the projectile.
+        /// x > 0 => positively charged
+        /// x = 0 => neutral
+        /// x < 0 => negatively charged
+        charge: i8 
+    },
 }
 
+/// Texture ID of positively charged small projectile.
 pub const PROJ_SMALL_TEX_POS: &str = "proj_small_plus";
+/// Texture ID of negatively charged small projectile.
 pub const PROJ_SMALL_TEX_NEG: &str = "proj_small_minus";
 
+/// Small projectiles's mass.
 const PROJ_SMALL_MASS: f32 = 1.0;
+/// Small projectiles's size.
+/// Also influences Hurt/HitBox's size.
 const PROJ_SMALL_SIZE: f32 = 2.0;
+/// Small projectiles's charge force.
 const PROJ_SMALL_CHARGE: f32 = 20.0;
+/// Small projectiles's influence by charge multiplier.
 const PROJ_SMALL_CHARGE_MULT: f32 = 0.4;
+/// Small projectiles's charge full force radius.
 const PROJ_SMALL_F_RADIUS: f32 = 100.0;
+/// Small projectiles's charge zero force radius.
 const PROJ_SMALL_RADIUS: f32 = 200.0;
 
+/// Texture ID of positively charged medium projectile.
 pub const PROJ_MED_TEX_POS: &str = "proj_medium_plus";
+/// Texture ID of negatively charged medium projectile.
 pub const PROJ_MED_TEX_NEG: &str = "proj_medium_minus";
+/// Texture ID of non-charged medium projectile.
 pub const PROJ_MED_TEX_NEUTRAL: &str = "proj_medium_neutral";
 
+/// Medium projectiles's mass.
 const PROJ_MED_MASS: f32 = 1.0;
+/// Medium projectiles's size.
+/// Also influences Hurt/HitBox's size.
 const PROJ_MED_SIZE: f32 = 8.0;
+/// Medium projectiles's charge force.
 const PROJ_MED_CHARGE: f32 = 40.0;
+/// Medium projectiles's influence by charge multiplier.
 const PROJ_MED_CHARGE_MULT: f32 = 0.7;
+/// Medium projectiles's charge full force radius.
 const PROJ_MED_F_RADIUS: f32 = 120.0;
+/// Medium projectiles's charge zero force radius.
 const PROJ_MED_RADIUS: f32 = 250.0;
 
 //-----------------------------------------------------------------------------
 //CONSTRUCT ENTITY
 //-----------------------------------------------------------------------------
 
+/// Creates fully featured projetile.
+/// ## Parameters 
+/// - `pos` - position of the projectile
+/// - `vel` - velocity of the projectile
+/// - `dmg` - damage the projectile deals
+/// - `team` - team the projectile belongs to
+/// - `proj_type` - type of the projectile to spawn
 pub fn create_projectile(
     pos: Vec2,
     vel: Vec2,
@@ -101,6 +143,7 @@ pub fn create_projectile(
         ),
     };
 
+    // return the entire projectile entity
     (
         Projectile,
         Position { x: pos.x, y: pos.y },
@@ -136,6 +179,7 @@ pub fn create_projectile(
 //-----------------------------------------------------------------------------
 //SYSTEM PART
 //-----------------------------------------------------------------------------
+// Handles deletion of projectiles on collision with something they can hurt.
 pub fn on_hurt(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     for (proj_id, _) in world.query_mut::<&Projectile>() {
         for (_, event) in events.query_mut::<&HitEvent>() {
