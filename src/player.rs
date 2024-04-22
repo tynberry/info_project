@@ -55,7 +55,7 @@ pub struct Player {
     fire_timer: f32,
     /// Time before another hit can be taken.
     invul_timer: f32,
-    /// Charge of the player. 
+    /// Charge of the player.
     /// 1 => positive
     /// -1 => negative
     polarity: i8,

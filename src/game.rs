@@ -53,7 +53,7 @@ struct EnemySpawns {
     /// Cost of spawning this enemy.
     /// It must be payed when spawned.
     cost: f32,
-    /// Amount of credits the Enemy Spawner gets 
+    /// Amount of credits the Enemy Spawner gets
     /// after it paid this wave.
     gain: f32,
     /// Weight of this spawn.
@@ -127,7 +127,7 @@ pub struct EnemySpawner {
     pub before_break: u32,
     /// How many credits the spawner has.
     pub credits: f32,
-    /// How long it waits before it either spawns another enemy or 
+    /// How long it waits before it either spawns another enemy or
     /// starts another wave.
     pub cooldown: f32,
 }

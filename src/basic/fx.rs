@@ -47,7 +47,7 @@ impl FxManager {
     /// Adds a particle to the manager.
     /// Removes the oldest particle if space is not available.
     /// # Arguments
-    /// * `particle` - particle to add 
+    /// * `particle` - particle to add
     pub fn add_particle(&mut self, particle: Particle) {
         //make space if not enough space
         if self.particles.len() == self.max_particles {
@@ -59,9 +59,9 @@ impl FxManager {
 
     /// Spawns many particles with different velocities.
     /// Removes old particles if space is not enough.
-    /// # Arguments 
-    /// * `base` - base particle to add 
-    /// * `vel_deviation` - random change in the base velocitie's length 
+    /// # Arguments
+    /// * `base` - base particle to add
+    /// * `vel_deviation` - random change in the base velocitie's length
     /// * `angle_deviation` - random change in the base velocitie's direction, in radians
     /// * `count` - how many particles should it spawn
     pub fn burst_particles(

@@ -1,6 +1,5 @@
 //! Contains components required to render UI.
 
-
 use hecs::World;
 use macroquad::prelude::*;
 
@@ -24,7 +23,7 @@ pub struct Title {
     pub color: Color,
 }
 
-/// Detects mouse interactions (hovering and activation) and changes color 
+/// Detects mouse interactions (hovering and activation) and changes color
 /// of Titles depending on its state.
 #[derive(Clone, Copy, Debug)]
 pub struct Button {

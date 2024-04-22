@@ -1,8 +1,7 @@
-//! This module initialises the game, all of its assets and 
+//! This module initialises the game, all of its assets and
 //! required systems to function.
 //! It also handles the main loop, update and render of Gamestates.
-//! 
-
+//!
 
 pub mod basic;
 pub mod enemy;
