@@ -1,4 +1,4 @@
-//! General enemy components
+//! Enemy components and AI
 
 pub mod asteroid;
 pub mod charged;
