@@ -1,3 +1,4 @@
+//! Supercharged (glowing) asteroid logic.
 use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, Entity, EntityBuilder, World};
@@ -20,19 +21,31 @@ use crate::{
 use super::asteroid::*;
 use super::{Enemy, ASTEROID_TEX_NEGATIVE, ASTEROID_TEX_POSITIVE};
 
+/// Texture ID of a supercharged asteroid.
 pub const ASTEROID_OUTLINE_TEX: &str = "asteroid_outline";
+/// Scale of the texture of an outline of a supercharged asteroid.
 const ASTEROID_OUTLINE_SCALE: f32 = ASTEROID_SIZE / 544.0;
 
+/// Time between subsequent shots of a supercharged asteroid.
 const ASTEROID_CHARGED_FIRE_COOLDOWN: f32 = 4.0;
+/// Damage of projectiles from a supercharged asteroid.
 const ASTEROID_CHARGED_PROJ_DMG: f32 = 2.0;
+/// Speed of projectiles from a supercharged asteroid.
 const ASTEROID_CHARGED_PROJ_SPEED: f32 = 180.0;
 
+/// Xp dropped by a supercharged asteroid on death.
 const ASTEROID_CHARGED_XP: u32 = 15;
 
+/// Handles all of the supercharged asteroid's logic.
 #[derive(Clone, Copy, Debug)]
 pub struct ChargedAsteroid {
+    /// Time before the next shot.
     pub cooldown: f32,
+    /// Reference to the entity making the outline.
     pub outline: Entity,
+    /// Charge of the supercharged asteroid.
+    /// 1 => positive
+    /// -1 => negative
     pub charge: i8,
 }
 
@@ -40,7 +53,11 @@ pub struct ChargedAsteroid {
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
-#[allow(clippy::type_complexity)]
+/// Returns a function that can be used to spawn a supercharged asteroid.
+/// # Arguments
+/// * `pos` - position of the supercharged asteroid
+/// * `dir` - direction it is heading
+/// * `charge` - its charge, same as regular asteroid
 pub fn create_supercharged_asteroid(
     pos: Vec2,
     dir: Vec2,
@@ -139,6 +156,9 @@ pub fn create_supercharged_asteroid(
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// AI of supercharged asteroids.
+///
+/// Makes them shoot projectiles periodically.
 pub fn supercharged_asteroid_ai(world: &mut World, cmd: &mut CommandBuffer, dt: f32) {
     //get player pos
     let (_, &player_pos) = world
@@ -171,6 +191,7 @@ pub fn supercharged_asteroid_ai(world: &mut World, cmd: &mut CommandBuffer, dt: 
     }
 }
 
+/// Makes sure to despawn any outlines of dead supercharged asteroids.
 pub fn supercharged_asteroid_death(world: &mut World, cmd: &mut CommandBuffer) {
     for (_, (charged, health)) in world.query_mut::<(&ChargedAsteroid, &Health)>() {
         if health.hp <= 0.0 {
@@ -179,6 +200,8 @@ pub fn supercharged_asteroid_death(world: &mut World, cmd: &mut CommandBuffer) {
     }
 }
 
+/// Synchronizes outline with the supercharged asteroid and spawns particles
+/// on its death.
 pub fn supercharged_asteroid_visual(world: &mut World, fx: &mut FxManager) {
     //CHARGING OUTLINE
     for (_, (charged, pos, angle)) in world

@@ -1,3 +1,5 @@
+//! Mine logic
+
 use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, EntityBuilder, World};
@@ -18,32 +20,51 @@ use crate::{
 
 use super::Enemy;
 
+/// Health of a mine.
 const MINE_HEALTH: f32 = 0.5;
+/// Speed of a mine.
 const MINE_SPEED: f32 = 60.0;
+/// Mass of a mine.
 const MINE_MASS: f32 = 4.0;
 
+/// Size of a mine.
+/// Affects Hurt/HitBox size.
 const MINE_SIZE: f32 = 60.0;
 
+/// Damage the mine deals on collision.
 const MINE_DMG: f32 = 1.5;
 
+/// Texture ID of neutral mine.
 pub const MINE_TEX_NEUTRAL: &str = "mine";
+/// Texture ID of positively charged mine.
 pub const MINE_TEX_POSITIVE: &str = "mine_plus";
+/// Texture ID of negatively charged mine.
 pub const MINE_TEX_NEGATIVE: &str = "mine_negative";
 
+/// Charge force of a mine.
 const MINE_FORCE: f32 = 200.0;
+/// Full radius of charge field of a mine.
 const MINE_FORCE_F_RADIUS: f32 = 100.0;
+/// Zero radius of charge field of a mine.
 const MINE_FORCE_RADIUS: f32 = 200.0;
 
+/// Knockback force dealt by mine on collision.
 const MINE_KNOCKBACK: f32 = 250.0;
 
+/// Time before the mine detonates by itself.
 const MINE_DETONATION_TIMER: f32 = 4.0;
+/// Time before detonation after which the mine starts to grow in size.
 const MINE_DETONATION_GROWING_TIMER: f32 = 1.0;
 
+/// Speed of the projectiles created by the mine.
 const MINE_PROJ_SPEED: f32 = 200.0;
+/// Damage of the projectiles created by the mine.
 const MINE_PROJ_DMG: f32 = 2.0;
 
+/// Xp dropped by the mine on death.
 const MINE_XP: u32 = 20;
 
+/// Handles all of Mine AI.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Mine {
     pub timer: f32,
@@ -54,6 +75,11 @@ pub struct Mine {
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
+/// Creates a mine.
+/// # Arguments
+/// * `pos` - position of the mine
+/// * `dir` - direction of the mine
+/// * `charge` - charge of the mine, same as asteroids
 pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let texture = match charge {
         1 => MINE_TEX_POSITIVE,
@@ -125,6 +151,7 @@ pub fn create_mine(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// Handles mines' detonations and makes them dead when timer ran out.
 pub fn mine_ai(world: &mut World, dt: f32) {
     for (_, (health, mine)) in world.query_mut::<(&mut Health, &mut Mine)>() {
         //bring detonation timer closer to death
@@ -136,6 +163,7 @@ pub fn mine_ai(world: &mut World, dt: f32) {
     }
 }
 
+/// Grows mines when the timer is close to detonation.
 pub fn mine_fx(world: &mut World) {
     for (_, (mine, sprite)) in world.query_mut::<(&Mine, &mut Sprite)>() {
         if mine.timer <= MINE_DETONATION_GROWING_TIMER {
@@ -146,11 +174,13 @@ pub fn mine_fx(world: &mut World) {
     }
 }
 
+/// Spawns projectiles when the mine is dead.
+/// Also handles particles spawned on death.
 pub fn mine_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
     for (_, (health, pos, mine)) in world.query::<(&Health, &Position, &Mine)>().into_iter() {
         //check if it is dead
         if health.hp <= 0.0 {
-            //spawn many smaller asteroids of the same charge
+            //spawn many smaller projectiles of the same charge
             for i in 0..16 {
                 let dir =
                     Vec2::from_angle(PI / 4.0 * (i as f32) + if i >= 8 { PI / 8.0 } else { 0.0 })

@@ -1,3 +1,4 @@
+//! Asteroid, charged and big astroid logic.
 use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, EntityBuilder, World};
@@ -21,54 +22,86 @@ use super::{charged::create_supercharged_asteroid, Enemy};
 
 //ASTEROID STATS
 
+/// Health of an asteroid.
 pub(super) const ASTEROID_HEALTH: f32 = 1.0;
+/// Speed of an asteroid.
 pub(super) const ASTEROID_SPEED: f32 = 50.0;
+/// Mass of an asteroid.
 pub(super) const ASTEROID_MASS: f32 = 18.0;
 
+/// Size of an asteroid.
+/// Also affects Hit/HurtBox sizes.
 pub(super) const ASTEROID_SIZE: f32 = 50.0;
+/// Scale of the texture of an asteroid.
 pub(super) const ASTEROID_SCALE: f32 = ASTEROID_SIZE / 512.0;
 
+/// Dmg an asteroid does while hitting something.
 pub(super) const ASTEROID_DMG: f32 = 2.0;
 
+/// Texture ID of neutral asteroid.
 pub const ASTEROID_TEX_NEUTRAL: &str = "asteroid";
+/// Texture ID of positively charged asteroid.
 pub const ASTEROID_TEX_POSITIVE: &str = "asteroid_plus";
+/// Texture ID of negatively charged asteroid.
 pub const ASTEROID_TEX_NEGATIVE: &str = "asteroid_negative";
 
+/// Charge force of a charged asteroid.
 pub(super) const ASTEROID_FORCE: f32 = 750.0;
+/// Full radius of charge field of a charged asteroid.
 pub(super) const ASTEROID_FORCE_F_RADIUS: f32 = 200.0;
+/// Zero radius of charge field of a charged asteroid.
 pub(super) const ASTEROID_FORCE_RADIUS: f32 = 350.0;
 
+/// Knockback dealt by the asteroid collision.
 pub(super) const ASTEROID_KNOCKBACK: f32 = 500.0;
 
+/// Xp dropped by an asteroid on death.
 const ASTEROID_XP: u32 = 10;
 
 //BIG ASTEROID STATS
 
+/// Health of a big asteroid.
 const BIG_ASTEROID_HEALTH: f32 = 2.0;
+/// Speed of a big asteroid.
 const BIG_ASTEROID_SPEED: f32 = 45.0;
+/// Mass of a big asteroid.
 const BIG_ASTEROID_MASS: f32 = 30.0;
 
+/// Size of a big asteroid.
+/// Also affects Hit/HurtBox sizes.
 const BIG_ASTEROID_SIZE: f32 = 200.0;
+/// Scale of the texture of a big asteroid.
 const BIG_ASTEROID_SCALE: f32 = BIG_ASTEROID_SIZE / 512.0;
 
+/// Dmg a big asteroid does while hitting something.
 const BIG_ASTEROID_DMG: f32 = 3.0;
 
+/// Texture ID of positively charged asteroid.
 pub const BIG_ASTEROID_TEX_POSITIVE: &str = "asteroid_big_plus";
+/// Texture ID of negatively charged asteroid.
 pub const BIG_ASTEROID_TEX_NEGATIVE: &str = "asteroid__big_minus";
 
+/// Charge force of a big asteroid.
 const BIG_ASTEROID_FORCE: f32 = 950.0;
+/// Full radius of charge field of a big asteroid.
 const BIG_ASTEROID_FORCE_F_RADIUS: f32 = 250.0;
+/// Zero radius of charge field of a big asteroid.
 const BIG_ASTEROID_FORCE_RADIUS: f32 = 400.0;
 
+/// Knockback dealt by a big asteroid collision.
 const BIG_ASTEROID_KNOCKBACK: f32 = 700.0;
 
+/// Xp dropped by a big asteroid on death.
 const BIG_ASTEROID_XP: u32 = 20;
 
+/// Acceleration towards player applied to big asteroids.
 const BIG_ASTEROID_FOLLOW: f32 = 20.0;
 
+/// Marker of an asteroid.
 #[derive(Clone, Copy, Debug)]
 pub struct Asteroid;
 
+/// Marker of a big asteroid.
 #[derive(Clone, Copy, Debug)]
 pub struct BigAsteroid;
 
@@ -76,6 +109,10 @@ pub struct BigAsteroid;
 //ENTITY CREATION
 //------------------------------------------------------------------------------
 
+/// Creates an asteroid.
+/// # Arguments
+/// * `pos` - position of the asteroid
+/// * `dir` - direction the asteroid is heading
 pub fn create_asteroid(pos: Vec2, dir: Vec2) -> EntityBuilder {
     let mut builder = EntityBuilder::new();
     builder.add_bundle((
@@ -114,7 +151,14 @@ pub fn create_asteroid(pos: Vec2, dir: Vec2) -> EntityBuilder {
     builder
 }
 
-#[allow(clippy::type_complexity)]
+/// Creates a charged asteroid.
+/// # Arguments
+/// * `pos` - position of the asteroid
+/// * `dir` - direction the asteroid is heading
+/// * `charge` - charge of the asteroid
+///     - x > 0 -> positively charged asteroid
+///     - x < 0 -> negatively charged asteroid
+///     - x = 0 -> undefined behaviour
 pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let texture = if charge > 0 {
         ASTEROID_TEX_POSITIVE
@@ -180,7 +224,14 @@ pub fn create_charged_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilde
     builder
 }
 
-#[allow(clippy::type_complexity)]
+/// Creates a charged asteroid.
+/// # Arguments
+/// * `pos` - position of the asteroid
+/// * `dir` - direction the asteroid is heading
+/// * `charge` - charge of the asteroid
+///     - x > 0 -> positively charged asteroid
+///     - x < 0 -> negatively charged asteroid
+///     - x = 0 -> undefined behaviour
 pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let texture = if charge > 0 {
         BIG_ASTEROID_TEX_POSITIVE
@@ -251,6 +302,8 @@ pub fn create_big_asteroid(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //SYSTEM PART
 //------------------------------------------------------------------------------
 
+/// AI of big asteroids.
+/// Currently only makes the asteroid attracted to player.
 pub fn big_asteroid_ai(world: &mut World, dt: f32) {
     //get player's position
     let (_, &player_pos) = world
@@ -272,6 +325,7 @@ pub fn big_asteroid_ai(world: &mut World, dt: f32) {
     }
 }
 
+/// Spawns particles on asteroid's destruction.
 pub fn asteroid_death(world: &mut World, fx: &mut FxManager) {
     for (_, (health, pos)) in world
         .query_mut::<(&Health, &Position)>()
@@ -300,6 +354,7 @@ pub fn asteroid_death(world: &mut World, fx: &mut FxManager) {
     }
 }
 
+/// Spawns asteroids and particles on big asteroid's death.
 pub fn big_asteroid_death(world: &mut World, cmd: &mut CommandBuffer, fx: &mut FxManager) {
     for (_, (health, pos, phys, charge)) in world
         .query::<(&Health, &Position, &PhysicsMotion, &ChargeSender)>()

@@ -1,3 +1,4 @@
+//! Sawblade logic.
 use std::f32::consts::PI;
 
 use hecs::{EntityBuilder, World};
@@ -16,25 +17,42 @@ use crate::{
 
 use super::Enemy;
 
+/// Health of a sawblade.
 const FOLLOWER_HEALTH: f32 = 0.8;
+/// Speed of a sawblade.
 const FOLLOWER_SPEED: f32 = 240.0;
+/// Acceleration towards player of a sawblade.
 const FOLLOWER_SPEED_CHANGE: f32 = 400.0;
+/// Mass of a sawblade.
 const FOLLOWER_MASS: f32 = 4.0;
 
+/// Size of a sawblade.
+/// Affects Hurt/HitBox size.
 const FOLLOWER_SIZE: f32 = 40.0;
 
+/// Damage sawblade does on hit.
 const FOLLOWER_DMG: f32 = 2.0;
 
+/// Texture ID of neutral sawblade.
 pub const FOLLOWER_TEX_NEUTRAL: &str = "follower";
+/// Texture ID of positively charged sawblade.
 pub const FOLLOWER_TEX_POSITIVE: &str = "follower_plus";
+/// Texture ID of negatively charged sawblade.
 pub const FOLLOWER_TEX_NEGATIVE: &str = "follower_negative";
 
+/// Knockback force dealt on hit by a sawblade.
 const FOLLOWER_KNOCKBACK: f32 = 150.0;
 
+/// Xp dropped on sawblade's death.
 const FOLLOWER_XP: u32 = 30;
 
+/// Handles sawblade's logic.
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Follower {
+    /// Charge of the sawblade.
+    /// 1 => positive
+    /// 0 => neutral
+    /// -1 => negative
     pub charge: i8,
 }
 
@@ -42,6 +60,11 @@ pub struct Follower {
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
+/// Creates a sawblade
+/// # Arguments
+/// * `pos` - position of the sawblade
+/// * `dir` - direction the sawblade is initially heading
+/// * `charge` - charge of the sawblade, same as asteroids
 pub fn create_follower(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
     let mut builder = EntityBuilder::default();
     builder.add_bundle((
@@ -105,6 +128,9 @@ pub fn create_follower(pos: Vec2, dir: Vec2, charge: i8) -> EntityBuilder {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
+/// AI of the sawblade.
+///
+/// Makes the sawblade attracted to the player.
 pub fn follower_ai(world: &mut World, dt: f32) {
     //get player's position
     let (_, &player_pos) = world
@@ -130,6 +156,7 @@ pub fn follower_ai(world: &mut World, dt: f32) {
     }
 }
 
+/// Spawns sawblade's trail.
 pub fn follower_fx(world: &mut World, fx: &mut FxManager) {
     for (_, (follower, pos)) in world.query_mut::<(&Follower, &Position)>() {
         fx.burst_particles(
@@ -156,6 +183,7 @@ pub fn follower_fx(world: &mut World, fx: &mut FxManager) {
     }
 }
 
+/// Spawns particles on sawblade's death.
 pub fn follower_death(world: &mut World, fx: &mut FxManager) {
     for (_, (follower, hp, pos)) in world.query_mut::<(&Follower, &Health, &Position)>() {
         if hp.hp <= 0.0 {
