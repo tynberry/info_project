@@ -50,6 +50,10 @@ pub struct XpOrb {
 //-----------------------------------------------------------------------------
 
 /// Create a xp orb entity.
+/// # Arguments
+/// * `pos` - position of the orb
+/// * `vel` - velocity of the orb
+/// * `amount` - how much xp is in the orb
 pub fn create_orb(pos: Vec2, vel: Vec2, amount: u32) -> EntityBuilder {
     let mut builder = EntityBuilder::new();
 

@@ -15,19 +15,19 @@ pub struct Projectile;
 /// Defines the type of projectile to spawn.
 #[derive(Clone, Debug)]
 pub enum ProjectileType {
-    Small { 
+    Small {
         /// Sets the polarity of the projectile.
         /// x > 0 => positively charged
         /// x = 0 => neutral
         /// x < 0 => negatively charged
-        charge: i8 
+        charge: i8,
     },
-    Medium { 
+    Medium {
         /// Sets the polarity of the projectile.
         /// x > 0 => positively charged
         /// x = 0 => neutral
         /// x < 0 => negatively charged
-        charge: i8 
+        charge: i8,
     },
 }
 
@@ -76,7 +76,7 @@ const PROJ_MED_RADIUS: f32 = 250.0;
 //-----------------------------------------------------------------------------
 
 /// Creates fully featured projetile.
-/// ## Parameters 
+/// # Arguments
 /// - `pos` - position of the projectile
 /// - `vel` - velocity of the projectile
 /// - `dmg` - damage the projectile deals

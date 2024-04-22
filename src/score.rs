@@ -1,4 +1,4 @@
-//! Score displays 
+//! Score displays
 
 use hecs::{Entity, EntityBuilder, World};
 use macroquad::{color::WHITE, math::Vec2};
@@ -21,7 +21,7 @@ pub struct HighScoreDisplay;
 //-----------------------------------------------------------------------------
 
 /// Creates score display entity
-/// ## Params 
+/// # Arguments
 /// - `pos` - position of the score display
 /// - `player` - entity ID of the player
 pub fn create_score_display(pos: Vec2, player: Entity) -> EntityBuilder {
@@ -42,7 +42,7 @@ pub fn create_score_display(pos: Vec2, player: Entity) -> EntityBuilder {
 }
 
 /// Creates high score display entity
-/// ## Params 
+/// ## Params
 /// - `pos` - position of the score display
 pub fn create_highscore_display(pos: Vec2) -> EntityBuilder {
     let mut builder = EntityBuilder::new();
