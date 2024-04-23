@@ -1,3 +1,5 @@
+//! Game states
+
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
@@ -10,23 +12,32 @@ use crate::{
     projectile, score, xp,
 };
 
+/// Represents the current state the game is in.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GameState {
+    /// Main Menu, first state when the game starts.
     MainMenu,
+    /// When the game is playable and the player plays.
     Running,
+    /// When the game is paused.
     Paused,
+    /// After death of the player to show informations.
     GameOver,
 }
 
+/// Marker of entites created in the pause state.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Pause;
 
+/// Timer used by the gameover state.
+/// It is used to implement fading.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct GameOverTimer {
     pub(crate) time: f32,
 }
 
 impl GameState {
+    /// Updates the current game state
     pub fn update(
         &mut self,
         world: &mut World,
@@ -47,6 +58,7 @@ impl GameState {
         }
     }
 
+    /// Renders the current game state
     pub fn render(
         &self,
         world: &mut World,
@@ -69,6 +81,7 @@ impl GameState {
 //MAIN MENU
 //-----------------------------------------------------------------------------
 
+/// Updates Main Menu state
 fn main_menu_update(world: &mut World) -> Option<GameState> {
     let new_state = menu::handle_buttons(world);
 
@@ -79,6 +92,7 @@ fn main_menu_update(world: &mut World) -> Option<GameState> {
     new_state
 }
 
+/// Renders Main Menu state
 fn main_menu_render(world: &mut World, assets: &AssetManager) {
     menu::button_colors(world);
     menu::render_title(world, assets);
@@ -88,6 +102,7 @@ fn main_menu_render(world: &mut World, assets: &AssetManager) {
 //GAME
 //-----------------------------------------------------------------------------
 
+/// Updates game state
 fn game_update(
     world: &mut World,
     events: &mut World,
@@ -165,6 +180,7 @@ fn game_update(
     None
 }
 
+/// Renders game state
 fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager, persist: &Persistent) {
     player::audio_visuals(world, fx, assets);
     score::score_display(world, persist);
@@ -186,6 +202,7 @@ fn game_render(world: &mut World, fx: &mut FxManager, assets: &AssetManager, per
 //PAUSE
 //-----------------------------------------------------------------------------
 
+/// Updates when paused
 fn pause_update(world: &mut World) -> Option<GameState> {
     if is_key_pressed(KeyCode::Escape) {
         super::init::clear_pause(world);
@@ -195,6 +212,7 @@ fn pause_update(world: &mut World) -> Option<GameState> {
     }
 }
 
+/// Renders when paused
 fn pause_render(
     world: &mut World,
     fx: &mut FxManager,
@@ -224,8 +242,10 @@ fn pause_render(
 //GAME OVER
 //-----------------------------------------------------------------------------
 
+/// Time before the game over screen becomes fully visible.
 const FULL_FADE_TIME: f32 = 1.0;
 
+/// Updates game over state.
 fn game_over_update(world: &mut World, dt: f32) -> Option<GameState> {
     //move timer
     for (_, timer) in world.query_mut::<&mut GameOverTimer>() {
@@ -240,6 +260,7 @@ fn game_over_update(world: &mut World, dt: f32) -> Option<GameState> {
     }
 }
 
+/// Renders game over state.
 fn game_over_render(
     world: &mut World,
     fx: &mut FxManager,

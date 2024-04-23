@@ -1,3 +1,4 @@
+//! Game state initialising functions
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 
@@ -12,6 +13,8 @@ use super::{
     EnemySpawner,
 };
 
+/// Initialises the play state.
+/// After this function the world is ready to be played by the player.
 pub fn init_game(world: &mut World) {
     //clear remains of the previous state
     world.clear();
@@ -46,6 +49,7 @@ pub fn init_game(world: &mut World) {
     world.spawn((EnemySpawner::default(),));
 }
 
+/// Initialises the main menu of the game.
 pub fn init_main_menu(world: &mut World) {
     //clear remains of the previous state
     world.clear();
@@ -88,6 +92,7 @@ pub fn init_main_menu(world: &mut World) {
     ));
 }
 
+/// Initialises pause screen.
 pub fn init_pause(world: &mut World) {
     world.spawn((
         Position {
@@ -104,6 +109,7 @@ pub fn init_pause(world: &mut World) {
     ));
 }
 
+/// Clears the pause screen.
 pub fn clear_pause(world: &mut World) {
     let mut cmd = CommandBuffer::new();
     for (entity, _) in world.query_mut::<&Pause>() {
@@ -112,6 +118,7 @@ pub fn clear_pause(world: &mut World) {
     cmd.run_on(world);
 }
 
+/// Initialises game over screen.
 pub fn init_game_over(world: &mut World) {
     world.spawn((GameOverTimer { time: 0.0 },));
 

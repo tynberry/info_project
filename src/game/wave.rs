@@ -1,3 +1,4 @@
+//! Enemy spawns used to compose a wave.
 use hecs::CommandBuffer;
 
 use super::*;
@@ -16,6 +17,10 @@ pub struct WavePreamble<'a> {
 //WAVE PART
 //
 
+/// Spawns 8 charged asteroids, each heading into the center.
+///
+/// Charges of asteroids in corners are opposite than charges from the asteroids
+/// which come from the edges.
 #[allow(dead_code)]
 pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     //center crunch attack
@@ -88,12 +93,18 @@ pub(super) fn center_crunch(cmd: &mut CommandBuffer) {
     );
 }
 
+/// Initialised tripleshot timer.
+///
+/// Should be ran before `tripleshot`.
 #[inline]
 #[allow(dead_code)]
 pub(super) fn tripleshot_init(timer: &mut f32) {
     *timer = 2.0;
 }
 
+/// Shoots three sets of three charged asteroids.
+///
+/// The asteroids are slightly spread.
 #[allow(dead_code)]
 pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
     //get side
@@ -148,12 +159,14 @@ pub(super) fn tripleshot(cmd: &mut CommandBuffer, timer: &f32, data: &mut u8) {
     }
 }
 
+/// Initialised salvos.
 #[inline]
 #[allow(dead_code)]
 pub(super) fn salvo_init(timer: &mut f32, base_time: f32) {
     *timer = base_time;
 }
 
+/// Spawns an asteroid from a random edge.
 pub(super) fn asteroid(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
@@ -164,6 +177,7 @@ pub(super) fn asteroid(preamble: &mut WavePreamble) {
         .spawn(enemy::create_charged_asteroid(pos, dir, charge).build());
 }
 
+/// Spawns a big asteroid from a random edge.
 pub(super) fn big_asteroid(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
@@ -174,6 +188,7 @@ pub(super) fn big_asteroid(preamble: &mut WavePreamble) {
         .spawn(enemy::create_big_asteroid(pos, dir, charge).build());
 }
 
+/// Spawns a charged asteroid from a random edge.
 pub(super) fn charged_asteroid(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
@@ -182,6 +197,7 @@ pub(super) fn charged_asteroid(preamble: &mut WavePreamble) {
     enemy::charged::create_supercharged_asteroid(pos, dir, charge)(preamble.world, preamble.cmd);
 }
 
+/// Spawns a sawblade from a random edge.
 pub(super) fn follower(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
@@ -192,6 +208,7 @@ pub(super) fn follower(preamble: &mut WavePreamble) {
         .spawn(enemy::follower::create_follower(pos, dir, charge).build())
 }
 
+/// Spawns a mine from a random edge.
 pub(super) fn mine(preamble: &mut WavePreamble) {
     let side = get_side();
     let dir = get_dir(side);
@@ -206,11 +223,18 @@ pub(super) fn mine(preamble: &mut WavePreamble) {
 //HELPER FUNCTIONS
 //------------------------------------------------------------------------------
 
+/// Returns a random side.
+///
+/// * 0 = TOP
+/// * 1 = BOTTOM
+/// * 2 = LEFT
+/// * 3 = RIGHT
 #[inline]
 fn get_side() -> u8 {
     fastrand::u8(0..4)
 }
 
+/// Returns a number representing the opposite side from `side`.
 #[inline]
 #[allow(dead_code)]
 fn get_opposite_side(side: u8) -> u8 {
@@ -223,6 +247,8 @@ fn get_opposite_side(side: u8) -> u8 {
     }
 }
 
+/// Returns a random valid position resprecting `SPAWN_MARGIN` and `SPAWN_PUSHBACK` so that
+/// the enemy is spawned on side `side`.
 #[inline]
 fn get_spawn_pos(side: u8) -> Vec2 {
     match side {
@@ -258,6 +284,7 @@ fn get_spawn_pos(side: u8) -> Vec2 {
     }
 }
 
+/// Returns the center of side `side`.
 #[inline]
 fn get_center_pos(side: u8) -> Vec2 {
     match side {
@@ -281,6 +308,8 @@ fn get_center_pos(side: u8) -> Vec2 {
     }
 }
 
+/// Returns a normal invard (towards center of the screen) unit vector of
+/// side `side`.
 #[inline]
 fn get_dir(side: u8) -> Vec2 {
     match side {
