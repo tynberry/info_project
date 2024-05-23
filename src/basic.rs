@@ -69,7 +69,7 @@ pub struct DeleteOnWarp;
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
-/// Handles the wrapping and deletion of entities marked by Wrapped or DeleteOnWarp.
+/// Handles the wrapping and deletion of entities marked by [Wrapped] or [DeleteOnWarp].
 pub fn ensure_wrapping(world: &mut World, cmd: &mut CommandBuffer, assets: &AssetManager) {
     //handle Wrapped wraping
     for (_, pos) in world.query_mut::<&mut Position>().with::<&Wrapped>() {

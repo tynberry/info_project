@@ -1,4 +1,4 @@
-//! Asteroid, charged and big astroid logic.
+//! Asteroid, charged and big asteroid logic.
 use std::f32::consts::PI;
 
 use hecs::{CommandBuffer, EntityBuilder, World};

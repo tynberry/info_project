@@ -1,4 +1,4 @@
-//! Persistent storage
+//! Persistent storage.
 
 use std::io::Write;
 

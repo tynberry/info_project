@@ -1,4 +1,4 @@
-//! Particle system logic
+//! Particle system logic.
 
 use std::collections::VecDeque;
 

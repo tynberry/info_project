@@ -1,4 +1,4 @@
-//! Game state initialising functions
+//! Game state initialising functions.
 use hecs::{CommandBuffer, World};
 use macroquad::prelude::*;
 

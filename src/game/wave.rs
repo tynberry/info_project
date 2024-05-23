@@ -7,9 +7,15 @@ use macroquad::prelude::*;
 
 use crate::{enemy, SPACE_HEIGHT, SPACE_WIDTH};
 
+/// Collection of useful structures that are commonly used to
+/// implement wave spawning.
 pub struct WavePreamble<'a> {
+    /// Current [World] of the game.
     pub world: &'a World,
+    /// [CommandBuffer] to dereffer enemy spawning.
     pub cmd: &'a mut CommandBuffer,
+    /// Current position of the [Player] so that some
+    /// enemies can target it.
     pub player_pos: &'a Position,
 }
 

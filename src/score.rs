@@ -1,4 +1,4 @@
-//! Score displays
+//! Score displays.
 
 use hecs::{Entity, EntityBuilder, World};
 use macroquad::{color::WHITE, math::Vec2};

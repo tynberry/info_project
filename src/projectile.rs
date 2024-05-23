@@ -1,4 +1,4 @@
-//! Projectiles logic and creation.
+//! Projectile logic and creation.
 
 use crate::basic::{
     motion::{ChargeDisable, ChargeReceiver, MaxVelocity, PhysicsMotion},

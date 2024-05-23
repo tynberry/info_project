@@ -1,4 +1,4 @@
-//! Xp orbs logic and creation
+//! Xp orbs logic and creation.
 
 use std::f32::consts::PI;
 

@@ -60,7 +60,7 @@ pub struct Follower {
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
-/// Creates a sawblade
+/// Creates a sawblade.
 /// # Arguments
 /// * `pos` - position of the sawblade
 /// * `dir` - direction the sawblade is initially heading
