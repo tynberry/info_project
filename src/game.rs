@@ -133,7 +133,7 @@ pub struct EnemySpawner {
 }
 
 impl EnemySpawner {
-    /// Create a default EnemySpawner
+    /// Create a default [EnemySpawner]
     pub fn new() -> Self {
         Self {
             before_break: MIN_SPAWNS_BEFORE_BREAK,
@@ -144,7 +144,7 @@ impl EnemySpawner {
 }
 
 impl Default for EnemySpawner {
-    /// Create a default EnemySpawner
+    /// Create a default [EnemySpawner]
     fn default() -> Self {
         Self::new()
     }

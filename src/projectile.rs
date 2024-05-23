@@ -179,7 +179,7 @@ pub fn create_projectile(
 //-----------------------------------------------------------------------------
 //SYSTEM PART
 //-----------------------------------------------------------------------------
-// Handles deletion of projectiles on collision with something they can hurt.
+/// Handles deletion of projectiles on collision with something they can hurt.
 pub fn on_hurt(world: &mut World, events: &mut World, cmd: &mut CommandBuffer) {
     for (proj_id, _) in world.query_mut::<&Projectile>() {
         for (_, event) in events.query_mut::<&HitEvent>() {

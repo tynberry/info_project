@@ -129,6 +129,7 @@ async fn main() {
         let dt = get_frame_time();
         //UPDATE WORLD
 
+        // update current game state
         state.update(&mut world, &mut events, &assets, dt, &mut fx, &mut persist);
 
         //CLEAR ALL EVENTS
@@ -138,6 +139,7 @@ async fn main() {
         clear_background(Color::new(0.0, 0.05, 0.1, 1.0));
 
         //UPDATE VISUALS
+        // set camera so that we have consistent space size
         set_camera(&Camera2D::from_display_rect(Rect {
             x: 0.0,
             y: SPACE_HEIGHT,
@@ -145,8 +147,10 @@ async fn main() {
             h: -SPACE_HEIGHT,
         }));
 
+        // step particle simulation
         fx.update_particles(dt);
 
+        // render current state
         state.render(&mut world, &mut events, &assets, dt, &mut fx, &persist);
 
         next_frame().await;

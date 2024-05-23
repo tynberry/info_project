@@ -20,7 +20,7 @@ pub struct HighScoreDisplay;
 //ENTITY CREATION
 //-----------------------------------------------------------------------------
 
-/// Creates score display entity
+/// Creates a score display entity.
 /// # Arguments
 /// - `pos` - position of the score display
 /// - `player` - entity ID of the player
@@ -41,7 +41,7 @@ pub fn create_score_display(pos: Vec2, player: Entity) -> EntityBuilder {
     builder
 }
 
-/// Creates high score display entity
+/// Creates a high score display entity.
 /// ## Params
 /// - `pos` - position of the score display
 pub fn create_highscore_display(pos: Vec2) -> EntityBuilder {

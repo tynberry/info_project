@@ -25,7 +25,7 @@ pub struct WavePreamble<'a> {
 
 /// Spawns 8 charged asteroids, each heading into the center.
 ///
-/// Charges of asteroids in corners are opposite than charges from the asteroids
+/// Charges of asteroids in corners are opposite from charges from the asteroids
 /// which come from the edges.
 #[allow(dead_code)]
 pub(super) fn center_crunch(cmd: &mut CommandBuffer) {

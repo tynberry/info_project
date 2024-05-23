@@ -15,7 +15,7 @@ pub struct Title {
     /// Text to render.
     pub text: String,
     /// Font to render the text with.
-    /// Represents asset location in AssetManager.
+    /// Represents asset location in [AssetManager].
     pub font: &'static str,
     /// Size of the text.
     pub size: f32,
@@ -24,7 +24,7 @@ pub struct Title {
 }
 
 /// Detects mouse interactions (hovering and activation) and changes color
-/// of Titles depending on its state.
+/// of [Title]s depending on its state.
 #[derive(Clone, Copy, Debug)]
 pub struct Button {
     /// Width of the interaction area.
@@ -48,7 +48,7 @@ pub struct StartButton;
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
-/// Handles rendering the texts of Titles.
+/// Handles rendering the texts of [Title]s.
 pub fn render_title(world: &mut World, assets: &AssetManager) {
     for (_, (title, position)) in world.query_mut::<(&Title, &Position)>() {
         //get font to render
@@ -70,8 +70,8 @@ pub fn render_title(world: &mut World, assets: &AssetManager) {
     }
 }
 
-/// Handles changing Title's color depending on the button's state.
-/// Also sets Button's 'clicked' variable according to its state.
+/// Handles changing [Title]'s color depending on the [Button]'s state.
+/// Also sets [Button]'s 'clicked' variable according to its state.
 pub fn button_colors(world: &mut World) {
     for (_, (position, button, title)) in world.query_mut::<(&Position, &mut Button, &mut Title)>()
     {
@@ -96,7 +96,7 @@ pub fn button_colors(world: &mut World) {
 }
 
 /// Handle special buttons.
-/// Currently handles StartButton changing game state to Running.
+/// Currently handles [StartButton] changing game state to [Running](GameState::Running).
 pub fn handle_buttons(world: &mut World) -> Option<GameState> {
     for (_, button) in world.query_mut::<&Button>().with::<&StartButton>() {
         if button.clicked {

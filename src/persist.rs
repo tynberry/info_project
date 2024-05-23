@@ -5,7 +5,7 @@ use std::io::Write;
 use macroquad::file::load_file;
 use nanoserde::{DeBin, SerBin};
 
-/// Persistent data that the application can save and load.
+/// Persistent data that the application can be saved and loaded.
 #[derive(Clone, Copy, Default, Debug, DeBin, SerBin)]
 pub struct Persistent {
     /// Highest reached score across all runs.
