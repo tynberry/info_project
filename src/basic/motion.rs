@@ -9,7 +9,7 @@ use super::{render::AssetManager, HitEvent, Position, Rotation};
 
 /// Moves an entity in a linear way.
 /// It does not accelerate, decelerate, change directions
-/// nor is affected by physics, knockback or charges.
+/// after being set nor is affected by physics, knockback or charges.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearMotion {
     /// Velocity of the entity.
@@ -17,7 +17,7 @@ pub struct LinearMotion {
 }
 
 /// Component that rotates an entity constantly.
-/// It does not change speed nor direction.
+/// It does not change speed nor direction after being set.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct LinearTorgue {
     /// Speed of rotation in radians per second.
@@ -31,7 +31,7 @@ pub struct PhysicsMotion {
     /// Velocity of the entity.
     pub vel: Vec2,
     /// Mass of the entity.
-    /// Affects the velocity change of a force.
+    /// Affects the velocity change by a force.
     pub mass: f32,
 }
 
@@ -39,14 +39,14 @@ impl PhysicsMotion {
     /// Applies a force on the entity.
     /// # Arguments
     /// * `force` - the force to apply
-    /// * `dt` - how long should the force be applied
+    /// * `dt` - how long was the force be applied
     pub fn apply_force(&mut self, force: Vec2, dt: f32) {
         self.vel += force * dt / self.mass;
     }
 }
 
 /// Makes an entity to slow down its motions on its own.
-/// It only dampens `PhysicsMotion`.
+/// It only dampens [PhysicsMotion].
 #[derive(Clone, Copy, Debug, Default)]
 pub struct PhysicsDamping {
     /// By this factor the entity's velocity is multiplied
@@ -62,7 +62,7 @@ pub struct PhysicsDamping {
 }
 
 /// Limits an entity's velocity to some amount.
-/// It only affects `PhysicsMotion`.
+/// It only affects [PhysicsMotion].
 #[derive(Clone, Copy, Debug, Default)]
 pub struct MaxVelocity {
     /// Max velocity the entity can achieve.
@@ -70,7 +70,7 @@ pub struct MaxVelocity {
 }
 
 /// Makes an entity produce electric field.
-/// This field affects all entities with `ĆhargeReceiver`.
+/// This field affects all entities with [ChargeReceiver].
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ChargeSender {
     /// Force that is applied on all affected entites.
@@ -110,7 +110,7 @@ pub struct KnockbackDealer {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
-/// Add `LinearMotion`, `LinearTorgue` and `PhysicsMotion`
+/// Add [LinearMotion], [LinearTorgue] and [PhysicsMotion]
 /// velocities to entities' positions and/or rotations.
 pub fn apply_motion(world: &mut World, dt: f32) {
     //apply linear motion
@@ -132,7 +132,7 @@ pub fn apply_motion(world: &mut World, dt: f32) {
 }
 
 /// Advance physics simulation.
-/// Handles the logic of `PhysicsDamping`, `MaxVelocity` and charges.
+/// Handles the logic of [PhysicsDamping], [MaxVelocity] and charges.
 pub fn apply_physics(world: &mut World, dt: f32) {
     //apply damping
     for (_, (physics, damping)) in world.query_mut::<(&mut PhysicsMotion, &PhysicsDamping)>() {
@@ -154,6 +154,7 @@ pub fn apply_physics(world: &mut World, dt: f32) {
     }
 
     //apply all charges O(n^2)
+    //iterate through all charge receivers
     for (a_ind, (a_charge, a_physics, a_pos, a_disable)) in world
         .query::<(
             &ChargeReceiver,
@@ -171,6 +172,7 @@ pub fn apply_physics(world: &mut World, dt: f32) {
             }
         }
 
+        //apply all charge sources
         for (b_ind, (b_charge, b_pos)) in world.query::<(&ChargeSender, &Position)>().into_iter() {
             //ignore same entities
             if a_ind == b_ind {
@@ -201,6 +203,9 @@ pub fn apply_physics(world: &mut World, dt: f32) {
     }
 }
 
+/// Applies knockback dealt by [KnockbackDealer].
+///
+/// Only affects entities with [PhysicsMotion].
 pub fn apply_knockback(world: &mut World, event: &mut World, assets: &AssetManager) {
     //for all events
     for (_, event) in event.query_mut::<&HitEvent>() {
@@ -213,6 +218,7 @@ pub fn apply_knockback(world: &mut World, event: &mut World, assets: &AssetManag
             continue;
         };
 
+        //get required components from the dealer
         let Some(deal) = deal_ent.get::<&KnockbackDealer>() else {
             continue;
         };
@@ -225,6 +231,7 @@ pub fn apply_knockback(world: &mut World, event: &mut World, assets: &AssetManag
             continue;
         };
 
+        //get required components from the victim
         let Some(mut victim_vel) = victim_ent.get::<&mut PhysicsMotion>() else {
             continue;
         };

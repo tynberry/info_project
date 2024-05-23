@@ -9,7 +9,7 @@ use macroquad::{
 
 use super::{Position, Rotation};
 
-/// Manager of all the assets used.
+/// Manager of all the used assets.
 /// Stores textures, fonts and sounds in one place so that they
 /// can be accessed with simple `str` lookup.
 #[derive(Debug, Default)]
@@ -23,7 +23,7 @@ pub struct AssetManager {
 }
 
 impl AssetManager {
-    /// Loads a texture from texture file (.png,...) into `AssetManager`.
+    /// Loads a texture from texture file (.png,...) into [AssetManager].
     ///
     /// Returns an error when something went bad during loading.
     /// # Arguments
@@ -43,14 +43,14 @@ impl AssetManager {
 
     /// Gets a texture from storage.
     ///
-    /// Returns `None` if the texture is not present.
+    /// Returns [None] if the texture is not present.
     /// # Arguments
     /// * `id` - id passed when loading the texture
     pub fn get_texture(&self, id: &'static str) -> Option<&Texture2D> {
         self.textures.get(id)
     }
 
-    /// Loads a font from font file (.ttf) into `AssetManager`.
+    /// Loads a font from font file (.ttf) into [AssetManager].
     ///
     /// Returns an error when something went bad during loading.
     /// # Arguments
@@ -70,14 +70,14 @@ impl AssetManager {
 
     /// Gets a font from storage.
     ///
-    /// Returns `None` if the font is not present.
+    /// Returns [None] if the font is not present.
     /// # Arguments
     /// * `id` - id passed when loading the font
     pub fn get_font(&self, id: &'static str) -> Option<&Font> {
         self.fonts.get(id)
     }
 
-    /// Loads a sound from sound file (.wav,...) into `AssetManager`.
+    /// Loads a sound from sound file (.wav,...) into [AssetManager].
     ///
     /// Returns an error when something went bad during loading.
     /// # Arguments
@@ -97,7 +97,7 @@ impl AssetManager {
 
     /// Gets a sound from storage.
     ///
-    /// Returns `None` if the sound is not present.
+    /// Returns [None] if the sound is not present.
     /// # Arguments
     /// * `id` - id passed when loading the sound
     pub fn get_sound(&self, id: &'static str) -> Option<&Sound> {
@@ -109,7 +109,7 @@ impl AssetManager {
 //COMPONENT PART
 //-----------------------------------------------------------------------------
 
-/// Renders a rectangle centered at entity's position. 
+/// Renders a rectangle centered at entity's position.
 #[derive(Clone, Copy, Debug)]
 pub struct Rectangle {
     /// Width of the rectangle.
@@ -158,7 +158,7 @@ impl Renderable for Rectangle {
 pub struct Circle {
     /// Radius of the circle.
     pub radius: f32,
-    /// Color of the circle. 
+    /// Color of the circle.
     pub color: Color,
     /// Z index the circle should be rendered at.
     pub z_index: i16,
@@ -177,12 +177,12 @@ impl Renderable for Circle {
 /// Renders a texture cented at entity's position.
 #[derive(Clone, Debug)]
 pub struct Sprite {
-    /// Texture ID of the texture to render. 
+    /// Texture ID of the texture to render.
     pub texture: &'static str,
-    /// Scale of the texture. 
+    /// Scale of the texture.
     pub scale: f32,
-    /// Tint of the texture. 
-    /// This color gets multiplied with texture's. 
+    /// Tint of the texture.
+    /// This color gets multiplied with texture's.
     pub color: Color,
     /// Z index the texture should be rendered at.
     pub z_index: i16,
@@ -223,11 +223,11 @@ impl Renderable for Sprite {
 /// Types that can rendered on the screen.
 #[enum_dispatch]
 trait Renderable {
-    /// Renders the type. 
-    /// # Arguments 
-    /// * `pos` - position of the center 
-    /// * `rotation` - rotation of the object 
-    /// * `assets` - `AssetManager` containg all the assets
+    /// Renders the type.
+    /// # Arguments
+    /// * `pos` - position of the center
+    /// * `rotation` - rotation of the object
+    /// * `assets` - [AssetManager] containing all the assets
     fn render(&self, pos: &Position, rotation: Option<&Rotation>, assets: &AssetManager);
     /// Returns an index of a z layer the type should be rendered at.
     /// Higher z index makes the type rendered over types with lower z index.
@@ -236,6 +236,8 @@ trait Renderable {
     }
 }
 
+/// Enumerator of all the possible Renderable objects this application wants
+/// to render.
 #[enum_dispatch(Renderable)]
 enum RenderJobs {
     Rectangle,
@@ -247,7 +249,7 @@ enum RenderJobs {
 //SYSTEM PART
 //-----------------------------------------------------------------------------
 
-/// Renders `Rectangle`s, `Circle`s and `Sprite`s on the screen.
+/// Renders [Rectangle]s, [Circle]s and [Sprite]s on the screen.
 pub fn render_all(world: &mut World, assets: &AssetManager) {
     //gather all render jobs
     //circles

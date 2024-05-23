@@ -10,7 +10,7 @@ use super::Team;
 //EVENT PART
 //-----------------------------------------------------------------------------
 
-/// Event representing collision between two entities.
+/// Event representing a collision between two entities.
 #[derive(Clone, Copy, Debug)]
 pub struct HitEvent {
     /// Entity id of the entity that was hit.
@@ -55,13 +55,13 @@ pub struct DamageDealer {
     pub dmg: f32,
 }
 
-/// Circle around which the entity can hit entites with `HitBox`.
+/// Circle around which the entity can hit entites with [HitBox].
 #[derive(Clone, Copy, Debug, Default)]
 pub struct HurtBox {
     pub radius: f32,
 }
 
-/// Circle around which the entity can get hit by entites with `HurtBox`.
+/// Circle around which the entity can get hit by entites with [HurtBox].
 #[derive(Clone, Copy, Debug, Default)]
 pub struct HitBox {
     pub radius: f32,
@@ -83,7 +83,7 @@ pub struct HealthDisplay {
     pub color: Color,
     /// Color of background of the bar.
     /// Background shows the max health the entity can have
-    /// (According to its `Health` component).
+    /// (According to its [Health] component).
     pub max_color: Color,
 }
 
@@ -95,13 +95,13 @@ pub struct HealthDisplay {
 pub fn render_displays(world: &mut World) {
     //iterate over all displays
     for (_, (display, pos)) in world.query::<(&HealthDisplay, &Position)>().into_iter() {
-        //get the entity in question
+        //get the entity of the health to display
         let mut target = world.query_one::<&Health>(display.target).unwrap();
         let target_hp = target.get().unwrap();
         //render a rect for their health
         let current_width = ((target_hp.hp / target_hp.max_hp) * display.max_width).max(0.0);
 
-        //draw background of max
+        //draw background of max health
         draw_rectangle(
             pos.x - display.max_width / 2.0,
             pos.y - display.height / 2.0,
@@ -120,13 +120,13 @@ pub fn render_displays(world: &mut World) {
     }
 }
 
-/// Handles collision detection between `HitBox`es and `HurtBox`es.
+/// Handles collision detection between [HitBox]es and [HurtBox]es.
 pub fn ensure_damage(world: &mut World, events: &mut World) {
-    //iterate through all hitable
+    //iterate through all hitable entities
     for (hit_id, (hit_pos, hit_box, hit_team)) in
         world.query::<(&Position, &HitBox, &Team)>().into_iter()
     {
-        //iterate through all hurtting
+        //iterate through all hurting entities
         for (hurt_id, (hurt_pos, hurt_box, hurt_team)) in
             world.query::<(&Position, &HurtBox, &Team)>().into_iter()
         {
